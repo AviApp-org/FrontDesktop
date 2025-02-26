@@ -1,0 +1,189 @@
+import React, { useState } from 'react';
+import { ChevronDown, Info } from 'lucide-react';
+
+interface CollectionEntry {
+  time: string;
+  collector: string;
+  status: string;
+  units?: number;
+  cages?: string;
+  notes?: string;
+}
+
+interface DeadBirds {
+  male: number;
+  female: number;
+}
+
+interface Category {
+  name: string;
+  total: number;
+  cages: string;
+  quantity: number;
+}
+
+function CollectionReview() {
+  const [collectionHistory] = useState<CollectionEntry[]>([
+    { time: '06:50', collector: 'Pedro Paulo', status: 'Incubáveis', units: 1153 },
+    { time: '06:30', collector: 'Pedro Paulo', status: 'Ovos incubáveis: 0' },
+    { time: '06:30', collector: 'Pedro Paulo', status: 'Ovos sujos: 0' },
+    { time: '06:30', collector: 'Pedro Paulo', status: 'Ovos deformados: 0' },
+    { time: '06:30', collector: 'Pedro Paulo', status: 'Ovos rejeitados: 0' },
+  ]);
+
+  const [deadBirds, setDeadBirds] = useState<DeadBirds>({
+    male: 16,
+    female: 53,
+  });
+
+  const [categories, setCategories] = useState<Category[]>([
+    { name: 'Incubáveis', total: 1153, cages: '', quantity: 0 },
+    { name: 'Deformados', total: 1153, cages: '', quantity: 0 },
+    { name: 'Eliminados', total: 1153, cages: '', quantity: 0 },
+    { name: 'Incubáveis', total: 1153, cages: '', quantity: 0 },
+  ]);
+
+  const currentDate = '12/08/2024';
+
+  const handleCategoryChange = (index: number, field: 'cages' | 'quantity', value: string | number) => {
+    const newCategories = [...categories];
+    newCategories[index] = {
+      ...newCategories[index],
+      [field]: value,
+    };
+    setCategories(newCategories);
+  };
+
+  const handleDeadBirdsChange = (type: 'male' | 'female', value: string) => {
+    const numValue = parseInt(value) || 0;
+    setDeadBirds(prev => ({
+      ...prev,
+      [type]: numValue,
+    }));
+  };
+
+  const handleSave = () => {
+    console.log('Saving categories:', categories);
+  };
+
+  const handleFinish = () => {
+    console.log('Finishing collection review:', { categories, deadBirds });
+  };
+
+  return (
+    <div className="p-6">
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">Revisão de coleta</h2>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Collection History */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Histórico de coleta</h3>
+            <button className="text-sm text-gray-500 hover:text-gray-700 flex items-center space-x-1">
+              <Info className="h-4 w-4" />
+              <span>Clique sobre uma coleta para obter mais informações</span>
+            </button>
+          </div>
+
+          <div className="space-y-3">
+            {collectionHistory.map((entry, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+              >
+                <div className="flex items-center space-x-4">
+                  <span className="text-gray-600">{currentDate}</span>
+                  <span className="text-gray-600">{entry.time}</span>
+                  <span className="font-medium">{entry.collector}</span>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <span>{entry.status}</span>
+                  {entry.units && (
+                    <span className="text-gray-600">Unidades: {entry.units}</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Categories and Dead Birds Count */}
+        <div className="space-y-6">
+          {/* Categories */}
+          <div className="bg-white rounded-lg shadow p-6">
+            {categories.map((category, index) => (
+              <div key={index} className="mb-4 last:mb-0">
+                <div className="flex items-center space-x-2 mb-2">
+                  <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                  <h4 className="font-medium">{category.name}</h4>
+                  <span className="text-gray-600">Total: {category.total}</span>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <input
+                    type="text"
+                    placeholder="Gaiolas"
+                    value={category.cages}
+                    onChange={(e) => handleCategoryChange(index, 'cages', e.target.value)}
+                    className="flex-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Quantidade"
+                    value={category.quantity}
+                    onChange={(e) => handleCategoryChange(index, 'quantity', parseInt(e.target.value) || 0)}
+                    className="w-32 px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+              </div>
+            ))}
+
+            <button 
+              onClick={handleSave}
+              className="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
+            >
+              Salvar
+            </button>
+          </div>
+
+          {/* Dead Birds Count */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-semibold mb-4">Contagem de aves mortas</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Aves Macho Mortas:
+                </label>
+                <input
+                  type="number"
+                  value={deadBirds.male}
+                  onChange={(e) => handleDeadBirdsChange('male', e.target.value)}
+                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Aves Fêmea Mortas:
+                </label>
+                <input
+                  type="number"
+                  value={deadBirds.female}
+                  onChange={(e) => handleDeadBirdsChange('female', e.target.value)}
+                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+            </div>
+
+            <button 
+              onClick={handleFinish}
+              className="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
+            >
+              Finalizar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default CollectionReview;
