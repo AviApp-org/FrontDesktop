@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Plus, ChevronDown } from 'lucide-react';
-
-interface Employee {
-  name: string;
-  document: string;
-  registration: string;
-}
+import { Employee } from '../types/interfaces/personnel';
 
 function Personnel() {
   const [searchTerm, setSearchTerm] = useState('');

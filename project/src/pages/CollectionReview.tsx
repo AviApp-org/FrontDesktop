@@ -1,26 +1,6 @@
 import React, { useState } from 'react';
-import { ChevronDown, Info } from 'lucide-react';
-
-interface CollectionEntry {
-  time: string;
-  collector: string;
-  status: string;
-  units?: number;
-  cages?: string;
-  notes?: string;
-}
-
-interface DeadBirds {
-  male: number;
-  female: number;
-}
-
-interface Category {
-  name: string;
-  total: number;
-  cages: string;
-  quantity: number;
-}
+import { CollectionEntry, DeadBirds, Category } from '../types/interfaces/collection';
+import { Info } from 'lucide-react';
 
 function CollectionReview() {
   const [collectionHistory] = useState<CollectionEntry[]>([

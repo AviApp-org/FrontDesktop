@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Reports from './pages/Reports';
 import Financial from './pages/Financial';
@@ -8,12 +7,12 @@ import CollectionReview from './pages/CollectionReview';
 import Personnel from './pages/Personnel';
 import DataEntry from './pages/DataEntry';
 import Layout from './components/Layout';
+import BatchManagement from './pages/BatchManagement';
 
-function App() {
+const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={
           <Layout>
             <Dashboard />
@@ -44,10 +43,15 @@ function App() {
             <DataEntry />
           </Layout>
         } />
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/batch-management" element={
+          <Layout>
+            <BatchManagement />
+          </Layout>
+        } />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Router>
   );
-}
+};
 
 export default App;

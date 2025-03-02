@@ -1,17 +1,37 @@
 import React, { useState } from 'react';
 import { Egg } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { authService } from '../services/authService';
+import api from '../services/api';
 
 function Login() {
-  const [username, setUsername] = useState('');
+  const [farmCode, setFarmCode] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement login logic with Java backend
-    console.log('Login attempt:', { username, password });
-    navigate('/dashboard');
+    
+    try {
+      setLoading(true);
+      
+      const response = await authService.loginFarm({ farmCode, password });
+      
+      // Salvar dados da granja e token
+      localStorage.setItem('@App:token', response.data.token);
+      localStorage.setItem('@App:farm', JSON.stringify(response.data.farm));
+      
+      // Configurar token no header das requisições
+      api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+      
+      // Redirecionar para o dashboard
+      navigate('/dashboard');
+    } catch (error) {
+      alert('Código da granja ou senha inválidos');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -31,20 +51,21 @@ function Login() {
               <Egg className="h-12 w-12 text-green-600" />
             </div>
             <h1 className="text-3xl font-bold text-gray-800">Bem vindo</h1>
-            <p className="text-gray-600 mt-2">Faça login para continuar</p>
+            <p className="text-gray-600 mt-2">Acesse sua granja</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                Usuário <span className="text-red-500">*</span>
+              <label htmlFor="farmCode" className="block text-sm font-medium text-gray-700">
+                Código da Granja <span className="text-red-500">*</span>
               </label>
               <input
-                id="username"
+                id="farmCode"
                 type="text"
                 required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={farmCode}
+                onChange={(e) => setFarmCode(e.target.value)}
+                placeholder="Digite o código da granja"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
               />
             </div>
@@ -59,6 +80,7 @@ function Login() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="Digite a senha"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
               />
             </div>
@@ -72,9 +94,10 @@ function Login() {
 
             <button
               type="submit"
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+              disabled={loading}
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors disabled:bg-green-400"
             >
-              Entrar
+              {loading ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
         </div>

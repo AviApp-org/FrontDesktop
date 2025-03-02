@@ -1,31 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Download, Plus, X } from 'lucide-react';
-
-interface Report {
-  id: string;
-  date: string;
-  statistics?: ReportStatistics;
-}
-
-interface ReportStatistics {
-  liveBirds: {
-    male: number;
-    female: number;
-    total: number;
-  };
-  eggs: {
-    total: number;
-    cracked: number;
-    dirtyNest: number;
-    small: number;
-    incubatable: number;
-    broken: number;
-    deformed: number;
-    thinShell: number;
-    eliminated: number;
-    market: number;
-  };
-}
+import { Report, ReportStatistics } from '../types/interfaces/report';
 
 function Reports() {
   const [searchTerm, setSearchTerm] = useState('');

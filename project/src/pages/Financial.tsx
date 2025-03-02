@@ -1,17 +1,6 @@
 import React, { useState } from 'react';
 import { Download, ChevronDown } from 'lucide-react';
-
-interface PriceHistory {
-  date: string;
-  price: number;
-  change: number;
-}
-
-interface EggData {
-  type: string;
-  quantity: number;
-  value: number;
-}
+import { PriceHistory, EggData, MonthlyData } from '../types/interfaces/financial';
 
 function Financial() {
   const [unitPrice, setUnitPrice] = useState(0.07);
@@ -29,7 +18,7 @@ function Financial() {
     { type: 'Ovo para mercado', quantity: 13688, value: 1688.00 },
   ]);
 
-  const [monthlyData] = useState({
+  const [monthlyData] = useState<MonthlyData>({
     totalEggs: 89922,
     incubatedEggs: 8556,
     marketEggs: 4666,

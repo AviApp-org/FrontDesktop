@@ -1,40 +1,9 @@
 import React, { useState } from 'react';
-import { Save, Plus, Trash2 } from 'lucide-react';
+import { Save } from 'lucide-react';
+import { AviaryData, AvailableAviary } from '../types/interfaces/aviary';
+import { DataSubmission } from '../types/interfaces/submission';
 
-interface AviaryData {
-  id: string;
-  waterQuantity: number;
-  liveBirds: {
-    male: number;
-    female: number;
-  };
-  eggs: {
-    total: number;
-    cracked: number;
-    dirtyNest: number;
-    small: number;
-    incubatable: number;
-    broken: number;
-    deformed: number;
-    thinShell: number;
-    eliminated: number;
-    market: number;
-  };
-}
-
-interface AvailableAviary {
-  id: string;
-  name: string;
-}
-
-interface DataSubmission {
-  id: string;
-  timestamp: string;
-  aviaryId: string;
-  aviaryName: string;
-  data: AviaryData;
-}
-
+// Valores padrão
 const defaultEggData = {
   total: 0,
   cracked: 0,
@@ -48,7 +17,7 @@ const defaultEggData = {
   market: 0,
 };
 
-const defaultAviaryData = {
+const defaultAviaryData: AviaryData = {
   id: '',
   waterQuantity: 0,
   liveBirds: {
@@ -58,50 +27,42 @@ const defaultAviaryData = {
   eggs: { ...defaultEggData },
 };
 
-// Generate a unique ID using timestamp and random number
+// Função auxiliar
 const generateUniqueId = () => {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 };
 
 function DataEntry() {
+  // Estados
   const [aviaryData, setAviaryData] = useState<AviaryData>({ 
     ...defaultAviaryData, 
     id: generateUniqueId() 
   });
 
-  // Lista de aviários disponíveis
   const [availableAviaries] = useState<AvailableAviary[]>([
     { id: '1', name: 'Aviário A' },
     { id: '2', name: 'Aviário B' },
     { id: '3', name: 'Aviário C' },
   ]);
 
-  // Estado para histórico de envios
   const [submissions, setSubmissions] = useState<DataSubmission[]>([]);
-  
-  // Estado para aviário selecionado
   const [selectedAviary, setSelectedAviary] = useState<string>('');
 
-  const handleAddAviary = () => {
-    setAviaryData({ ...defaultAviaryData, id: generateUniqueId() });
-  };
-
-  const handleRemoveAviary = () => {
-    setAviaryData({ ...defaultAviaryData, id: generateUniqueId() });
-  };
-
+  // Handlers
   const updateAviaryData = (field: string, value: number) => {
-    const updatedData = { ...aviaryData };
+    setAviaryData(prev => {
+      const updatedData = { ...prev };
 
-    if (field === 'waterQuantity') {
-      updatedData.waterQuantity = value;
-    } else if (field === 'male' || field === 'female') {
-      updatedData.liveBirds = { ...updatedData.liveBirds, [field]: value };
-    } else {
-      updatedData.eggs = { ...updatedData.eggs, [field]: value };
-    }
+      if (field === 'waterQuantity') {
+        updatedData.waterQuantity = value;
+      } else if (field === 'male' || field === 'female') {
+        updatedData.liveBirds = { ...updatedData.liveBirds, [field]: value };
+      } else {
+        updatedData.eggs = { ...updatedData.eggs, [field]: value };
+      }
 
-    setAviaryData(updatedData);
+      return updatedData;
+    });
   };
 
   const handleSubmit = () => {
@@ -110,7 +71,7 @@ function DataEntry() {
       return;
     }
 
-    const newSubmission = {
+    const newSubmission: DataSubmission = {
       id: generateUniqueId(),
       timestamp: new Date().toISOString(),
       aviaryId: selectedAviary,
@@ -119,20 +80,19 @@ function DataEntry() {
     };
 
     setSubmissions(prev => [newSubmission, ...prev]);
-    
-    // Resetar apenas os dados, mantendo o aviário selecionado
     setAviaryData({ ...defaultAviaryData, id: generateUniqueId() });
   };
 
-  // Função para editar submissão
   const handleEdit = (submission: DataSubmission) => {
     setSelectedAviary(submission.aviaryId);
     setAviaryData(submission.data);
     setSubmissions(prev => prev.filter(s => s.id !== submission.id));
   };
 
+  // JSX
   return (
     <div className="p-6">
+      {/* Cabeçalho */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Entrada de Dados</h2>
         <button
@@ -144,7 +104,7 @@ function DataEntry() {
         </button>
       </div>
 
-      {/* Adicionar seletor de aviário após o título */}
+      {/* Seletor de Aviário */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Selecione o Aviário
@@ -163,6 +123,7 @@ function DataEntry() {
         </select>
       </div>
 
+      {/* Formulário */}
       <div className="bg-white rounded-lg shadow p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Water Quantity */}
@@ -326,7 +287,7 @@ function DataEntry() {
         </div>
       </div>
 
-      {/* Adicionar seção de histórico no final */}
+      {/* Histórico de Submissões */}
       <div className="mt-12">
         <h3 className="text-xl font-semibold text-gray-900 mb-6">Histórico de Envios</h3>
         <div className="space-y-4">

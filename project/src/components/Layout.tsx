@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Settings, Bell, User, ChevronLeft, LayoutDashboard, FileText, Egg, DollarSign, ClipboardCheck, Users, FileInput } from 'lucide-react';
+import { Settings, Bell, User, ChevronLeft, LayoutDashboard, FileText, Egg, DollarSign, ClipboardCheck, Users, FileInput, Layers } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -94,6 +94,18 @@ function Layout({ children }: LayoutProps) {
           >
             <FileInput className="h-5 w-5" />
             <span>Entrada de Dados</span>
+          </button>
+
+          <button
+            onClick={() => navigate('/batch-management')}
+            className={`w-full flex items-center space-x-2 p-2 rounded-lg transition-colors ${
+              isActive('/batch-management')
+                ? 'bg-green-50 text-green-600'
+                : 'text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            <Layers className="h-5 w-5" />
+            <span>Lotes e Aviários</span>
           </button>
         </nav>
       </div>
