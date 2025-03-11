@@ -37,6 +37,18 @@ function Layout({ children }: LayoutProps) {
           </button>
 
           <button
+            onClick={() => navigate('/collection-review')}
+            className={`w-full flex items-center space-x-2 p-2 rounded-lg transition-colors ${
+              isActive('/collection-review')
+                ? 'bg-green-50 text-green-600'
+                : 'text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            <ClipboardCheck className="h-5 w-5" />
+            <span>Revisão de Coleta</span>
+          </button>
+
+          <button
             onClick={() => navigate('/reports')}
             className={`w-full flex items-center space-x-2 p-2 rounded-lg transition-colors ${
               isActive('/reports')
@@ -49,27 +61,15 @@ function Layout({ children }: LayoutProps) {
           </button>
 
           <button
-            onClick={() => navigate('/financial')}
+            onClick={() => navigate('/batch-management')}
             className={`w-full flex items-center space-x-2 p-2 rounded-lg transition-colors ${
-              isActive('/financial')
+              isActive('/batch-management')
                 ? 'bg-green-50 text-green-600'
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            <DollarSign className="h-5 w-5" />
-            <span>Financeiro</span>
-          </button>
-
-          <button
-            onClick={() => navigate('/collection-review')}
-            className={`w-full flex items-center space-x-2 p-2 rounded-lg transition-colors ${
-              isActive('/collection-review')
-                ? 'bg-green-50 text-green-600'
-                : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            <ClipboardCheck className="h-5 w-5" />
-            <span>Revisão de Coleta</span>
+            <Layers className="h-5 w-5" />
+            <span>Lotes e Aviários</span>
           </button>
 
           <button
@@ -85,6 +85,18 @@ function Layout({ children }: LayoutProps) {
           </button>
 
           <button
+            onClick={() => navigate('/financial')}
+            className={`w-full flex items-center space-x-2 p-2 rounded-lg transition-colors ${
+              isActive('/financial')
+                ? 'bg-green-50 text-green-600'
+                : 'text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            <DollarSign className="h-5 w-5" />
+            <span>Financeiro</span>
+          </button>
+
+          <button
             onClick={() => navigate('/data-entry')}
             className={`w-full flex items-center space-x-2 p-2 rounded-lg transition-colors ${
               isActive('/data-entry')
@@ -94,18 +106,6 @@ function Layout({ children }: LayoutProps) {
           >
             <FileInput className="h-5 w-5" />
             <span>Entrada de Dados</span>
-          </button>
-
-          <button
-            onClick={() => navigate('/batch-management')}
-            className={`w-full flex items-center space-x-2 p-2 rounded-lg transition-colors ${
-              isActive('/batch-management')
-                ? 'bg-green-50 text-green-600'
-                : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            <Layers className="h-5 w-5" />
-            <span>Lotes e Aviários</span>
           </button>
         </nav>
       </div>
