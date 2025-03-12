@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Search, Download, Plus, X } from 'lucide-react';
-import { Report, ReportStatistics } from '../types/interfaces/report';
+import { Search, Download, Plus, X, Calendar } from 'lucide-react';
+import { Report } from '../types/interfaces/report';
 
 function Reports() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -8,295 +8,340 @@ function Reports() {
   const [showMaisAntigo, setShowMaisAntigo] = useState(false);
   const [showUltimoVisualizado, setShowUltimoVisualizado] = useState(false);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const [reportType, setReportType] = useState<'detalhado' | 'diario' | 'semanal'>('detalhado');
 
-  const [reports] = useState<Report[]>([
+  const mockReports: Report[] = [
     {
-      id: 'N do relatório',
-      date: '12-09-2023',
+      id: 'AV001',
+      date: '2024-03-20',
       statistics: {
         liveBirds: {
-          male: 1200,
-          female: 2800,
-          total: 4000
+          total: 4000,
+          male: 2000,
+          female: 2000
+        },
+        waterConsumption: {
+          total: 1000,
+          dailyAverage: 142.85,
+          temperature: 25
         },
         eggs: {
-          total: 3500,
-          cracked: 50,
-          dirtyNest: 75,
-          small: 30,
-          incubatable: 3000,
-          broken: 25,
-          deformed: 40,
-          thinShell: 35,
-          eliminated: 45,
-          market: 200
-        }
+          total: 1800,
+          damaged: 50,
+          dirty: 30,
+          good: 1720
+        },
+        mortality: 0.5
       }
     },
-    { id: 'N do relatório', date: '12-10-2023' },
-    { id: 'N do relatório', date: '12-11-2023' },
-    { id: 'N do relatório', date: '12-12-2023' },
-    { id: 'N do relatório', date: '12-01-2024' },
-    { id: 'N do relatório', date: '12-02-2024' },
-    { id: 'N do relatório', date: '12-03-2024' },
-  ]);
+    {
+      id: 'AV002',
+      date: '2024-03-19',
+      statistics: {
+        liveBirds: {
+          total: 3950,
+          male: 1975,
+          female: 1975
+        },
+        waterConsumption: {
+          total: 980,
+          dailyAverage: 140,
+          temperature: 24
+        },
+        eggs: {
+          total: 1750,
+          damaged: 45,
+          dirty: 25,
+          good: 1680
+        },
+        mortality: 0.8
+      }
+    }
+  ];
 
-  const filteredReports = reports.filter(report =>
-    report.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    report.date.includes(searchTerm)
+  const filteredReports = mockReports.filter(
+    report =>
+      report.id.toLowerCase().includes(searchTerm.toLowerCase()) || report.date.includes(searchTerm)
   );
 
-  const calculatePercentage = (value: number, total: number) => {
-    return ((value / total) * 100).toFixed(1);
+  const calculateRatio = (male: number, female: number) => {
+    return `${(male / female).toFixed(2)}:1`;
+  };
+
+  const renderReportCard = (report: Report) => {
+    if (!report.statistics) return null;
+
+    return (
+      <div className="card">
+        <div className="card-header">
+          <div className="flex items-center justify-between">
+            <h4 className="card-title">{report.id}</h4>
+            <Calendar className="h-5 w-5 text-gray-400" />
+          </div>
+          <p className="text-sm text-gray-500">{report.date}</p>
+        </div>
+
+        {reportType === 'diario' ? (
+          <div className="space-y-4">
+            <div className="stat-card">
+              <p className="text-gray-600">Produção Total</p>
+              <p className="stat-value-success">{report.statistics.eggs.total}%</p>
+            </div>
+            <div className="stat-card">
+              <p className="text-gray-600">Taxa de Mortalidade</p>
+              <p className="stat-value-danger">{report.statistics.mortality}%</p>
+            </div>
+            <div className="stat-card">
+              <p className="text-gray-600">Razão Macho/Fêmea</p>
+              <p className="stat-value-info">
+                {calculateRatio(
+                  report.statistics.liveBirds.male,
+                  report.statistics.liveBirds.female
+                )}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="stat-card">
+              <p className="text-gray-600">Produção Total</p>
+              <p className="stat-value-success">{report.statistics.eggs.total * 7}%</p>
+            </div>
+            <div className="stat-card">
+              <p className="text-gray-600">Taxa de Mortalidade</p>
+              <p className="stat-value-danger">{report.statistics.mortality}%</p>
+            </div>
+            <div className="stat-card">
+              <p className="text-gray-600">Razão Macho/Fêmea</p>
+              <p className="stat-value-info">
+                {calculateRatio(
+                  report.statistics.liveBirds.male,
+                  report.statistics.liveBirds.female
+                )}
+              </p>
+            </div>
+          </div>
+        )}
+
+        <div className="flex justify-end space-x-2 mt-4">
+          <button onClick={() => setSelectedReport(report)} className="btn-primary">
+            Visualizar
+          </button>
+          <button className="btn-icon">
+            <Download className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+    );
   };
 
   return (
-    <div className="relative">
-      <h2 className="text-2xl font-bold text-gray-900 mb-8">Relatórios</h2>
+    <div className="page-container">
+      {/* Report Type Selector */}
+      <div className="card">
+        <div className="flex space-x-4 mb-6">
+          {['detalhado', 'diario', 'semanal'].map(type => (
+            <button
+              key={type}
+              onClick={() => setReportType(type as typeof reportType)}
+              className={`btn-${reportType === type ? 'primary' : 'secondary'}`}
+            >
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </button>
+          ))}
+        </div>
 
-      {/* Search and Filters */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        {/* Search and Filters */}
         <div className="relative mb-6">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
           <input
             type="text"
             placeholder="Buscar..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            onChange={e => setSearchTerm(e.target.value)}
+            className="input-search"
           />
         </div>
 
-        <div className="space-y-2">
-          <h3 className="font-semibold text-gray-700 mb-2">Filtrar por</h3>
-          
-          <div className="space-y-2">
-            <button
-              onClick={() => setShowMaisRecente(!showMaisRecente)}
-              className="flex items-center space-x-2 w-full text-left"
-            >
-              <Plus className={`h-4 w-4 ${showMaisRecente ? 'transform rotate-45' : ''}`} />
-              <span className="text-gray-700">Mais recente</span>
+        <div className="filter-section">
+          <h3 className="section-title">Filtrar por</h3>
+          {[
+            { state: showMaisRecente, setState: setShowMaisRecente, label: 'Mais recente' },
+            { state: showMaisAntigo, setState: setShowMaisAntigo, label: 'Mais antigo' },
+            {
+              state: showUltimoVisualizado,
+              setState: setShowUltimoVisualizado,
+              label: 'Último visualizado',
+            },
+          ].map(({ state, setState, label }) => (
+            <button key={label} onClick={() => setState(!state)} className="filter-button">
+              <Plus className={`h-4 w-4 ${state ? 'transform rotate-45' : ''}`} />
+              <span className="text-gray-700">{label}</span>
             </button>
-
-            <button
-              onClick={() => setShowMaisAntigo(!showMaisAntigo)}
-              className="flex items-center space-x-2 w-full text-left"
-            >
-              <Plus className={`h-4 w-4 ${showMaisAntigo ? 'transform rotate-45' : ''}`} />
-              <span className="text-gray-700">Mais antigo</span>
-            </button>
-
-            <button
-              onClick={() => setShowUltimoVisualizado(!showUltimoVisualizado)}
-              className="flex items-center space-x-2 w-full text-left"
-            >
-              <Plus className={`h-4 w-4 ${showUltimoVisualizado ? 'transform rotate-45' : ''}`} />
-              <span className="text-gray-700">Último visualizado</span>
-            </button>
-          </div>
+          ))}
         </div>
       </div>
 
       {/* Reports List */}
-      <div className="bg-white rounded-lg shadow">
-        {filteredReports.map((report, index) => (
-          <div
-            key={index}
-            className="flex items-center justify-between p-4 border-b last:border-b-0"
-          >
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-900 font-medium">{report.id}</span>
-              <span className="text-gray-500">{report.date}</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <button 
-                onClick={() => setSelectedReport(report)}
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-              >
-                Visualizar
-              </button>
-              <button className="p-2 text-gray-500 hover:text-gray-700">
-                <Download className="h-5 w-5" />
-              </button>
-            </div>
+      <div className="card">
+        {reportType === 'detalhado' ? (
+          <div className="divide-y">
+            {filteredReports.map((report, index) => (
+              <div key={index} className="flex items-center justify-between p-4">
+                <div className="flex items-center space-x-4">
+                  <span className="text-gray-900 font-medium">{report.id}</span>
+                  <span className="text-gray-500">{report.date}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button onClick={() => setSelectedReport(report)} className="btn-primary">
+                    Visualizar
+                  </button>
+                  <button className="btn-icon">
+                    <Download className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        ) : (
+          <div className="grid-cards">
+            {filteredReports.map((report, index) => (
+              <React.Fragment key={index}>{renderReportCard(report)}</React.Fragment>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Details Modal */}
-      {selectedReport && selectedReport.statistics && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto m-4">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-gray-900">
-                  Detalhes do Relatório - {selectedReport.date}
-                </h3>
-                <button
-                  onClick={() => setSelectedReport(null)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
+      {selectedReport?.statistics && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3 className="section-title mb-0">Detalhes do Relatório - {selectedReport.date}</h3>
+              <button onClick={() => setSelectedReport(null)} className="btn-icon">
+                <X className="h-6 w-6" />
+              </button>
+            </div>
 
+            <div className="modal-body">
               <div className="space-y-6">
                 {/* Live Birds Section */}
                 <div className="border-b pb-6">
-                  <h4 className="text-lg font-semibold mb-4">Quantidade de Aves Vivas</h4>
+                  <h4 className="section-title">Quantidade de Aves Vivas</h4>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="stat-card-highlighted">
+                      <p className="text-green-700 font-medium">Total</p>
+                      <p className="text-3xl font-bold text-green-800">
+                        {selectedReport.statistics.liveBirds.total.toLocaleString()}
+                      </p>
+                      <p className="text-sm text-green-600 font-medium">100%</p>
+                    </div>
+                    <div className="stat-card">
                       <p className="text-gray-600">Machos</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="stat-value">
                         {selectedReport.statistics.liveBirds.male.toLocaleString()}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {calculatePercentage(
-                          selectedReport.statistics.liveBirds.male,
-                          selectedReport.statistics.liveBirds.total
-                        )}%
+                        {((selectedReport.statistics.liveBirds.male /
+                          selectedReport.statistics.liveBirds.total) *
+                          100).toFixed(1)}
+                        %
                       </p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="stat-card">
                       <p className="text-gray-600">Fêmeas</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="stat-value">
                         {selectedReport.statistics.liveBirds.female.toLocaleString()}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {calculatePercentage(
-                          selectedReport.statistics.liveBirds.female,
-                          selectedReport.statistics.liveBirds.total
-                        )}%
+                        {((selectedReport.statistics.liveBirds.female /
+                          selectedReport.statistics.liveBirds.total) *
+                          100).toFixed(1)}
+                        %
                       </p>
                     </div>
-                    <div className="bg-green-50 p-4 rounded-lg">
-                      <p className="text-gray-600">Total</p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {selectedReport.statistics.liveBirds.total.toLocaleString()}
+                  </div>
+                </div>
+
+                {/* Water Consumption Section */}
+                <div className="border-b pb-6">
+                  <h4 className="section-title">Consumo de Água</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="stat-card-highlighted">
+                      <p className="text-green-700 font-medium">Consumo Total</p>
+                      <p className="text-3xl font-bold text-green-800">
+                        {selectedReport.statistics.waterConsumption.total} L
                       </p>
-                      <p className="text-sm text-gray-500">100%</p>
+                      <p className="text-sm text-green-600 font-medium">
+                        Litros por ave:{' '}
+                        {(
+                          selectedReport.statistics.waterConsumption.total /
+                          selectedReport.statistics.liveBirds.total
+                        ).toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="stat-card">
+                      <p className="text-gray-600">Média Diária</p>
+                      <p className="stat-value">
+                        {selectedReport.statistics.waterConsumption.dailyAverage} L
+                      </p>
+                      <p className="stat-label">Por dia</p>
+                    </div>
+                    <div className="stat-card">
+                      <p className="text-gray-600">Temperatura Média</p>
+                      <p className="stat-value">
+                        {selectedReport.statistics.waterConsumption.temperature}°C
+                      </p>
+                      <p className="stat-label">Ambiente</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Egg Production Section */}
                 <div>
-                  <h4 className="text-lg font-semibold mb-4">Produção de Ovos</h4>
+                  <h4 className="section-title">Produção de Ovos</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div className="bg-green-50 p-4 rounded-lg">
-                      <p className="text-gray-600">Produção Total</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                    <div className="stat-card-highlighted">
+                      <p className="text-green-700 font-medium">Produção Total</p>
+                      <p className="text-3xl font-bold text-green-800">
                         {selectedReport.statistics.eggs.total.toLocaleString()}
                       </p>
-                      <p className="text-sm text-gray-500">100%</p>
+                      <p className="text-sm text-green-600 font-medium">100%</p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-gray-600">Ovos Trincados</p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {selectedReport.statistics.eggs.cracked.toLocaleString()}
+                    <div className="stat-card">
+                      <p className="text-gray-600">Ovos Danificados</p>
+                      <p className="stat-value">
+                        {selectedReport.statistics.eggs.damaged.toLocaleString()}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {calculatePercentage(
-                          selectedReport.statistics.eggs.cracked,
-                          selectedReport.statistics.eggs.total
-                        )}%
+                        {((selectedReport.statistics.eggs.damaged /
+                          selectedReport.statistics.eggs.total) *
+                          100).toFixed(1)}
+                        %
                       </p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-gray-600">Ovos Sujos de Ninho</p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {selectedReport.statistics.eggs.dirtyNest.toLocaleString()}
+                    <div className="stat-card">
+                      <p className="text-gray-600">Ovos Sujos</p>
+                      <p className="stat-value">
+                        {selectedReport.statistics.eggs.dirty.toLocaleString()}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {calculatePercentage(
-                          selectedReport.statistics.eggs.dirtyNest,
-                          selectedReport.statistics.eggs.total
-                        )}%
+                        {((selectedReport.statistics.eggs.dirty /
+                          selectedReport.statistics.eggs.total) *
+                          100).toFixed(1)}
+                        %
                       </p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-gray-600">Ovos Pequenos</p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {selectedReport.statistics.eggs.small.toLocaleString()}
+                    <div className="stat-card">
+                      <p className="text-gray-600">Ovos em Bom Estado</p>
+                      <p className="stat-value">
+                        {selectedReport.statistics.eggs.good.toLocaleString()}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {calculatePercentage(
-                          selectedReport.statistics.eggs.small,
-                          selectedReport.statistics.eggs.total
-                        )}%
-                      </p>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-gray-600">Ovos Incubáveis</p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {selectedReport.statistics.eggs.incubatable.toLocaleString()}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {calculatePercentage(
-                          selectedReport.statistics.eggs.incubatable,
-                          selectedReport.statistics.eggs.total
-                        )}%
-                      </p>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-gray-600">Ovos Quebrados</p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {selectedReport.statistics.eggs.broken.toLocaleString()}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {calculatePercentage(
-                          selectedReport.statistics.eggs.broken,
-                          selectedReport.statistics.eggs.total
-                        )}%
-                      </p>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-gray-600">Ovos Deformados</p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {selectedReport.statistics.eggs.deformed.toLocaleString()}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {calculatePercentage(
-                          selectedReport.statistics.eggs.deformed,
-                          selectedReport.statistics.eggs.total
-                        )}%
-                      </p>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-gray-600">Ovos Casca Fina</p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {selectedReport.statistics.eggs.thinShell.toLocaleString()}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {calculatePercentage(
-                          selectedReport.statistics.eggs.thinShell,
-                          selectedReport.statistics.eggs.total
-                        )}%
-                      </p>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-gray-600">Eliminados</p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {selectedReport.statistics.eggs.eliminated.toLocaleString()}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {calculatePercentage(
-                          selectedReport.statistics.eggs.eliminated,
-                          selectedReport.statistics.eggs.total
-                        )}%
-                      </p>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-gray-600">Ovos para Mercado</p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {selectedReport.statistics.eggs.market.toLocaleString()}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {calculatePercentage(
-                          selectedReport.statistics.eggs.market,
-                          selectedReport.statistics.eggs.total
-                        )}%
+                        {((selectedReport.statistics.eggs.good /
+                          selectedReport.statistics.eggs.total) *
+                          100).toFixed(1)}
+                        %
                       </p>
                     </div>
                   </div>

@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Layout Padrão */
+  .page-container {
+    @apply space-y-8;
+  }
+
+  /* Headers */
+  .page-title {
+    @apply text-3xl font-bold text-gray-900;
+  }
+
+  .section-title {
+    @apply text-xl font-semibold text-gray-900 mb-4;
+  }
+
+  .subsection-title {
+    @apply text-lg font-medium text-gray-900 mb-3;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-white rounded-lg shadow-sm border p-6;
+  }
+
+  .card-header {
+    @apply flex justify-between items-center mb-6;
+  }
+
+  .card-title {
+    @apply text-lg font-medium text-gray-900;
+  }
+
+  /* Grids */
+  .grid-cards {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+  }
+
+  .grid-form {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+  }
+
+  /* Stats */
+  .stat-card {
+    @apply bg-white rounded-lg p-4 border;
+  }
+
+  .stat-card-highlighted {
+    @apply bg-green-50 rounded-lg p-4 border-2 border-green-500;
+  }
+
+  .stat-label {
+    @apply text-sm text-gray-500 mb-1;
+  }
+
+  .stat-value {
+    @apply text-2xl font-bold text-gray-900;
+  }
+
+  .stat-value-primary {
+    @apply text-2xl font-bold text-green-600;
+  }
+
+  .stat-value-danger {
+    @apply text-2xl font-bold text-red-600;
+  }
+
+  .stat-value-info {
+    @apply text-2xl font-bold text-blue-600;
+  }
+
+  /* Inputs */
+  .input-default {
+    @apply w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500;
+  }
+
+  .input-search {
+    @apply w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500;
+  }
+
+  .input-label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors;
+  }
+
+  .btn-icon {
+    @apply p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors;
+  }
+
+  /* Tables */
+  .table-container {
+    @apply overflow-x-auto rounded-lg border;
+  }
+
+  .table-default {
+    @apply min-w-full divide-y divide-gray-200;
+  }
+
+  .table-header {
+    @apply bg-gray-50 text-left text-sm font-medium text-gray-500 uppercase tracking-wider;
+  }
+
+  .table-cell {
+    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
+  }
+
+  /* Filters */
+  .filter-section {
+    @apply space-y-3;                                                   
+  }
+
+  .filter-button {
+    @apply flex items-center space-x-2 w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4;
+  }
+
+  .modal-content {
+    @apply bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto;
+  }
+
+  .modal-header {
+    @apply flex justify-between items-center p-6 border-b;
+  }
+
+  .modal-body {
+    @apply p-6;
+  }
+
+  .modal-footer {
+    @apply flex justify-end space-x-4 p-6 border-t;
+  }
+
+  /* Scrollbar */
+  .custom-scrollbar {
+    @apply scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100;
+  }
+} 

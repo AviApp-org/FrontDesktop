@@ -1,6 +1,10 @@
 export interface AviaryData {
   id: string;
   waterQuantity: number;
+  temperature: {
+    max: number;
+    min: number;
+  };
   liveBirds: {
     male: number;
     female: number;
@@ -22,4 +26,4 @@ export interface AviaryData {
 export interface AvailableAviary {
   id: string;
   name: string;
-} 
+}

@@ -6,8 +6,20 @@ import { Info } from 'lucide-react';
 function CollectionReview() {
   // Mock de aviários - será substituído pela API
   const [aviaries, setAviaries] = useState<Aviary[]>([
-    { id: '1', name: 'Aviário A', initialBirds: { male: 100, female: 1000 }, currentBirds: { male: 95, female: 980 }, isActive: true },
-    { id: '2', name: 'Aviário B', initialBirds: { male: 150, female: 1500 }, currentBirds: { male: 148, female: 1490 }, isActive: true },
+    {
+      id: '1',
+      name: 'Aviário A',
+      initialBirds: { male: 100, female: 1000 },
+      currentBirds: { male: 95, female: 980 },
+      isActive: true,
+    },
+    {
+      id: '2',
+      name: 'Aviário B',
+      initialBirds: { male: 150, female: 1500 },
+      currentBirds: { male: 148, female: 1490 },
+      isActive: true,
+    },
   ]);
 
   const [selectedAviary, setSelectedAviary] = useState<string>('');
@@ -34,7 +46,11 @@ function CollectionReview() {
 
   const currentDate = '12/08/2024';
 
-  const handleCategoryChange = (index: number, field: 'cages' | 'quantity', value: string | number) => {
+  const handleCategoryChange = (
+    index: number,
+    field: 'cages' | 'quantity',
+    value: string | number
+  ) => {
     const newCategories = [...categories];
     newCategories[index] = {
       ...newCategories[index],
@@ -62,8 +78,7 @@ function CollectionReview() {
   return (
     <div className="p-6">
       <div className="flex flex-col space-y-4 mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Revisão de coleta</h2>
-        
+
         {/* Seletor de Aviário */}
         <div className="w-full max-w-md">
           <label htmlFor="aviary-select" className="block text-sm font-medium text-gray-700 mb-1">
@@ -72,11 +87,11 @@ function CollectionReview() {
           <select
             id="aviary-select"
             value={selectedAviary}
-            onChange={(e) => setSelectedAviary(e.target.value)}
+            onChange={e => setSelectedAviary(e.target.value)}
             className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
           >
             <option value="">Selecione um aviário</option>
-            {aviaries.map((aviary) => (
+            {aviaries.map(aviary => (
               <option key={aviary.id} value={aviary.id}>
                 {aviary.name} - Aves: {aviary.currentBirds.male + aviary.currentBirds.female}
               </option>
@@ -134,21 +149,23 @@ function CollectionReview() {
                         type="text"
                         placeholder="Carrinhos"
                         value={category.cages}
-                        onChange={(e) => handleCategoryChange(index, 'cages', e.target.value)}
+                        onChange={e => handleCategoryChange(index, 'cages', e.target.value)}
                         className="flex-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                       />
                       <input
                         type="number"
                         placeholder="Unidade"
                         value={category.quantity}
-                        onChange={(e) => handleCategoryChange(index, 'quantity', parseInt(e.target.value) || 0)}
+                        onChange={e =>
+                          handleCategoryChange(index, 'quantity', parseInt(e.target.value) || 0)
+                        }
                         className="w-32 px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                       />
                     </div>
                   </div>
                 ))}
 
-                <button 
+                <button
                   onClick={handleSave}
                   className="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
                 >
@@ -167,7 +184,7 @@ function CollectionReview() {
                     <input
                       type="number"
                       value={deadBirds.male}
-                      onChange={(e) => handleDeadBirdsChange('male', e.target.value)}
+                      onChange={e => handleDeadBirdsChange('male', e.target.value)}
                       className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                     />
                   </div>
@@ -178,13 +195,13 @@ function CollectionReview() {
                     <input
                       type="number"
                       value={deadBirds.female}
-                      onChange={(e) => handleDeadBirdsChange('female', e.target.value)}
+                      onChange={e => handleDeadBirdsChange('female', e.target.value)}
                       className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                     />
                   </div>
                 </div>
 
-                <button 
+                <button
                   onClick={handleFinish}
                   className="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
                 >

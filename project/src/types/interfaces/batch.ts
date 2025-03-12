@@ -17,4 +17,4 @@ export interface Batch {
   startDate: string;
   aviaries: Aviary[];
   isActive: boolean;
-} 
+}

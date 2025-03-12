@@ -8,4 +8,4 @@ interface PrivateRouteProps {
 export function PrivateRoute({ children }: PrivateRouteProps) {
   // Temporariamente retornando sempre as children
   return <>{children}</>;
-} 
+}

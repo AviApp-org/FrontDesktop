@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Reports from './pages/Reports';
 import Financial from './pages/Financial';
@@ -11,46 +11,74 @@ import BatchManagement from './pages/BatchManagement';
 
 const App: React.FC = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/dashboard" element={
+    <Routes>
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      
+      <Route
+        path="/dashboard"
+        element={
           <Layout>
             <Dashboard />
           </Layout>
-        } />
-        <Route path="/reports" element={
+        }
+      />
+      
+      <Route
+        path="/reports"
+        element={
           <Layout>
             <Reports />
           </Layout>
-        } />
-        <Route path="/financial" element={
+        }
+      />
+      
+      <Route
+        path="/financial"
+        element={
           <Layout>
             <Financial />
           </Layout>
-        } />
-        <Route path="/collection-review" element={
+        }
+      />
+      
+      <Route
+        path="/review"
+        element={
           <Layout>
             <CollectionReview />
           </Layout>
-        } />
-        <Route path="/personnel" element={
+        }
+      />
+      
+      <Route
+        path="/employees"
+        element={
           <Layout>
             <Personnel />
           </Layout>
-        } />
-        <Route path="/data-entry" element={
+        }
+      />
+      
+      <Route
+        path="/data-entry"
+        element={
           <Layout>
             <DataEntry />
           </Layout>
-        } />
-        <Route path="/batch-management" element={
+        }
+      />
+      
+      <Route
+        path="/lots"
+        element={
           <Layout>
             <BatchManagement />
           </Layout>
-        } />
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </Router>
+        }
+      />
+      
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
   );
 };
 

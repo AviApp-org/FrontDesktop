@@ -7,4 +7,4 @@ export const aviaryService = {
   create: (data: AviaryData) => api.post('/aviaries', data),
   update: (id: string, data: AviaryData) => api.put(`/aviaries/${id}`, data),
   delete: (id: string) => api.delete(`/aviaries/${id}`),
-}; 
+};

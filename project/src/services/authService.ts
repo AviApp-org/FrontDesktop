@@ -16,6 +16,6 @@ interface FarmLoginResponse {
 }
 
 export const authService = {
-  loginFarm: (credentials: FarmLoginCredentials) => 
+  loginFarm: (credentials: FarmLoginCredentials) =>
     api.post<FarmLoginResponse>('/auth/farm/login', credentials),
-}; 
+};

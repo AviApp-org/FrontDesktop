@@ -5,7 +5,7 @@ import { PriceHistory, EggData, MonthlyData } from '../types/interfaces/financia
 function Financial() {
   const [unitPrice, setUnitPrice] = useState(0.07);
   const [currentMonth] = useState('Julho');
-  
+
   const [priceHistory] = useState<PriceHistory[]>([
     { date: '12/08/2024', price: 0.42, change: 0.25 },
     { date: '12/08/2024', price: 0.39, change: -0.25 },
@@ -14,8 +14,8 @@ function Financial() {
   ]);
 
   const [eggData] = useState<EggData[]>([
-    { type: 'Ovo incubado', quantity: 13688, value: 1688.00 },
-    { type: 'Ovo para mercado', quantity: 13688, value: 1688.00 },
+    { type: 'Ovo incubado', quantity: 13688, value: 1688.0 },
+    { type: 'Ovo para mercado', quantity: 13688, value: 1688.0 },
   ]);
 
   const [monthlyData] = useState<MonthlyData>({
@@ -49,8 +49,11 @@ function Financial() {
                   <span className="text-gray-600">{item.date}</span>
                   <div className="flex items-center space-x-2">
                     <span>R$ {item.price.toFixed(2)}</span>
-                    <span className={`text-sm ${item.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                      ({item.change > 0 ? '+' : ''}{item.change.toFixed(2)}%)
+                    <span
+                      className={`text-sm ${item.change >= 0 ? 'text-green-500' : 'text-red-500'}`}
+                    >
+                      ({item.change > 0 ? '+' : ''}
+                      {item.change.toFixed(2)}%)
                     </span>
                   </div>
                 </div>
@@ -66,9 +69,7 @@ function Financial() {
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Valor unitário do ovo</h3>
               <div className="flex items-center space-x-4">
-                <span className="text-xl font-bold text-green-600">
-                  R$ {unitPrice.toFixed(2)}
-                </span>
+                <span className="text-xl font-bold text-green-600">R$ {unitPrice.toFixed(2)}</span>
                 <div className="relative">
                   <input
                     type="number"
@@ -116,7 +117,7 @@ function Financial() {
               <p className="text-gray-600">
                 Total de ovos: {monthlyData.totalEggs.toLocaleString()}
               </p>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h4 className="font-medium text-gray-900">Ovos incubados</h4>

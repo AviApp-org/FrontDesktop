@@ -18,10 +18,11 @@ function Personnel() {
     { name: 'João Henrique', document: '072.395.156.98', registration: '5699811' },
   ]);
 
-  const filteredEmployees = employees.filter(employee =>
-    employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    employee.document.includes(searchTerm) ||
-    employee.registration.includes(searchTerm)
+  const filteredEmployees = employees.filter(
+    employee =>
+      employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.document.includes(searchTerm) ||
+      employee.registration.includes(searchTerm)
   );
 
   return (
@@ -45,7 +46,7 @@ function Personnel() {
                   type="text"
                   placeholder="Buscar..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={e => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 />
               </div>
@@ -59,7 +60,9 @@ function Personnel() {
                   className="flex items-center justify-between w-full text-left"
                 >
                   <span className="text-gray-600">Alfabética</span>
-                  <ChevronDown className={`h-5 w-5 transform transition-transform ${showAlphabetical ? 'rotate-180' : ''}`} />
+                  <ChevronDown
+                    className={`h-5 w-5 transform transition-transform ${showAlphabetical ? 'rotate-180' : ''}`}
+                  />
                 </button>
 
                 <button
@@ -67,7 +70,9 @@ function Personnel() {
                   className="flex items-center justify-between w-full text-left"
                 >
                   <span className="text-gray-600">Data de Contratação</span>
-                  <ChevronDown className={`h-5 w-5 transform transition-transform ${showHiringDate ? 'rotate-180' : ''}`} />
+                  <ChevronDown
+                    className={`h-5 w-5 transform transition-transform ${showHiringDate ? 'rotate-180' : ''}`}
+                  />
                 </button>
 
                 <button
@@ -75,7 +80,9 @@ function Personnel() {
                   className="flex items-center justify-between w-full text-left"
                 >
                   <span className="text-gray-600">Último visualizado</span>
-                  <ChevronDown className={`h-5 w-5 transform transition-transform ${showLastViewed ? 'rotate-180' : ''}`} />
+                  <ChevronDown
+                    className={`h-5 w-5 transform transition-transform ${showLastViewed ? 'rotate-180' : ''}`}
+                  />
                 </button>
               </div>
             </div>

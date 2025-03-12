@@ -30,10 +30,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setLoading(true);
       const response = await api.post('/auth/farm/login', { farmCode, password });
-      
+
       setFarm(response.data.farm);
       api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-      
+
       localStorage.setItem('@App:token', response.data.token);
       localStorage.setItem('@App:farm', JSON.stringify(response.data.farm));
     } finally {
@@ -61,4 +61,4 @@ export function useAuth(): AuthContextData {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-} 
+}

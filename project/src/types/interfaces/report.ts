@@ -1,25 +1,25 @@
 export interface ReportStatistics {
   liveBirds: {
+    total: number;
     male: number;
     female: number;
+  };
+  waterConsumption: {
     total: number;
+    dailyAverage: number;
+    temperature: number;
   };
   eggs: {
     total: number;
-    cracked: number;
-    dirtyNest: number;
-    small: number;
-    incubatable: number;
-    broken: number;
-    deformed: number;
-    thinShell: number;
-    eliminated: number;
-    market: number;
+    damaged: number;
+    dirty: number;
+    good: number;
   };
+  mortality: number;
 }
 
 export interface Report {
   id: string;
   date: string;
-  statistics?: ReportStatistics;
-} 
+  statistics: ReportStatistics;
+}

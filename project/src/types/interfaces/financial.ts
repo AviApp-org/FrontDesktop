@@ -16,4 +16,4 @@ export interface MonthlyData {
   marketEggs: number;
   incubatedValue: number;
   marketValue: number;
-} 
+}

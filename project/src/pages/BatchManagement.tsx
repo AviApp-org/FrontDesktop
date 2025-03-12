@@ -7,7 +7,7 @@ function BatchManagement() {
   const [showNewBatchForm, setShowNewBatchForm] = useState(false);
   const [showNewAviaryForm, setShowNewAviaryForm] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null);
-  
+
   // Estados para novo lote
   const [newBatchCode, setNewBatchCode] = useState('');
   const [newBatchDate, setNewBatchDate] = useState('');
@@ -28,7 +28,7 @@ function BatchManagement() {
       code: newBatchCode,
       startDate: newBatchDate,
       aviaries: [],
-      isActive: true
+      isActive: true,
     };
 
     setBatches(prev => [...prev, newBatch]);
@@ -49,24 +49,26 @@ function BatchManagement() {
       name: newAviaryName,
       initialBirds: {
         male: newAviaryMaleBirds,
-        female: newAviaryFemaleBirds
+        female: newAviaryFemaleBirds,
       },
       currentBirds: {
         male: newAviaryMaleBirds,
-        female: newAviaryFemaleBirds
+        female: newAviaryFemaleBirds,
       },
-      isActive: true
+      isActive: true,
     };
 
-    setBatches(prev => prev.map(batch => {
-      if (batch.id === selectedBatch.id) {
-        return {
-          ...batch,
-          aviaries: [...batch.aviaries, newAviary]
-        };
-      }
-      return batch;
-    }));
+    setBatches(prev =>
+      prev.map(batch => {
+        if (batch.id === selectedBatch.id) {
+          return {
+            ...batch,
+            aviaries: [...batch.aviaries, newAviary],
+          };
+        }
+        return batch;
+      })
+    );
 
     setNewAviaryName('');
     setNewAviaryMaleBirds(0);
@@ -104,19 +106,21 @@ function BatchManagement() {
                   Início: {new Date(batch.startDate).toLocaleDateString()}
                 </p>
               </div>
-              <span className={`px-2 py-1 rounded-full text-xs ${
-                batch.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-              }`}>
+              <span
+                className={`px-2 py-1 rounded-full text-xs ${
+                  batch.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                }`}
+              >
                 {batch.isActive ? 'Ativo' : 'Inativo'}
               </span>
             </div>
             <div className="space-y-2">
+              <p className="text-sm text-gray-600">Total de Aviários: {batch.aviaries.length}</p>
               <p className="text-sm text-gray-600">
-                Total de Aviários: {batch.aviaries.length}
-              </p>
-              <p className="text-sm text-gray-600">
-                Total de Aves: {batch.aviaries.reduce((acc, aviary) => 
-                  acc + aviary.currentBirds.male + aviary.currentBirds.female, 0
+                Total de Aves:{' '}
+                {batch.aviaries.reduce(
+                  (acc, aviary) => acc + aviary.currentBirds.male + aviary.currentBirds.female,
+                  0
                 )}
               </p>
             </div>
@@ -128,9 +132,7 @@ function BatchManagement() {
       {selectedBatch && (
         <div className="mt-8">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-semibold">
-              Aviários do Lote {selectedBatch.code}
-            </h3>
+            <h3 className="text-xl font-semibold">Aviários do Lote {selectedBatch.code}</h3>
             <button
               onClick={() => setShowNewAviaryForm(true)}
               className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2"
@@ -145,9 +147,11 @@ function BatchManagement() {
               <div key={aviary.id} className="bg-white rounded-lg shadow p-6">
                 <div className="flex justify-between items-start mb-4">
                   <h4 className="text-lg font-semibold">{aviary.name}</h4>
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    aviary.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                  }`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      aviary.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    }`}
+                  >
                     {aviary.isActive ? 'Ativo' : 'Inativo'}
                   </span>
                 </div>
@@ -188,7 +192,7 @@ function BatchManagement() {
                 <input
                   type="text"
                   value={newBatchCode}
-                  onChange={(e) => setNewBatchCode(e.target.value)}
+                  onChange={e => setNewBatchCode(e.target.value)}
                   className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                   placeholder="Ex: LOTE001"
                 />
@@ -200,7 +204,7 @@ function BatchManagement() {
                 <input
                   type="date"
                   value={newBatchDate}
-                  onChange={(e) => setNewBatchDate(e.target.value)}
+                  onChange={e => setNewBatchDate(e.target.value)}
                   className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                 />
               </div>
@@ -236,7 +240,7 @@ function BatchManagement() {
                 <input
                   type="text"
                   value={newAviaryName}
-                  onChange={(e) => setNewAviaryName(e.target.value)}
+                  onChange={e => setNewAviaryName(e.target.value)}
                   className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                   placeholder="Ex: Aviário A"
                 />
@@ -248,7 +252,7 @@ function BatchManagement() {
                 <input
                   type="number"
                   value={newAviaryMaleBirds}
-                  onChange={(e) => setNewAviaryMaleBirds(Number(e.target.value))}
+                  onChange={e => setNewAviaryMaleBirds(Number(e.target.value))}
                   className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                   min="0"
                 />
@@ -260,7 +264,7 @@ function BatchManagement() {
                 <input
                   type="number"
                   value={newAviaryFemaleBirds}
-                  onChange={(e) => setNewAviaryFemaleBirds(Number(e.target.value))}
+                  onChange={e => setNewAviaryFemaleBirds(Number(e.target.value))}
                   className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                   min="0"
                 />
@@ -279,4 +283,4 @@ function BatchManagement() {
   );
 }
 
-export default BatchManagement; 
+export default BatchManagement;

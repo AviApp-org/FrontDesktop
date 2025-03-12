@@ -6,4 +6,4 @@ export const ROUTES = {
   LOGIN: '/login',
   DASHBOARD: '/dashboard',
   DATA_ENTRY: '/data-entry',
-}; 
+};

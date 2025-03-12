@@ -12,19 +12,19 @@ function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       setLoading(true);
-      
+
       const response = await authService.loginFarm({ farmCode, password });
-      
+
       // Salvar dados da granja e token
       localStorage.setItem('@App:token', response.data.token);
       localStorage.setItem('@App:farm', JSON.stringify(response.data.farm));
-      
+
       // Configurar token no header das requisições
       api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-      
+
       // Redirecionar para o dashboard
       navigate('/dashboard');
     } catch (error) {
@@ -64,7 +64,7 @@ function Login() {
                 type="text"
                 required
                 value={farmCode}
-                onChange={(e) => setFarmCode(e.target.value)}
+                onChange={e => setFarmCode(e.target.value)}
                 placeholder="Digite o código da granja"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
               />
@@ -79,7 +79,7 @@ function Login() {
                 type="password"
                 required
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
                 placeholder="Digite a senha"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
               />

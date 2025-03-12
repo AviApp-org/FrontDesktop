@@ -17,4 +17,4 @@ export interface Category {
   total: number;
   cages: string;
   quantity: number;
-} 
+}

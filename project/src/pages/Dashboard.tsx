@@ -12,7 +12,7 @@ import {
   Cell,
   LineChart,
   Line,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from 'recharts';
 
 const COLORS = ['#8884d8', '#82ca9d'];
@@ -91,7 +91,7 @@ function Dashboard() {
                   <input
                     type="number"
                     value={day.producao}
-                    onChange={(e) => handleDataUpdate(index, 'producao', Number(e.target.value))}
+                    onChange={e => handleDataUpdate(index, 'producao', Number(e.target.value))}
                     className="w-full p-1 border rounded text-sm"
                   />
                 </div>
@@ -124,7 +124,9 @@ function Dashboard() {
                   <input
                     type="number"
                     value={day.aproveitamento}
-                    onChange={(e) => handleDataUpdate(index, 'aproveitamento', Number(e.target.value))}
+                    onChange={e =>
+                      handleDataUpdate(index, 'aproveitamento', Number(e.target.value))
+                    }
                     className="w-full p-1 border rounded text-sm"
                   />
                 </div>

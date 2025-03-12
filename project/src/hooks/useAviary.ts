@@ -24,4 +24,4 @@ export function useAviary() {
   }, []);
 
   return { data, loading, error, refetch: fetchData };
-} 
+}

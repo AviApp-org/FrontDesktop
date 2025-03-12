@@ -6,4 +6,4 @@ export interface DataSubmission {
   aviaryId: string;
   aviaryName: string;
   data: AviaryData;
-}   
+}
