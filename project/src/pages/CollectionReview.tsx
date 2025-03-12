@@ -76,19 +76,24 @@ function CollectionReview() {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex flex-col space-y-4 mb-6">
-
-        {/* Seletor de Aviário */}
-        <div className="w-full max-w-md">
-          <label htmlFor="aviary-select" className="block text-sm font-medium text-gray-700 mb-1">
-            Selecione o Aviário
-          </label>
+    
+    <div>
+    <div className="flex justify-between items-center mb-8">
+      <h2 className="text-2xl font-bold text-gray-900">Revisão de Coleta</h2>
+    </div>
+  
+    <div className="grid grid-cols-1 gap-8">
+      <div className="bg-white p-6 rounded-lg shadow">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-semibold">Seleção de Aviário</h3>
+        </div>
+  
+        <div className="max-w-md mb-6">
           <select
             id="aviary-select"
             value={selectedAviary}
             onChange={e => setSelectedAviary(e.target.value)}
-            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
           >
             <option value="">Selecione um aviário</option>
             {aviaries.map(aviary => (
@@ -98,24 +103,23 @@ function CollectionReview() {
             ))}
           </select>
         </div>
-
+  
         {selectedAviary ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Collection History */}
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white rounded-lg border p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Histórico de coleta</h3>
-                <button className="text-sm text-gray-500 hover:text-gray-700 flex items-center space-x-1">
-                  <Info className="h-4 w-4" />
-                  <span>Clique sobre uma coleta para obter mais informações</span>
-                </button>
+                <div className="flex items-center text-sm text-gray-500">
+                  <Info className="h-4 w-4 mr-1" />
+                  <span>Clique para mais informações</span>
+                </div>
               </div>
-
+  
               <div className="space-y-3">
                 {collectionHistory.map((entry, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
                   >
                     <div className="flex items-center space-x-4">
                       <span className="text-gray-600">{currentDate}</span>
@@ -132,91 +136,76 @@ function CollectionReview() {
                 ))}
               </div>
             </div>
-
-            {/* Categories and Dead Birds Count */}
+  
             <div className="space-y-6">
-              {/* Categories */}
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="bg-white rounded-lg border p-6">
                 {categories.map((category, index) => (
-                  <div key={index} className="mb-4 last:mb-0">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                  <div key={index} className="mb-6 last:mb-0">
+                    <div className="flex items-center space-x-2 mb-3">
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
                       <h4 className="font-medium">{category.name}</h4>
-                      <span className="text-gray-600">Total: {category.total}</span>
+                      <span className="text-gray-500">Total: {category.total}</span>
                     </div>
-                    <div className="flex items-center space-x-4">
+                    <div className="grid grid-cols-2 gap-4">
                       <input
                         type="text"
                         placeholder="Carrinhos"
                         value={category.cages}
                         onChange={e => handleCategoryChange(index, 'cages', e.target.value)}
-                        className="flex-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+                        className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
                       />
                       <input
                         type="number"
                         placeholder="Unidade"
                         value={category.quantity}
-                        onChange={e =>
-                          handleCategoryChange(index, 'quantity', parseInt(e.target.value) || 0)
-                        }
-                        className="w-32 px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+                        onChange={e => handleCategoryChange(index, 'quantity', parseInt(e.target.value) || 0)}
+                        className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
                       />
                     </div>
                   </div>
                 ))}
-
-                <button
-                  onClick={handleSave}
-                  className="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
-                >
+                <button onClick={handleSave} className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors mt-6">
                   Salvar
                 </button>
               </div>
-
-              {/* Dead Birds Count */}
-              <div className="bg-white rounded-lg shadow p-6">
+  
+              <div className="bg-white rounded-lg border p-6">
                 <h3 className="text-lg font-semibold mb-4">Contagem de aves mortas</h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Aves Macho Mortas:
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Galos</label>
                     <input
                       type="number"
                       value={deadBirds.male}
                       onChange={e => handleDeadBirdsChange('male', e.target.value)}
-                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Aves Fêmea Mortas:
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Galinhas</label>
                     <input
                       type="number"
                       value={deadBirds.female}
                       onChange={e => handleDeadBirdsChange('female', e.target.value)}
-                      className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
                     />
                   </div>
                 </div>
-
-                <button
-                  onClick={handleFinish}
-                  className="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
-                >
+                <button onClick={handleFinish} className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors mt-6">
                   Finalizar
                 </button>
               </div>
             </div>
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-12 text-gray-500">
             Selecione um aviário para visualizar os dados de coleta
           </div>
         )}
       </div>
     </div>
+  </div>
+  
   );
 }
 

@@ -5,12 +5,29 @@
 @layer components {
   /* Layout Padrão */
   .page-container {
-    @apply space-y-8;
+    @apply space-y-6 p-8;
+  }
+
+  .page-wrapper {
+    @apply grid grid-cols-1 gap-8;
+  }
+
+  .page-header {
+    @apply flex justify-between items-center mb-8;
+  }
+
+  /* Content Cards */
+  .content-card {
+    @apply bg-white p-6 rounded-lg shadow;
+  }
+
+  .content-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
   }
 
   /* Headers */
   .page-title {
-    @apply text-3xl font-bold text-gray-900;
+    @apply text-2xl font-bold text-gray-900;
   }
 
   .section-title {
@@ -149,4 +166,4 @@
   .custom-scrollbar {
     @apply scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100;
   }
-} 
+}

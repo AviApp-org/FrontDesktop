@@ -136,80 +136,87 @@ function Reports() {
   };
 
   return (
-    <div className="page-container">
-      {/* Report Type Selector */}
-      <div className="card">
-        <div className="flex space-x-4 mb-6">
-          {['detalhado', 'diario', 'semanal'].map(type => (
-            <button
-              key={type}
-              onClick={() => setReportType(type as typeof reportType)}
-              className={`btn-${reportType === type ? 'primary' : 'secondary'}`}
-            >
-              {type.charAt(0).toUpperCase() + type.slice(1)}
-            </button>
-          ))}
-        </div>
 
-        {/* Search and Filters */}
-        <div className="relative mb-6">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-          <input
-            type="text"
-            placeholder="Buscar..."
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            className="input-search"
-          />
-        </div>
-
-        <div className="filter-section">
-          <h3 className="section-title">Filtrar por</h3>
-          {[
-            { state: showMaisRecente, setState: setShowMaisRecente, label: 'Mais recente' },
-            { state: showMaisAntigo, setState: setShowMaisAntigo, label: 'Mais antigo' },
-            {
-              state: showUltimoVisualizado,
-              setState: setShowUltimoVisualizado,
-              label: 'Último visualizado',
-            },
-          ].map(({ state, setState, label }) => (
-            <button key={label} onClick={() => setState(!state)} className="filter-button">
-              <Plus className={`h-4 w-4 ${state ? 'transform rotate-45' : ''}`} />
-              <span className="text-gray-700">{label}</span>
-            </button>
-          ))}
-        </div>
+    <div>
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-2xl font-bold text-gray-900">Relatóridos</h2>
       </div>
 
-      {/* Reports List */}
-      <div className="card">
-        {reportType === 'detalhado' ? (
-          <div className="divide-y">
-            {filteredReports.map((report, index) => (
-              <div key={index} className="flex items-center justify-between p-4">
-                <div className="flex items-center space-x-4">
-                  <span className="text-gray-900 font-medium">{report.id}</span>
-                  <span className="text-gray-500">{report.date}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button onClick={() => setSelectedReport(report)} className="btn-primary">
-                    Visualizar
-                  </button>
-                  <button className="btn-icon">
-                    <Download className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
+      <div className="grid grid-cols-1 gap-8">
+        {/* Report Type Selector Card */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="flex space-x-4 mb-6">
+            {['detalhado', 'diario', 'semanal'].map(type => (
+              <button
+                key={type}
+                onClick={() => setReportType(type as typeof reportType)}
+                className={`btn-${reportType === type ? 'primary' : 'secondary'}`}
+              >
+                {type.charAt(0).toUpperCase() + type.slice(1)}
+              </button>
             ))}
           </div>
-        ) : (
-          <div className="grid-cards">
-            {filteredReports.map((report, index) => (
-              <React.Fragment key={index}>{renderReportCard(report)}</React.Fragment>
+
+          {/* Search and Filters */}
+          <div className="relative mb-6">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <input
+              type="text"
+              placeholder="Buscar..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="input-search"
+            />
+          </div>
+
+          <div className="filter-section">
+            <h3 className="section-title">Filtrar por</h3>
+            {[
+              { state: showMaisRecente, setState: setShowMaisRecente, label: 'Mais recente' },
+              { state: showMaisAntigo, setState: setShowMaisAntigo, label: 'Mais antigo' },
+              {
+                state: showUltimoVisualizado,
+                setState: setShowUltimoVisualizado,
+                label: 'Último visualizado',
+              },
+            ].map(({ state, setState, label }) => (
+              <button key={label} onClick={() => setState(!state)} className="filter-button">
+                <Plus className={`h-4 w-4 ${state ? 'transform rotate-45' : ''}`} />
+                <span className="text-gray-700">{label}</span>
+              </button>
             ))}
           </div>
-        )}
+        </div>
+
+        {/* Reports List Card */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          {reportType === 'detalhado' ? (
+            <div className="divide-y">
+              {filteredReports.map((report, index) => (
+                <div key={index} className="flex items-center justify-between p-4">
+                  <div className="flex items-center space-x-4">
+                    <span className="text-gray-900 font-medium">{report.id}</span>
+                    <span className="text-gray-500">{report.date}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button onClick={() => setSelectedReport(report)} className="btn-primary">
+                      Visualizar
+                    </button>
+                    <button className="btn-icon">
+                      <Download className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid-cards">
+              {filteredReports.map((report, index) => (
+                <React.Fragment key={index}>{renderReportCard(report)}</React.Fragment>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Details Modal */}
@@ -308,6 +315,20 @@ function Reports() {
                       </p>
                       <p className="text-sm text-green-600 font-medium">100%</p>
                     </div>
+                    
+                    <div className="stat-card">
+                      <p className="text-gray-600">Ovos Incubaveis</p>
+                      <p className="stat-value">
+                        {selectedReport.statistics.eggs.damaged.toLocaleString()}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {((selectedReport.statistics.eggs.damaged /
+                          selectedReport.statistics.eggs.total) *
+                          100).toFixed(1)}
+                        %
+                      </p>
+                    </div>
+
                     <div className="stat-card">
                       <p className="text-gray-600">Ovos Danificados</p>
                       <p className="stat-value">
@@ -320,6 +341,7 @@ function Reports() {
                         %
                       </p>
                     </div>
+
                     <div className="stat-card">
                       <p className="text-gray-600">Ovos Sujos</p>
                       <p className="stat-value">
@@ -354,5 +376,4 @@ function Reports() {
     </div>
   );
 }
-
 export default Reports;

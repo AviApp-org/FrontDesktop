@@ -34,14 +34,18 @@ function Financial() {
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Financeiro</h2>
+    <div>
+  <div className="flex justify-between items-center mb-8">
+    <h2 className="text-2xl font-bold text-gray-900">Financeiro</h2>
+  </div>
 
+  <div className="grid grid-cols-1 gap-8">
+    <div className="bg-white p-6 rounded-lg shadow">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column */}
         <div className="space-y-6">
           {/* Price History */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg border p-6">
             <h3 className="text-lg font-semibold mb-4">Histórico de preço unitário do ovo</h3>
             <div className="space-y-2">
               {priceHistory.map((item, index) => (
@@ -49,9 +53,7 @@ function Financial() {
                   <span className="text-gray-600">{item.date}</span>
                   <div className="flex items-center space-x-2">
                     <span>R$ {item.price.toFixed(2)}</span>
-                    <span
-                      className={`text-sm ${item.change >= 0 ? 'text-green-500' : 'text-red-500'}`}
-                    >
+                    <span className={`text-sm ${item.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                       ({item.change > 0 ? '+' : ''}
                       {item.change.toFixed(2)}%)
                     </span>
@@ -65,7 +67,7 @@ function Financial() {
         {/* Right Column */}
         <div className="space-y-6">
           {/* Current Price */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg border p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Valor unitário do ovo</h3>
               <div className="flex items-center space-x-4">
@@ -102,7 +104,7 @@ function Financial() {
           </div>
 
           {/* Monthly Summary */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg border p-6">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-semibold">
                 Mês de: <span className="text-green-600">{currentMonth}</span>
@@ -114,9 +116,7 @@ function Financial() {
             </div>
 
             <div className="space-y-4">
-              <p className="text-gray-600">
-                Total de ovos: {monthlyData.totalEggs.toLocaleString()}
-              </p>
+              <p className="text-gray-600">Total de ovos: {monthlyData.totalEggs.toLocaleString()}</p>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -135,6 +135,9 @@ function Financial() {
         </div>
       </div>
     </div>
+  </div>
+</div>
+
   );
 }
 

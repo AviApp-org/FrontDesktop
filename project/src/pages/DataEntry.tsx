@@ -99,13 +99,18 @@ function DataEntry() {
 
   // JSX
   return (
-    <div className="p-6">
-      {/* Cabeçalho */}
+<div>
+  <div className="flex justify-between items-center mb-8">
+    <h2 className="text-2xl font-bold text-gray-900">Entrada de Dados</h2>
+  </div>
+
+  <div className="grid grid-cols-1 gap-8">
+    <div className="bg-white p-6 rounded-lg shadow">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Entrada de Dados</h2>
+        <h3 className="text-xl font-semibold">Dados do Aviário</h3>
         <button
           onClick={handleSubmit}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2"
+          className="bg-green-600 text-white w-38 px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center gap-2"
         >
           <Save className="h-5 w-5" />
           <span>Salvar Dados</span>
@@ -129,219 +134,217 @@ function DataEntry() {
         </select>
       </div>
 
-      {/* Formulário */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Water and Temperature Section */}
-          <div className="col-span-full">
-            <h4 className="text-lg font-medium text-gray-900 mb-4">Água e Temperatura</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Quantidade de Água (L)
-                </label>
-                <input
-                  type="number"
-                  value={aviaryData.waterQuantity}
-                  onChange={e => updateAviaryData('waterQuantity', Number(e.target.value))}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Temperatura Máxima (°C)
-                </label>
-                <input
-                  type="number"
-                  value={aviaryData.temperature.max}
-                  onChange={e => updateAviaryData('tempMax', Number(e.target.value))}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Temperatura Mínima (°C)
-                </label>
-                <input
-                  type="number"
-                  value={aviaryData.temperature.min}
-                  onChange={e => updateAviaryData('tempMin', Number(e.target.value))}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-            </div>
+      {/* Water and Temperature Section */}
+      <div className="mb-8">
+        <h4 className="text-lg font-medium text-gray-900 mb-4">Água e Temperatura</h4>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Quantidade de Água (L)
+            </label>
+            <input
+              type="number"
+              value={aviaryData.waterQuantity}
+              onChange={e => updateAviaryData('waterQuantity', Number(e.target.value))}
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+            />
           </div>
 
-          {/* Live Birds */}
-          <div className="col-span-full">
-            <h4 className="text-lg font-medium text-gray-900 mb-4">Aves Vivas</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Machos</label>
-                <input
-                  type="number"
-                  value={aviaryData.liveBirds.male}
-                  onChange={e => updateAviaryData('male', Number(e.target.value))}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Fêmeas</label>
-                <input
-                  type="number"
-                  value={aviaryData.liveBirds.female}
-                  onChange={e => updateAviaryData('female', Number(e.target.value))}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Temperatura Máxima (°C)
+            </label>
+            <input
+              type="number"
+              value={aviaryData.temperature.max}
+              onChange={e => updateAviaryData('tempMax', Number(e.target.value))}
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+            />
           </div>
-
-          {/* Eggs Section */}
-          <div className="col-span-full">
-            <h4 className="text-lg font-medium text-gray-900 mb-4">Produção de Ovos</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Total de Ovos
-                </label>
-                <input
-                  type="number"
-                  value={aviaryData.eggs.total}
-                  onChange={e => updateAviaryData('total', Number(e.target.value))}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Ovos Trincados
-                </label>
-                <input
-                  type="number"
-                  value={aviaryData.eggs.cracked}
-                  onChange={e => updateAviaryData('cracked', Number(e.target.value))}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Ovos Sujos de Ninho
-                </label>
-                <input
-                  type="number"
-                  value={aviaryData.eggs.dirtyNest}
-                  onChange={e => updateAviaryData('dirtyNest', Number(e.target.value))}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Ovos Pequenos
-                </label>
-                <input
-                  type="number"
-                  value={aviaryData.eggs.small}
-                  onChange={e => updateAviaryData('small', Number(e.target.value))}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Ovos Incubáveis
-                </label>
-                <input
-                  type="number"
-                  value={aviaryData.eggs.incubatable}
-                  onChange={e => updateAviaryData('incubatable', Number(e.target.value))}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Ovos Quebrados
-                </label>
-                <input
-                  type="number"
-                  value={aviaryData.eggs.broken}
-                  onChange={e => updateAviaryData('broken', Number(e.target.value))}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Ovos Deformados
-                </label>
-                <input
-                  type="number"
-                  value={aviaryData.eggs.deformed}
-                  onChange={e => updateAviaryData('deformed', Number(e.target.value))}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Ovos Casca Fina
-                </label>
-                <input
-                  type="number"
-                  value={aviaryData.eggs.thinShell}
-                  onChange={e => updateAviaryData('thinShell', Number(e.target.value))}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Eliminados</label>
-                <input
-                  type="number"
-                  value={aviaryData.eggs.eliminated}
-                  onChange={e => updateAviaryData('eliminated', Number(e.target.value))}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Ovos para Mercado
-                </label>
-                <input
-                  type="number"
-                  value={aviaryData.eggs.market}
-                  onChange={e => updateAviaryData('market', Number(e.target.value))}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Temperatura Mínima (°C)
+            </label>
+            <input
+              type="number"
+              value={aviaryData.temperature.min}
+              onChange={e => updateAviaryData('tempMin', Number(e.target.value))}
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+            />
           </div>
         </div>
       </div>
 
-      {/* Histórico de Submissões */}
-      <div className="mt-12">
-        <h3 className="text-xl font-semibold text-gray-900 mb-6">Histórico de Envios</h3>
-        <div className="space-y-4">
-          {submissions.map(submission => (
-            <div
-              key={submission.id}
-              className="bg-gray-50 rounded-lg p-4 flex justify-between items-center"
-            >
-              <div>
-                <p className="font-medium">{submission.aviaryName}</p>
-                <p className="text-sm text-gray-500">
-                  {new Date(submission.timestamp).toLocaleString()}
-                </p>
-                <p className="text-sm">Total de Ovos: {submission.data.eggs.total}</p>
-              </div>
-              <button
-                onClick={() => handleEdit(submission)}
-                className="bg-blue-100 text-blue-600 px-4 py-2 rounded-md hover:bg-blue-200 transition-colors"
-              >
-                Editar
-              </button>
-            </div>
-          ))}
+      {/* Live Birds */}
+      <div className="mb-8">
+        <h4 className="text-lg font-medium text-gray-900 mb-4">Aves Vivas</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Machos</label>
+            <input
+              type="number"
+              value={aviaryData.liveBirds.male}
+              onChange={e => updateAviaryData('male', Number(e.target.value))}
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Fêmeas</label>
+            <input
+              type="number"
+              value={aviaryData.liveBirds.female}
+              onChange={e => updateAviaryData('female', Number(e.target.value))}
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Eggs Section */}
+      <div>
+        <h4 className="text-lg font-medium text-gray-900 mb-4">Produção de Ovos</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Total de Ovos
+            </label>
+            <input
+              type="number"
+              value={aviaryData.eggs.total}
+              onChange={e => updateAviaryData('total', Number(e.target.value))}
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Ovos Trincados
+            </label>
+            <input
+              type="number"
+              value={aviaryData.eggs.cracked}
+              onChange={e => updateAviaryData('cracked', Number(e.target.value))}
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Ovos Sujos de Ninho
+            </label>
+            <input
+              type="number"
+              value={aviaryData.eggs.dirtyNest}
+              onChange={e => updateAviaryData('dirtyNest', Number(e.target.value))}
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Ovos Pequenos
+            </label>
+            <input
+              type="number"
+              value={aviaryData.eggs.small}
+              onChange={e => updateAviaryData('small', Number(e.target.value))}
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Ovos Incubáveis
+            </label>
+            <input
+              type="number"
+              value={aviaryData.eggs.incubatable}
+              onChange={e => updateAviaryData('incubatable', Number(e.target.value))}
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Ovos Quebrados
+            </label>
+            <input
+              type="number"
+              value={aviaryData.eggs.broken}
+              onChange={e => updateAviaryData('broken', Number(e.target.value))}
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Ovos Deformados
+            </label>
+            <input
+              type="number"
+              value={aviaryData.eggs.deformed}
+              onChange={e => updateAviaryData('deformed', Number(e.target.value))}
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Ovos Casca Fina
+            </label>
+            <input
+              type="number"
+              value={aviaryData.eggs.thinShell}
+              onChange={e => updateAviaryData('thinShell', Number(e.target.value))}
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Eliminados</label>
+            <input
+              type="number"
+              value={aviaryData.eggs.eliminated}
+              onChange={e => updateAviaryData('eliminated', Number(e.target.value))}
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Ovos para Mercado
+            </label>
+            <input
+              type="number"
+              value={aviaryData.eggs.market}
+              onChange={e => updateAviaryData('market', Number(e.target.value))}
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
+            />
+          </div>
         </div>
       </div>
     </div>
+
+    {/* Submissions History */}
+    <div className="bg-white p-6 rounded-lg shadow">
+      <h3 className="text-xl font-semibold mb-6">Histórico de Envios</h3>
+      <div className="space-y-4">
+        {submissions.map(submission => (
+          <div
+            key={submission.id}
+            className="bg-gray-50 rounded-lg p-4 flex justify-between items-center"
+          >
+            <div>
+              <p className="font-medium">{submission.aviaryName}</p>
+              <p className="text-sm text-gray-500">
+                {new Date(submission.timestamp).toLocaleString()}
+              </p>
+              <p className="text-sm">Total de Ovos: {submission.data.eggs.total}</p>
+            </div>
+            <button
+              onClick={() => handleEdit(submission)}
+              className="bg-blue-100 text-blue-600 px-4 py-2 rounded-md hover:bg-blue-200 transition-colors"
+            >
+              Editar
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
   );
 }
 

@@ -77,101 +77,112 @@ function BatchManagement() {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div>
+      <div className="flex justify-between items-center mb-8">
         <h2 className="text-2xl font-bold text-gray-900">Gerenciamento de Lotes</h2>
-        <button
-          onClick={() => setShowNewBatchForm(true)}
-          className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center space-x-2"
-        >
-          <Plus className="h-5 w-5" />
-          <span>Novo Lote</span>
-        </button>
       </div>
 
-      {/* Lista de Lotes */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {batches.map(batch => (
-          <div
-            key={batch.id}
-            className={`bg-white rounded-lg shadow p-6 cursor-pointer transition-colors ${
-              selectedBatch?.id === batch.id ? 'ring-2 ring-green-500' : ''
-            }`}
-            onClick={() => setSelectedBatch(batch)}
-          >
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="text-lg font-semibold">Lote {batch.code}</h3>
-                <p className="text-sm text-gray-500">
-                  Início: {new Date(batch.startDate).toLocaleDateString()}
-                </p>
-              </div>
-              <span
-                className={`px-2 py-1 rounded-full text-xs ${
-                  batch.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                }`}
-              >
-                {batch.isActive ? 'Ativo' : 'Inativo'}
-              </span>
-            </div>
-            <div className="space-y-2">
-              <p className="text-sm text-gray-600">Total de Aviários: {batch.aviaries.length}</p>
-              <p className="text-sm text-gray-600">
-                Total de Aves:{' '}
-                {batch.aviaries.reduce(
-                  (acc, aviary) => acc + aviary.currentBirds.male + aviary.currentBirds.female,
-                  0
-                )}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Detalhes do Lote Selecionado */}
-      {selectedBatch && (
-        <div className="mt-8">
+      <div className="grid grid-cols-1 gap-8">
+        <div className="bg-white p-6 rounded-lg shadow">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-semibold">Aviários do Lote {selectedBatch.code}</h3>
+            <h3 className="text-xl font-semibold">Lotes</h3>
             <button
-              onClick={() => setShowNewAviaryForm(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2"
-            >
+              onClick={() => setShowNewBatchForm(true)}
+              className="bg-green-600 text-white w-36 px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center justify-center gap-2">
               <Plus className="h-5 w-5" />
-              <span>Novo Aviário</span>
+              <span>Novo Lote</span>
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {selectedBatch.aviaries.map(aviary => (
-              <div key={aviary.id} className="bg-white rounded-lg shadow p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <h4 className="text-lg font-semibold">{aviary.name}</h4>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs ${
-                      aviary.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}
-                  >
-                    {aviary.isActive ? 'Ativo' : 'Inativo'}
-                  </span>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Galos:</span>
-                    <span className="font-medium">{aviary.currentBirds.male}</span>
+          {batches.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {batches.map(batch => (
+                <div
+                  key={batch.id}
+                  className={`bg-white rounded-lg shadow p-6 cursor-pointer transition-colors ${
+                    selectedBatch?.id === batch.id ? 'ring-2 ring-green-500' : ''
+                  }`}
+                  onClick={() => setSelectedBatch(batch)}
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold">Lote {batch.code}</h3>
+                      <p className="text-sm text-gray-500">
+                        Início: {new Date(batch.startDate).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        batch.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {batch.isActive ? 'Ativo' : 'Inativo'}
+                    </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Galinhas:</span>
-                    <span className="font-medium">{aviary.currentBirds.female}</span>
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-600">Total de Aviários: {batch.aviaries.length}</p>
+                    <p className="text-sm text-gray-600">
+                      Total de Aves:{' '}
+                      {batch.aviaries.reduce(
+                        (acc, aviary) => acc + aviary.currentBirds.male + aviary.currentBirds.female,
+                        0
+                      )}
+                    </p>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12">
+              <p className="text-gray-500 mb-4">Nenhum lote cadastrado</p>
+            </div>
+          )}
         </div>
-      )}
 
-      {/* Modal Novo Lote */}
+        {selectedBatch && (
+          <div className="bg-white p-6 rounded-lg shadow">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-semibold">Aviários do Lote {selectedBatch.code}</h3>
+              <button
+                onClick={() => setShowNewAviaryForm(true)}
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
+              >
+                <Plus className="h-5 w-5" />
+                <span>Novo Aviário</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {selectedBatch.aviaries.map(aviary => (
+                <div key={aviary.id} className="bg-white rounded-lg shadow p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <h4 className="text-lg font-semibold">{aviary.name}</h4>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        aviary.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {aviary.isActive ? 'Ativo' : 'Inativo'}
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Galos:</span>
+                      <span className="font-medium">{aviary.currentBirds.male}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Galinhas:</span>
+                      <span className="font-medium">{aviary.currentBirds.female}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Keep existing modals */}
       {showNewBatchForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
@@ -219,7 +230,6 @@ function BatchManagement() {
         </div>
       )}
 
-      {/* Modal Novo Aviário */}
       {showNewAviaryForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
