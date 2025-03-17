@@ -5,7 +5,6 @@ interface Farm {
   id: string;
   name: string;
   code: string;
-  // outros dados da granja
 }
 
 interface AuthContextData {

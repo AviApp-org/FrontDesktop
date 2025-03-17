@@ -8,6 +8,7 @@ import {
   Users,
   DollarSign,
   FileInput,
+  Egg,
 } from 'lucide-react';
 
 const sidebarItems = [
@@ -29,12 +30,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
       <div className="w-64 bg-white shadow-lg fixed h-full">
         <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="p-6 border-b">
-            <h1 className="text-2xl font-bold text-gray-900">AviApp</h1>
+          <div className="p-4 border-b">
+            <div className="flex items-center">
+              <Egg className="h-8 w-8 text-green-600 mr-2" />
+              <h1 className="text-2xl font-bold text-green-900">AviApp</h1>
+            </div>
           </div>
 
           {/* Navigation */}

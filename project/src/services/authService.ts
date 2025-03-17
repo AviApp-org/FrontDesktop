@@ -11,7 +11,6 @@ interface FarmLoginResponse {
     id: string;
     name: string;
     code: string;
-    // outros dados da granja que a API retorna
   };
 }
 

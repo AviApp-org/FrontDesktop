@@ -4,7 +4,7 @@ import { Aviary } from '../types/interfaces/batch';
 import { Info } from 'lucide-react';
 
 function CollectionReview() {
-  // Mock de aviários - será substituído pela API
+  
   const [aviaries, setAviaries] = useState<Aviary[]>([
     {
       id: '1',

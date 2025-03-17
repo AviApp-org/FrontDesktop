@@ -8,11 +8,9 @@ function BatchManagement() {
   const [showNewAviaryForm, setShowNewAviaryForm] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null);
 
-  // Estados para novo lote
   const [newBatchCode, setNewBatchCode] = useState('');
   const [newBatchDate, setNewBatchDate] = useState('');
 
-  // Estados para novo aviário
   const [newAviaryName, setNewAviaryName] = useState('');
   const [newAviaryMaleBirds, setNewAviaryMaleBirds] = useState(0);
   const [newAviaryFemaleBirds, setNewAviaryFemaleBirds] = useState(0);
