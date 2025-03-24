@@ -13,7 +13,7 @@ function Reports() {
   const mockReports: Report[] = [
     {
       id: 'AV001',
-      date: '2024-03-20',
+      date: '20/03/2025',
       statistics: {
         liveBirds: {
           total: 4000,
@@ -36,7 +36,7 @@ function Reports() {
     },
     {
       id: 'AV002',
-      date: '2024-03-19',
+      date: '19/03/2025',
       statistics: {
         liveBirds: {
           total: 3950,
