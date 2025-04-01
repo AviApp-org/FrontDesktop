@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Download, Plus, X, Calendar } from 'lucide-react';
-import { Report } from '../types/interfaces/report';
+import { Report } from '../@types/interfaces/report';
 
 function Reports() {
   const [searchTerm, setSearchTerm] = useState('');

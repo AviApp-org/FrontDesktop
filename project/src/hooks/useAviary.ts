@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { aviaryService } from '../services/aviaryService';
-import { AviaryData } from '../types/interfaces/aviary';
+import { AviaryData } from '../@types/interfaces/aviary';
 
 export function useAviary() {
   const [data, setData] = useState<AviaryData[]>([]);

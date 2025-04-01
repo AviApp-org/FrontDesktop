@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Save, X, Edit2, Check } from 'lucide-react';
-import { Batch, Aviary, Bird } from '../types/interfaces/batch';
+import { Batch, Aviary, Bird } from '../@types/interfaces/batch';
 
 function BatchManagement() {
   const [batches, setBatches] = useState<Batch[]>([]);

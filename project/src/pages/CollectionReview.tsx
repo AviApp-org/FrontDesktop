@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { CollectionEntry, DeadBirds, Category } from '../types/interfaces/collection';
-import { Aviary } from '../types/interfaces/batch';
+import { CollectionEntry, DeadBirds, Category } from '../@types/interfaces/collection';
+import { Aviary } from '../@types/interfaces/batch';
 import { Info } from 'lucide-react';
 
 function CollectionReview() {
