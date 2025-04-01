@@ -1,5 +1,5 @@
 import api from './api';
-import { AviaryData } from '../types/interfaces/aviary';
+import { AviaryData } from '../@types/interfaces/aviary';
 
 export const aviaryService = {
   getAll: () => api.get('/aviaries'),

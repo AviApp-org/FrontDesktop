@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Plus, ChevronDown } from 'lucide-react';
-import { Employee } from '../types/interfaces/personnel';
+import { Employee } from '../@types/interfaces/personnel';
 
 function Personnel() {
   const [searchTerm, setSearchTerm] = useState('');

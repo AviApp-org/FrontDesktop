@@ -1,4 +1,4 @@
-import { AviaryData } from './aviary';
+import { AviaryData } from './AviaryData';
 
 export interface DataSubmission {
   id: string;
