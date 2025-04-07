@@ -4,10 +4,9 @@ import Dashboard from './pages/Dashboard';
 import Reports from './pages/Reports';
 import Financial from './pages/Financial';
 import CollectionReview from './pages/CollectionReview';
-import Personnel from './pages/Personnel';
 import DataEntry from './pages/DataEntry';
 import Layout from './components/Layout';
-import BatchManagement from './pages/BatchManagement';
+import { BatchManagement } from './pages/BatchManagement';
 
 const App: React.FC = () => {
   return (
@@ -50,14 +49,14 @@ const App: React.FC = () => {
         }
       />
       
-      <Route
+      {/* <Route
         path="/employees"
         element={
           <Layout>
             <Personnel />
           </Layout>
         }
-      />
+      /> */}
       
       <Route
         path="/data-entry"

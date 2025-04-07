@@ -1,288 +1,284 @@
 import React, { useState } from 'react';
-import { Plus, Save, X, Edit2, Check } from 'lucide-react';
-import { Batch, Aviary, Bird } from '../@types/interfaces/batch';
+import { useBatchData, usePostBatchData, useUpdateBatchData, useDeleteBatchData } from '../hooks/useBatch';
+import { Batch } from '../types/interfaces/batch';
+import { Plus, Edit, Trash2, AlertCircle } from 'lucide-react';
 
-function BatchManagement() {
-  const [batches, setBatches] = useState<Batch[]>([]);
-  const [showNewBatchForm, setShowNewBatchForm] = useState(false);
-  const [showNewAviaryForm, setShowNewAviaryForm] = useState(false);
+export function BatchManagement() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const [newBatchCode, setNewBatchCode] = useState('');
-  const [newBatchDate, setNewBatchDate] = useState('');
+  const { data: batches, isLoading, error: fetchError } = useBatchData();
+  const createBatch = usePostBatchData();
+  const updateBatch = useUpdateBatchData();
+  const deleteBatch = useDeleteBatchData();
 
-  const [newAviaryName, setNewAviaryName] = useState('');
-  const [newAviaryMaleBirds, setNewAviaryMaleBirds] = useState(0);
-  const [newAviaryFemaleBirds, setNewAviaryFemaleBirds] = useState(0);
-
-  const handleCreateBatch = () => {
-    if (!newBatchCode || !newBatchDate) {
-      alert('Por favor, preencha todos os campos');
-      return;
+  const handleCreateBatch = async (newBatch: Omit<Batch, 'id'>) => {
+    try {
+      await createBatch.mutateAsync(newBatch);
+      setIsModalOpen(false);
+      setError(null);
+    } catch (err) {
+      setError('Erro ao criar lote. Por favor, tente novamente.');
     }
-
-    const newBatch: Batch = {
-      id: Date.now().toString(),
-      code: newBatchCode,
-      startDate: newBatchDate,
-      aviaries: [],
-      isActive: true,
-    };
-
-    setBatches(prev => [...prev, newBatch]);
-    setNewBatchCode('');
-    setNewBatchDate('');
-    setShowNewBatchForm(false);
-    setSelectedBatch(newBatch);
   };
 
-  const handleCreateAviary = () => {
-    if (!selectedBatch || !newAviaryName) {
-      alert('Por favor, preencha todos os campos');
-      return;
+  const handleUpdateBatch = async (updatedBatch: Batch) => {
+    try {
+      await updateBatch.mutateAsync(updatedBatch);
+      setSelectedBatch(null);
+      setError(null);
+    } catch (err) {
+      setError('Erro ao atualizar lote. Por favor, tente novamente.');
     }
+  };
 
-    const newAviary: Aviary = {
-      id: Date.now().toString(),
-      name: newAviaryName,
-      initialBirds: {
-        male: newAviaryMaleBirds,
-        female: newAviaryFemaleBirds,
-      },
-      currentBirds: {
-        male: newAviaryMaleBirds,
-        female: newAviaryFemaleBirds,
-      },
-      isActive: true,
-    };
+  const handleDeleteBatch = async (batchId: number) => {
+    if (window.confirm('Tem certeza que deseja excluir este lote?')) {
+      try {
+        await deleteBatch.mutateAsync(batchId);
+        setError(null);
+      } catch (err) {
+        setError('Erro ao excluir lote. Por favor, tente novamente.');
+      }
+    }
+  };
 
-    setBatches(prev =>
-      prev.map(batch => {
-        if (batch.id === selectedBatch.id) {
-          return {
-            ...batch,
-            aviaries: [...batch.aviaries, newAviary],
-          };
-        }
-        return batch;
-      })
+  if (isLoading) {
+    return (
+      <div className="page-container">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      </div>
     );
+  }
 
-    setNewAviaryName('');
-    setNewAviaryMaleBirds(0);
-    setNewAviaryFemaleBirds(0);
-    setShowNewAviaryForm(false);
-  };
+  if (fetchError) {
+    return (
+      <div className="page-container">
+        <div className="flex items-center justify-center h-64 text-danger">
+          <AlertCircle className="w-6 h-6 mr-2" />
+          <span>Erro ao carregar lotes. Por favor, tente novamente mais tarde.</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900">Gerenciamento de Lotes</h2>
+    <div className="page-container">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="page-title">Gerenciamento de Lotes</h1>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="btn-primary flex items-center"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Novo Lote
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-8">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-semibold">Lotes</h3>
-            <button
-              onClick={() => setShowNewBatchForm(true)}
-              className="bg-green-600 text-white w-36 px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center justify-center gap-2">
-              <Plus className="h-5 w-5" />
-              <span>Novo Lote</span>
-            </button>
-          </div>
-
-          {batches.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {batches.map(batch => (
-                <div
-                  key={batch.id}
-                  className={`bg-white rounded-lg shadow p-6 cursor-pointer transition-colors ${
-                    selectedBatch?.id === batch.id ? 'ring-2 ring-green-500' : ''
-                  }`}
-                  onClick={() => setSelectedBatch(batch)}
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold">Lote {batch.code}</h3>
-                      <p className="text-sm text-gray-500">
-                        Início: {new Date(batch.startDate).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        batch.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {batch.isActive ? 'Ativo' : 'Inativo'}
-                    </span>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600">Total de Aviários: {batch.aviaries.length}</p>
-                    <p className="text-sm text-gray-600">
-                      Total de Aves:{' '}
-                      {batch.aviaries.reduce(
-                        (acc, aviary) => acc + aviary.currentBirds.male + aviary.currentBirds.female,
-                        0
-                      )}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-12">
-              <p className="text-gray-500 mb-4">Nenhum lote cadastrado</p>
-            </div>
-          )}
-        </div>
-
-        {selectedBatch && (
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-semibold">Aviários do Lote {selectedBatch.code}</h3>
-              <button
-                onClick={() => setShowNewAviaryForm(true)}
-                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
-              >
-                <Plus className="h-5 w-5" />
-                <span>Novo Aviário</span>
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {selectedBatch.aviaries.map(aviary => (
-                <div key={aviary.id} className="bg-white rounded-lg shadow p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <h4 className="text-lg font-semibold">{aviary.name}</h4>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        aviary.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {aviary.isActive ? 'Ativo' : 'Inativo'}
-                    </span>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Galos:</span>
-                      <span className="font-medium">{aviary.currentBirds.male}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">Galinhas:</span>
-                      <span className="font-medium">{aviary.currentBirds.female}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Keep existing modals */}
-      {showNewBatchForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Novo Lote</h3>
-              <button
-                onClick={() => setShowNewBatchForm(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Código do Lote
-                </label>
-                <input
-                  type="text"
-                  value={newBatchCode}
-                  onChange={e => setNewBatchCode(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                  placeholder="Ex: LOTE001"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Data de Início
-                </label>
-                <input
-                  type="date"
-                  value={newBatchDate}
-                  onChange={e => setNewBatchDate(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                />
-              </div>
-              <button
-                onClick={handleCreateBatch}
-                className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors"
-              >
-                Criar Lote
-              </button>
-            </div>
-          </div>
+      {error && (
+        <div className="bg-danger/10 text-danger p-4 rounded-lg mb-6 flex items-center">
+          <AlertCircle className="w-5 h-5 mr-2" />
+          {error}
         </div>
       )}
 
-      {showNewAviaryForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Novo Aviário</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {batches?.map((batch) => (
+          <div key={batch.id} className="card">
+            <div className="card-header">
+              <h3 className="card-title">Lote {batch.id}</h3>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setSelectedBatch(batch)}
+                  className="btn-icon text-info hover:bg-info/10"
+                >
+                  <Edit className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleDeleteBatch(batch.id)}
+                  className="btn-icon text-danger hover:bg-danger/10"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            <div className="p-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Data de Entrada</p>
+                  <p className="font-medium">{new Date(batch.entryDate).toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Quantidade</p>
+                  <p className="font-medium">{batch.quantity}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Aviário</p>
+                  <p className="font-medium">{batch.aviary}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Status</p>
+                  <p className="font-medium">{batch.status}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Modal para criar/editar lote */}
+      {isModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2 className="text-xl font-semibold">
+                {selectedBatch ? 'Editar Lote' : 'Novo Lote'}
+              </h2>
               <button
-                onClick={() => setShowNewAviaryForm(false)}
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setSelectedBatch(null);
+                }}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <X className="h-5 w-5" />
+                ×
               </button>
             </div>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nome do Aviário
-                </label>
-                <input
-                  type="text"
-                  value={newAviaryName}
-                  onChange={e => setNewAviaryName(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                  placeholder="Ex: Aviário A"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Quantidade de Galos
-                </label>
-                <input
-                  type="number"
-                  value={newAviaryMaleBirds}
-                  onChange={e => setNewAviaryMaleBirds(Number(e.target.value))}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                  min="0"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Quantidade de Galinhas
-                </label>
-                <input
-                  type="number"
-                  value={newAviaryFemaleBirds}
-                  onChange={e => setNewAviaryFemaleBirds(Number(e.target.value))}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
-                  min="0"
-                />
-              </div>
-              <button
-                onClick={handleCreateAviary}
-                className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors"
-              >
-                Criar Aviário
-              </button>
+            <div className="modal-body">
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const batchData = {
+                  farmId: 1, // Temporário, deve vir do contexto de autenticação
+                  name: formData.get('name') as string,
+                  entryDate: formData.get('entryDate') as string,
+                  quantity: Number(formData.get('quantity')),
+                  aviary: formData.get('aviary') as string,
+                  status: (formData.get('status') as Batch['status']) || 'ACTIVE',
+                  startDate: formData.get('startDate') as string,
+                };
+
+                if (selectedBatch) {
+                  handleUpdateBatch({ ...batchData, id: selectedBatch.id });
+                } else {
+                  handleCreateBatch(batchData);
+                }
+              }}>
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="name" className="input-label">
+                      Nome do Lote
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      defaultValue={selectedBatch?.name}
+                      className="input-default"
+                      placeholder="Ex: LOTE001"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="entryDate" className="input-label">
+                      Data de Entrada
+                    </label>
+                    <input
+                      type="date"
+                      id="entryDate"
+                      name="entryDate"
+                      defaultValue={selectedBatch?.entryDate}
+                      className="input-default"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="quantity" className="input-label">
+                      Quantidade
+                    </label>
+                    <input
+                      type="number"
+                      id="quantity"
+                      name="quantity"
+                      defaultValue={selectedBatch?.quantity}
+                      className="input-default"
+                      min="0"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="aviary" className="input-label">
+                      Aviário
+                    </label>
+                    <input
+                      type="text"
+                      id="aviary"
+                      name="aviary"
+                      defaultValue={selectedBatch?.aviary}
+                      className="input-default"
+                      placeholder="Ex: AVIÁRIO 1"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="status" className="input-label">
+                      Status
+                    </label>
+                    <select
+                      id="status"
+                      name="status"
+                      defaultValue={selectedBatch?.status || 'ACTIVE'}
+                      className="input-default"
+                      required
+                    >
+                      <option value="ACTIVE">Ativo</option>
+                      <option value="COMPLETED">Concluído</option>
+                      <option value="CANCELLED">Cancelado</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label htmlFor="startDate" className="input-label">
+                      Data de Início
+                    </label>
+                    <input
+                      type="date"
+                      id="startDate"
+                      name="startDate"
+                      defaultValue={selectedBatch?.startDate}
+                      className="input-default"
+                      required
+                    />
+                  </div>
+
+                  <div className="flex justify-end space-x-3 mt-6">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsModalOpen(false);
+                        setSelectedBatch(null);
+                      }}
+                      className="btn-secondary"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn-primary"
+                      disabled={createBatch.isPending || updateBatch.isPending}
+                    >
+                      {selectedBatch ? 'Salvar' : 'Criar'} Lote
+                    </button>
+                  </div>
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -290,5 +286,3 @@ function BatchManagement() {
     </div>
   );
 }
-
-export default BatchManagement;

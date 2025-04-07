@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { CollectionEntry, DeadBirds, Category } from '../@types/interfaces/collection';
-import { Aviary } from '../@types/interfaces/batch';
+
 import { Info } from 'lucide-react';
+import { Aviary, Category, CollectionEntry, DeadBirds, } from '@/@types/collection';
 
 function CollectionReview() {
   
@@ -9,14 +9,14 @@ function CollectionReview() {
     {
       id: '1',
       name: 'Aviário A',
-      initialBirds: { male: 100, female: 1000 },
+      initialBrids: { male: 100, female: 1000 },
       currentBirds: { male: 95, female: 980 },
       isActive: true,
     },
     {
       id: '2',
       name: 'Aviário B',
-      initialBirds: { male: 150, female: 1500 },
+      initialBrids: { male: 150, female: 1500 },
       currentBirds: { male: 148, female: 1490 },
       isActive: true,
     },
@@ -97,7 +97,7 @@ function CollectionReview() {
           >
             <option value="">Selecione um aviário</option>
             {aviaries.map(aviary => (
-              <option key={aviary.id} value={aviary.id}>
+              <option key={aviary.id} value={aviary.id?.toString()}>
                 {aviary.name} - Aves: {aviary.currentBirds.male + aviary.currentBirds.female}
               </option>
             ))}
