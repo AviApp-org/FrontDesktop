@@ -1,69 +1,140 @@
 import React, { useState } from 'react';
-import { useBatchData, usePostBatchData, useUpdateBatchData, useDeleteBatchData } from '../hooks/useBatch';
+import { usePostBatchData, useActivateBatchData, useDeactivateBatchData } from '../hooks/useBatch';
 import { Batch } from '../types/interfaces/batch';
 import { Plus, Edit, Trash2, AlertCircle } from 'lucide-react';
+import { formatDate } from '../utils/formatDate';
+
+// Mock temporário para listar lotes até que o backend tenha um endpoint para isso
+const mockBatches: Batch[] = [
+  {
+    id: 1,
+    name: 'Lote 001',
+    status: 'ACTIVE',
+    farmId: 1,
+    startDate: '2023-04-01',
+  },
+  {
+    id: 2,
+    name: 'Lote 002',
+    status: 'ACTIVE',
+    farmId: 1,
+    startDate: '2023-04-15',
+  },
+  {
+    id: 3,
+    name: 'Lote 003',
+    status: 'COMPLETED',
+    farmId: 1,
+    startDate: '2023-03-01',
+  },
+];
+
+// Função para traduzir o status para português
+const translateStatus = (status: string): string => {
+  switch (status) {
+    case 'ACTIVE':
+      return 'Ativo';
+    case 'COMPLETED':
+      return 'Concluído';
+    case 'CANCELLED':
+      return 'Cancelado';
+    default:
+      return status;
+  }
+};
 
 export function BatchManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [batches, setBatches] = useState<Batch[]>(mockBatches);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { data: batches, isLoading, error: fetchError } = useBatchData();
-  const createBatch = usePostBatchData();
-  const updateBatch = useUpdateBatchData();
-  const deleteBatch = useDeleteBatchData();
+  const { mutate: createBatch, isPending: isCreating } = usePostBatchData();
+  const { mutate: activateBatch, isPending: isActivating } = useActivateBatchData();
+  const { mutate: deactivateBatch, isPending: isDeactivating } = useDeactivateBatchData();
 
-  const handleCreateBatch = async (newBatch: Omit<Batch, 'id'>) => {
-    try {
-      await createBatch.mutateAsync(newBatch);
-      setIsModalOpen(false);
-      setError(null);
-    } catch (err) {
-      setError('Erro ao criar lote. Por favor, tente novamente.');
+  const validateBatchData = (data: Omit<Batch, 'id'>): boolean => {
+    const errors: Record<string, string> = {};
+    
+    if (!data.name || data.name.trim() === '') {
+      errors.name = 'Nome do lote é obrigatório';
     }
+    
+    if (!data.startDate) {
+      errors.startDate = 'Data de início é obrigatória';
+    }
+    
+    if (!data.farmId) {
+      errors.farmId = 'ID da fazenda é obrigatório';
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
-  const handleUpdateBatch = async (updatedBatch: Batch) => {
-    try {
-      await updateBatch.mutateAsync(updatedBatch);
-      setSelectedBatch(null);
-      setError(null);
-    } catch (err) {
-      setError('Erro ao atualizar lote. Por favor, tente novamente.');
+  const handleCreateBatch = (newBatch: Omit<Batch, 'id'>) => {
+    setError(null);
+    setFormErrors({});
+    setIsSubmitting(true);
+    
+    if (!validateBatchData(newBatch)) {
+      setIsSubmitting(false);
+      return;
     }
+    
+    // Garantir que apenas os campos necessários sejam enviados
+    const batchData = {
+      name: newBatch.name,
+      startDate: newBatch.startDate,
+      status: newBatch.status || 'ACTIVE',
+      farmId: newBatch.farmId
+    };
+    
+    createBatch(batchData, {
+      onSuccess: (createdBatch) => {
+        setBatches([...batches, createdBatch]);
+        setIsModalOpen(false);
+        setIsSubmitting(false);
+      },
+      onError: (error) => {
+        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao criar lote';
+        setError('Erro ao criar lote: ' + errorMessage);
+        setIsSubmitting(false);
+      },
+    });
   };
 
-  const handleDeleteBatch = async (batchId: number) => {
-    if (window.confirm('Tem certeza que deseja excluir este lote?')) {
-      try {
-        await deleteBatch.mutateAsync(batchId);
-        setError(null);
-      } catch (err) {
-        setError('Erro ao excluir lote. Por favor, tente novamente.');
-      }
-    }
+  const handleActivateBatch = (id: number) => {
+    setError(null);
+    activateBatch(id, {
+      onSuccess: () => {
+        setBatches(batches.map(batch => 
+          batch.id === id ? { ...batch, status: 'ACTIVE' as const } : batch
+        ));
+      },
+      onError: (error) => {
+        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao ativar lote';
+        setError('Erro ao ativar lote: ' + errorMessage);
+      },
+    });
   };
 
-  if (isLoading) {
-    return (
-      <div className="page-container">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-      </div>
-    );
-  }
-
-  if (fetchError) {
-    return (
-      <div className="page-container">
-        <div className="flex items-center justify-center h-64 text-danger">
-          <AlertCircle className="w-6 h-6 mr-2" />
-          <span>Erro ao carregar lotes. Por favor, tente novamente mais tarde.</span>
-        </div>
-      </div>
-    );
-  }
+  const handleDeactivateBatch = (id: number) => {
+    setError(null);
+    deactivateBatch(id, {
+      onSuccess: () => {
+        setBatches(batches.map(batch => 
+          batch.id === id ? { ...batch, status: 'CANCELLED' as const } : batch
+        ));
+      },
+      onError: (error) => {
+        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao desativar lote';
+        setError('Erro ao desativar lote: ' + errorMessage);
+      },
+    });
+  };
 
   return (
     <div className="page-container">
@@ -72,9 +143,10 @@ export function BatchManagement() {
         <button
           onClick={() => setIsModalOpen(true)}
           className="btn-primary flex items-center"
+          disabled={isCreating || isSubmitting}
         >
           <Plus className="w-4 h-4 mr-2" />
-          Novo Lote
+          {isCreating || isSubmitting ? 'Criando...' : 'Novo Lote'}
         </button>
       </div>
 
@@ -85,67 +157,66 @@ export function BatchManagement() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {batches?.map((batch) => (
-          <div key={batch.id} className="card">
-            <div className="card-header">
-              <h3 className="card-title">Lote {batch.id}</h3>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => setSelectedBatch(batch)}
-                  className="btn-icon text-info hover:bg-info/10"
-                >
-                  <Edit className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => handleDeleteBatch(batch.id)}
-                  className="btn-icon text-danger hover:bg-danger/10"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-            <div className="p-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">Data de Entrada</p>
-                  <p className="font-medium">{new Date(batch.entryDate).toLocaleDateString()}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Quantidade</p>
-                  <p className="font-medium">{batch.quantity}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Aviário</p>
-                  <p className="font-medium">{batch.aviary}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Status</p>
-                  <p className="font-medium">{batch.status}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
+      <div className="card">
+        <div className="card-header">
+          <h2 className="card-title">Lista de Lotes</h2>
+        </div>
+
+        <div className="table-container">
+          <table className="table-default">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Data de Início</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {batches.map((batch) => (
+                <tr key={batch.id}>
+                  <td>{batch.name}</td>
+                  <td>{formatDate(batch.startDate)}</td>
+                  <td>{translateStatus(batch.status)}</td>
+                  <td>
+                    <button
+                      className="btn-icon"
+                      onClick={() => setSelectedBatch(batch)}
+                      disabled={isActivating || isDeactivating || isSubmitting}
+                    >
+                      Editar
+                    </button>
+                    {batch.status === 'ACTIVE' ? (
+                      <button
+                        className="btn-icon"
+                        onClick={() => handleDeactivateBatch(batch.id)}
+                        disabled={isDeactivating || isSubmitting}
+                      >
+                        Desativar
+                      </button>
+                    ) : (
+                      <button
+                        className="btn-icon"
+                        onClick={() => handleActivateBatch(batch.id)}
+                        disabled={isActivating || isSubmitting}
+                      >
+                        Ativar
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Modal para criar/editar lote */}
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-header">
-              <h2 className="text-xl font-semibold">
-                {selectedBatch ? 'Editar Lote' : 'Novo Lote'}
-              </h2>
-              <button
-                onClick={() => {
-                  setIsModalOpen(false);
-                  setSelectedBatch(null);
-                }}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                ×
-              </button>
+              <h3>Novo Lote</h3>
+              <button onClick={() => setIsModalOpen(false)} disabled={isSubmitting}>×</button>
             </div>
             <div className="modal-body">
               <form onSubmit={(e) => {
@@ -154,18 +225,11 @@ export function BatchManagement() {
                 const batchData = {
                   farmId: 1, // Temporário, deve vir do contexto de autenticação
                   name: formData.get('name') as string,
-                  entryDate: formData.get('entryDate') as string,
-                  quantity: Number(formData.get('quantity')),
-                  aviary: formData.get('aviary') as string,
-                  status: (formData.get('status') as Batch['status']) || 'ACTIVE',
                   startDate: formData.get('startDate') as string,
+                  status: (formData.get('status') as Batch['status']) || 'ACTIVE',
                 };
 
-                if (selectedBatch) {
-                  handleUpdateBatch({ ...batchData, id: selectedBatch.id });
-                } else {
-                  handleCreateBatch(batchData);
-                }
+                handleCreateBatch(batchData);
               }}>
                 <div className="space-y-4">
                   <div>
@@ -176,72 +240,14 @@ export function BatchManagement() {
                       type="text"
                       id="name"
                       name="name"
-                      defaultValue={selectedBatch?.name}
-                      className="input-default"
+                      className={`input-default ${formErrors.name ? 'input-error' : ''}`}
                       placeholder="Ex: LOTE001"
                       required
+                      disabled={isSubmitting}
                     />
-                  </div>
-
-                  <div>
-                    <label htmlFor="entryDate" className="input-label">
-                      Data de Entrada
-                    </label>
-                    <input
-                      type="date"
-                      id="entryDate"
-                      name="entryDate"
-                      defaultValue={selectedBatch?.entryDate}
-                      className="input-default"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="quantity" className="input-label">
-                      Quantidade
-                    </label>
-                    <input
-                      type="number"
-                      id="quantity"
-                      name="quantity"
-                      defaultValue={selectedBatch?.quantity}
-                      className="input-default"
-                      min="0"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="aviary" className="input-label">
-                      Aviário
-                    </label>
-                    <input
-                      type="text"
-                      id="aviary"
-                      name="aviary"
-                      defaultValue={selectedBatch?.aviary}
-                      className="input-default"
-                      placeholder="Ex: AVIÁRIO 1"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="status" className="input-label">
-                      Status
-                    </label>
-                    <select
-                      id="status"
-                      name="status"
-                      defaultValue={selectedBatch?.status || 'ACTIVE'}
-                      className="input-default"
-                      required
-                    >
-                      <option value="ACTIVE">Ativo</option>
-                      <option value="COMPLETED">Concluído</option>
-                      <option value="CANCELLED">Cancelado</option>
-                    </select>
+                    {formErrors.name && (
+                      <span className="text-danger text-sm">{formErrors.name}</span>
+                    )}
                   </div>
 
                   <div>
@@ -252,29 +258,147 @@ export function BatchManagement() {
                       type="date"
                       id="startDate"
                       name="startDate"
-                      defaultValue={selectedBatch?.startDate}
+                      className={`input-default ${formErrors.startDate ? 'input-error' : ''}`}
+                      required
+                      disabled={isSubmitting}
+                    />
+                    {formErrors.startDate && (
+                      <span className="text-danger text-sm">{formErrors.startDate}</span>
+                    )}
+                  </div>
+
+                  <div>
+                    <label htmlFor="status" className="input-label">
+                      Status
+                    </label>
+                    <select
+                      id="status"
+                      name="status"
                       className="input-default"
                       required
-                    />
+                      disabled={isSubmitting}
+                    >
+                      <option value="ACTIVE">Ativo</option>
+                      <option value="COMPLETED">Concluído</option>
+                      <option value="CANCELLED">Cancelado</option>
+                    </select>
                   </div>
 
                   <div className="flex justify-end space-x-3 mt-6">
                     <button
                       type="button"
-                      onClick={() => {
-                        setIsModalOpen(false);
-                        setSelectedBatch(null);
-                      }}
+                      onClick={() => setIsModalOpen(false)}
                       className="btn-secondary"
+                      disabled={isSubmitting}
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
                       className="btn-primary"
-                      disabled={createBatch.isPending || updateBatch.isPending}
+                      disabled={isCreating || isActivating || isDeactivating || isSubmitting}
                     >
-                      {selectedBatch ? 'Salvar' : 'Criar'} Lote
+                      {isSubmitting ? 'Criando...' : 'Criar Lote'}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selectedBatch && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>Editar Lote</h3>
+              <button onClick={() => setSelectedBatch(null)} disabled={isSubmitting}>×</button>
+            </div>
+            <div className="modal-body">
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const batchData = {
+                  farmId: 1, // Temporário, deve vir do contexto de autenticação
+                  name: formData.get('name') as string,
+                  startDate: formData.get('startDate') as string,
+                  status: (formData.get('status') as Batch['status']) || 'ACTIVE',
+                };
+
+                handleCreateBatch(batchData);
+              }}>
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="name" className="input-label">
+                      Nome do Lote
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      defaultValue={selectedBatch.name}
+                      className={`input-default ${formErrors.name ? 'input-error' : ''}`}
+                      placeholder="Ex: LOTE001"
+                      required
+                      disabled={isSubmitting}
+                    />
+                    {formErrors.name && (
+                      <span className="text-danger text-sm">{formErrors.name}</span>
+                    )}
+                  </div>
+
+                  <div>
+                    <label htmlFor="startDate" className="input-label">
+                      Data de Início
+                    </label>
+                    <input
+                      type="date"
+                      id="startDate"
+                      name="startDate"
+                      defaultValue={selectedBatch.startDate}
+                      className={`input-default ${formErrors.startDate ? 'input-error' : ''}`}
+                      required
+                      disabled={isSubmitting}
+                    />
+                    {formErrors.startDate && (
+                      <span className="text-danger text-sm">{formErrors.startDate}</span>
+                    )}
+                  </div>
+
+                  <div>
+                    <label htmlFor="status" className="input-label">
+                      Status
+                    </label>
+                    <select
+                      id="status"
+                      name="status"
+                      defaultValue={selectedBatch.status}
+                      className="input-default"
+                      required
+                      disabled={isSubmitting}
+                    >
+                      <option value="ACTIVE">Ativo</option>
+                      <option value="COMPLETED">Concluído</option>
+                      <option value="CANCELLED">Cancelado</option>
+                    </select>
+                  </div>
+
+                  <div className="flex justify-end space-x-3 mt-6">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedBatch(null)}
+                      className="btn-secondary"
+                      disabled={isSubmitting}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn-primary"
+                      disabled={isCreating || isActivating || isDeactivating || isSubmitting}
+                    >
+                      {isSubmitting ? 'Salvando...' : 'Salvar Lote'}
                     </button>
                   </div>
                 </div>

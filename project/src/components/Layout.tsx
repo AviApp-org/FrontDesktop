@@ -15,7 +15,7 @@ const sidebarItems = [
   { icon: LayoutDashboard, text: 'Dashboard', path: '/' },
   { icon: ClipboardCheck, text: 'Revisão de coletas', path: '/review' },
   { icon: FileBarChart, text: 'Relatórios', path: '/reports' },
-  { icon: Home, text: 'Lotes e aviários', path: '/lots' },
+  { icon: Home, text: 'Lotes e aviários', path: '/batches' },
   { icon: Users, text: 'Funcionários', path: '/employees' },
   { icon: DollarSign, text: 'Financeiro', path: '/financial' },
   { icon: FileInput, text: 'Entrada de dados', path: '/data-entry' },

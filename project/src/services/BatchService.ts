@@ -1,27 +1,23 @@
 import { Batch } from '../types/interfaces/batch';
-import axios, { AxiosPromise } from 'axios';
+import axios from 'axios';
+import { API_URL } from '../config/api';
 
-const API_URL = "http://localhost:8080";
-
-class BatchService {
-  async getAll(): Promise<Batch[]> {
-    const response = await axios.get(`${API_URL}/batches`);
+export class BatchService {
+  static async getById(id: number): Promise<Batch> {
+    const response = await axios.get(`${API_URL}/api/batches/${id}`);
     return response.data;
   }
 
-  async create(batch: Omit<Batch, 'id'>): Promise<Batch> {
-    const response = await axios.post(`${API_URL}/batches`, batch);
+  static async create(batch: Omit<Batch, 'id'>): Promise<Batch> {
+    const response = await axios.post(`${API_URL}/api/batches`, batch);
     return response.data;
   }
 
-  async update(id: number, batch: Partial<Batch>): Promise<Batch> {
-    const response = await axios.put(`${API_URL}/batches/${id}`, batch);
-    return response.data;
+  static async activate(id: number): Promise<void> {
+    await axios.patch(`${API_URL}/api/batches/${id}/activate`);
   }
 
-  async delete(id: number): Promise<void> {
-    await axios.delete(`${API_URL}/batches/${id}`);
+  static async deactivate(id: number): Promise<void> {
+    await axios.patch(`${API_URL}/api/batches/${id}/deactivate`);
   }
-}
-
-export const batchService = new BatchService(); 
+} 
