@@ -126,7 +126,28 @@ export function usePostBatchData() {
 
       console.log('Dados formatados para envio:', formattedBatch);
 
-      const response = await api.post<Batch>(API_ENDPOINTS.batches, formattedBatch);
+      const response = await api.post<Batch>('/api/batches', formattedBatch);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['batches'] });
+    },
+  });
+}
+
+export function useUpdateBatchData() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: Partial<Omit<Batch, 'id'>> }) => {
+      const formattedData = {
+        ...data,
+        startDate: data.startDate ? formatDateToDDMMYYYY(data.startDate) : undefined,
+      };
+
+      console.log('Dados formatados para atualização:', formattedData);
+
+      const response = await api.put<Batch>(`/api/batches/${id}`, formattedData);
       return response.data;
     },
     onSuccess: () => {
@@ -140,7 +161,7 @@ export function useActivateBatchData() {
 
   return useMutation({
     mutationFn: async (id: number) => {
-      const response = await api.patch<Batch>(`${API_ENDPOINTS.batches}/${id}/activate`);
+      const response = await api.patch(`/api/batches/${id}/activate`);
       return response.data;
     },
     onSuccess: () => {
@@ -154,7 +175,7 @@ export function useDeactivateBatchData() {
 
   return useMutation({
     mutationFn: async (id: number) => {
-      const response = await api.patch<Batch>(`${API_ENDPOINTS.batches}/${id}/deactivate`);
+      const response = await api.patch(`/api/batches/${id}/deactivate`);
       return response.data;
     },
     onSuccess: () => {

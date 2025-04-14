@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { usePostBatchData, useActivateBatchData, useDeactivateBatchData } from '../hooks/useBatch';
+import { usePostBatchData, useUpdateBatchData, useActivateBatchData, useDeactivateBatchData } from '../hooks/useBatch';
 import { Batch } from '../types/interfaces/batch';
 import { Plus, Edit, Trash2, AlertCircle } from 'lucide-react';
 import { formatDate } from '../utils/formatDate';
@@ -52,6 +52,7 @@ export function BatchManagement() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { mutate: createBatch, isPending: isCreating } = usePostBatchData();
+  const { mutate: updateBatch, isPending: isUpdating } = useUpdateBatchData();
   const { mutate: activateBatch, isPending: isActivating } = useActivateBatchData();
   const { mutate: deactivateBatch, isPending: isDeactivating } = useDeactivateBatchData();
 
@@ -132,6 +133,44 @@ export function BatchManagement() {
       onError: (error) => {
         const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao desativar lote';
         setError('Erro ao desativar lote: ' + errorMessage);
+      },
+    });
+  };
+
+  const handleUpdateBatch = (id: number, updatedData: Partial<Omit<Batch, 'id'>>) => {
+    setError(null);
+    setFormErrors({});
+    setIsSubmitting(true);
+    
+    // Validar apenas os campos que estão sendo atualizados
+    const errors: Record<string, string> = {};
+    
+    if (updatedData.name !== undefined && (!updatedData.name || updatedData.name.trim() === '')) {
+      errors.name = 'Nome do lote é obrigatório';
+    }
+    
+    if (updatedData.startDate !== undefined && !updatedData.startDate) {
+      errors.startDate = 'Data de início é obrigatória';
+    }
+    
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      setIsSubmitting(false);
+      return;
+    }
+    
+    updateBatch({ id, data: updatedData }, {
+      onSuccess: (updatedBatch) => {
+        setBatches(batches.map(batch => 
+          batch.id === id ? updatedBatch : batch
+        ));
+        setSelectedBatch(null);
+        setIsSubmitting(false);
+      },
+      onError: (error) => {
+        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao atualizar lote';
+        setError('Erro ao atualizar lote: ' + errorMessage);
+        setIsSubmitting(false);
       },
     });
   };
@@ -320,13 +359,12 @@ export function BatchManagement() {
                 e.preventDefault();
                 const formData = new FormData(e.currentTarget);
                 const batchData = {
-                  farmId: 1, // Temporário, deve vir do contexto de autenticação
                   name: formData.get('name') as string,
                   startDate: formData.get('startDate') as string,
-                  status: (formData.get('status') as Batch['status']) || 'ACTIVE',
+                  status: formData.get('status') as Batch['status'],
                 };
 
-                handleCreateBatch(batchData);
+                handleUpdateBatch(selectedBatch.id, batchData);
               }}>
                 <div className="space-y-4">
                   <div>
@@ -396,7 +434,7 @@ export function BatchManagement() {
                     <button
                       type="submit"
                       className="btn-primary"
-                      disabled={isCreating || isActivating || isDeactivating || isSubmitting}
+                      disabled={isUpdating || isSubmitting}
                     >
                       {isSubmitting ? 'Salvando...' : 'Salvar Lote'}
                     </button>

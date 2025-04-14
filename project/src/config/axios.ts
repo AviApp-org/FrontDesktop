@@ -1,27 +1,21 @@
 import axios from 'axios';
 import { API_URL } from './api';
 
-// Criar uma instância do Axios com configurações padrão
+// Configuração base do Axios
 const api = axios.create({
   baseURL: API_URL,
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
   },
-  timeout: 10000, // 10 segundos
 });
 
 // Interceptor para requisições
 api.interceptors.request.use(
   (config) => {
-    // Adicionar token de autenticação se necessário
-    // const token = localStorage.getItem('token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
-    
     // Log da requisição para debug
     console.log(`Requisição ${config.method?.toUpperCase()} para ${config.url}`, config.data);
-    
     return config;
   },
   (error) => {
@@ -38,7 +32,6 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Tratamento global de erros
     if (error.response) {
       // O servidor respondeu com um status de erro
       console.error('Erro na resposta:', error.response.status, error.response.data);
@@ -46,11 +39,6 @@ api.interceptors.response.use(
       // Tratamento específico para erros 400
       if (error.response.status === 400) {
         console.error('Erro de validação. Verifique os dados enviados:', error.response.data);
-      }
-      
-      // Tratamento específico para erros 405
-      if (error.response.status === 405) {
-        console.error('Método não permitido. Verifique se o servidor está configurado corretamente.');
       }
       
       // Tratamento específico para erros 404
