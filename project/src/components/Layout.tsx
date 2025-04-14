@@ -35,7 +35,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="p-4 border-b">
             <div className="flex items-center">
               <Egg className="h-8 w-8 text-green-600 mr-2" />
-              <h1 className="text-2xl font-bold text-green-900">AviApp</h1>
+              <h1 className="text-2xl font-bold text-green-900">Zuvo</h1>
             </div>
           </div>
 
@@ -62,7 +62,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
           {/* Footer */}
           <div className="p-6 border-t">
-            <p className="text-sm text-gray-600">© 2024 AviApp</p>
+            <p className="text-sm text-gray-600">© 2022 Zuvo</p>
           </div>
         </div>
       </div>
