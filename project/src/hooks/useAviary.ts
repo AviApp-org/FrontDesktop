@@ -1,27 +1,45 @@
-import { useState, useEffect } from 'react';
-import { aviaryService } from '../services/aviaryService';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AviaryData } from '../@types/AviaryData';
+import { aviaryService } from '../services/aviaryService';
 
-export function useAviary() {
-  const [data, setData] = useState<AviaryData[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export function useAviaries(batchId: number) {
+  return useQuery({
+    queryKey: ['aviaries', batchId],
+    queryFn: () => aviaryService.getAll(batchId),
+    enabled: !!batchId,
+  });
+}
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const response = await aviaryService.getAll();
-      setData(response.data);
-    } catch (error) {
-      setError('Erro ao carregar dados');
-    } finally {
-      setLoading(false);
-    }
-  };
+export function useCreateAviary() {
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  return useMutation({
+    mutationFn: (aviary: Omit<AviaryData, 'id'>) => aviaryService.create(aviary),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['aviaries', variables.batchId] });
+    },
+  });
+}
 
-  return { data, loading, error, refetch: fetchData };
+export function useUpdateAviary() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Partial<AviaryData> }) => 
+      aviaryService.update(id, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['aviaries', variables.data.batchId] });
+    },
+  });
+}
+
+export function useDeleteAviary() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => aviaryService.delete(id),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['aviaries'] });
+    },
+  });
 }

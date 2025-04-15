@@ -1,33 +1,10 @@
 import React, { useState } from 'react';
 import { usePostBatchData, useUpdateBatchData, useActivateBatchData, useDeactivateBatchData } from '../hooks/useBatch';
+import { useAviaries, useCreateAviary, useUpdateAviary, useDeleteAviary } from '../hooks/useAviary';
 import { Batch } from '../types/interfaces/batch';
-import { Plus, Edit, Trash2, AlertCircle } from 'lucide-react';
+import { AviaryData } from '../@types/AviaryData';
+import { Plus, Edit, Trash2, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { formatDate } from '../utils/formatDate';
-
-// Mock temporário para listar lotes até que o backend tenha um endpoint para isso
-const mockBatches: Batch[] = [
-  {
-    id: 1,
-    name: 'Lote 001',
-    status: 'ACTIVE',
-    farmId: 1,
-    startDate: '2023-04-01',
-  },
-  {
-    id: 2,
-    name: 'Lote 002',
-    status: 'ACTIVE',
-    farmId: 1,
-    startDate: '2023-04-15',
-  },
-  {
-    id: 3,
-    name: 'Lote 003',
-    status: 'COMPLETED',
-    farmId: 1,
-    startDate: '2023-03-01',
-  },
-];
 
 // Função para traduzir o status para português
 const translateStatus = (status: string): string => {
@@ -45,9 +22,12 @@ const translateStatus = (status: string): string => {
 
 export function BatchManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAviaryModalOpen, setIsAviaryModalOpen] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null);
+  const [selectedAviary, setSelectedAviary] = useState<AviaryData | null>(null);
+  const [expandedBatches, setExpandedBatches] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [batches, setBatches] = useState<Batch[]>(mockBatches);
+  const [batches, setBatches] = useState<Batch[]>([]);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -55,6 +35,59 @@ export function BatchManagement() {
   const { mutate: updateBatch, isPending: isUpdating } = useUpdateBatchData();
   const { mutate: activateBatch, isPending: isActivating } = useActivateBatchData();
   const { mutate: deactivateBatch, isPending: isDeactivating } = useDeactivateBatchData();
+  const { mutate: createAviary } = useCreateAviary();
+  const { mutate: updateAviary } = useUpdateAviary();
+  const { mutate: deleteAviary } = useDeleteAviary();
+
+  // Buscar aviários quando um lote é expandido
+  const { data: aviariesData, isLoading: isLoadingAviaries } = useAviaries(
+    expandedBatches.length > 0 ? expandedBatches[expandedBatches.length - 1] : 0
+  );
+
+  const toggleBatchExpansion = (batchId: number) => {
+    setExpandedBatches(prev =>
+      prev.includes(batchId)
+        ? prev.filter(id => id !== batchId)
+        : [batchId] // Mantém apenas o lote atual expandido
+    );
+  };
+
+  const handleCreateAviary = (newAviary: Omit<AviaryData, 'id'>) => {
+    if (!selectedBatch) return;
+
+    createAviary(newAviary, {
+      onSuccess: () => {
+        setIsAviaryModalOpen(false);
+        setSelectedAviary(null);
+      },
+      onError: (error) => {
+        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao criar aviário';
+        setError('Erro ao criar aviário: ' + errorMessage);
+      },
+    });
+  };
+
+  const handleUpdateAviary = (id: number, updatedData: Partial<AviaryData>) => {
+    updateAviary({ id, data: updatedData }, {
+      onSuccess: () => {
+        setIsAviaryModalOpen(false);
+        setSelectedAviary(null);
+      },
+      onError: (error) => {
+        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao atualizar aviário';
+        setError('Erro ao atualizar aviário: ' + errorMessage);
+      },
+    });
+  };
+
+  const handleDeleteAviary = (id: number) => {
+    deleteAviary(id, {
+      onError: (error) => {
+        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao deletar aviário';
+        setError('Erro ao deletar aviário: ' + errorMessage);
+      },
+    });
+  };
 
   const validateBatchData = (data: Omit<Batch, 'id'>): boolean => {
     const errors: Record<string, string> = {};
@@ -176,93 +209,229 @@ export function BatchManagement() {
   };
 
   return (
-    <div className="page-container">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="page-title">Gerenciamento de Lotes</h1>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="btn-primary flex items-center"
-          disabled={isCreating || isSubmitting}
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          {isCreating || isSubmitting ? 'Criando...' : 'Novo Lote'}
-        </button>
-      </div>
-
-      {error && (
-        <div className="bg-danger/10 text-danger p-4 rounded-lg mb-6 flex items-center">
-          <AlertCircle className="w-5 h-5 mr-2" />
-          {error}
-        </div>
-      )}
-
-      <div className="card">
-        <div className="card-header">
-          <h2 className="card-title">Lista de Lotes</h2>
+    <div className="page-container bg-gray-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Gerenciamento de Lotes e Aviários</h1>
+            <p className="mt-2 text-sm text-gray-600">Gerencie seus lotes e aviários de forma eficiente</p>
+          </div>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="btn-primary flex items-center px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors duration-200"
+            disabled={isCreating || isSubmitting}
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            {isCreating || isSubmitting ? 'Criando...' : 'Novo Lote'}
+          </button>
         </div>
 
-        <div className="table-container">
-          <table className="table-default">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Data de Início</th>
-                <th>Status</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {batches.map((batch) => (
-                <tr key={batch.id}>
-                  <td>{batch.name}</td>
-                  <td>{formatDate(batch.startDate)}</td>
-                  <td>{translateStatus(batch.status)}</td>
-                  <td>
-                    <button
-                      className="btn-icon"
-                      onClick={() => setSelectedBatch(batch)}
-                      disabled={isActivating || isDeactivating || isSubmitting}
-                    >
-                      Editar
-                    </button>
-                    {batch.status === 'ACTIVE' ? (
-                      <button
-                        className="btn-icon"
-                        onClick={() => handleDeactivateBatch(batch.id)}
-                        disabled={isDeactivating || isSubmitting}
-                      >
-                        Desativar
-                      </button>
-                    ) : (
-                      <button
-                        className="btn-icon"
-                        onClick={() => handleActivateBatch(batch.id)}
-                        disabled={isActivating || isSubmitting}
-                      >
-                        Ativar
-                      </button>
-                    )}
-                  </td>
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded-lg flex items-center">
+            <AlertCircle className="w-5 h-5 text-red-400 mr-2" />
+            <p className="text-red-700">{error}</p>
+          </div>
+        )}
+
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-800">Lista de Lotes e Aviários</h2>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Nome
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Data de Início
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Ações
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {batches.map((batch) => (
+                  <React.Fragment key={batch.id}>
+                    <tr className="hover:bg-gray-50 transition-colors duration-150">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <button
+                            onClick={() => toggleBatchExpansion(batch.id)}
+                            className="mr-3 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                          >
+                            {expandedBatches.includes(batch.id) ? (
+                              <ChevronDown className="w-5 h-5" />
+                            ) : (
+                              <ChevronUp className="w-5 h-5" />
+                            )}
+                          </button>
+                          <span className="text-sm font-medium text-gray-900">{batch.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {formatDate(batch.startDate)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          batch.status === 'ACTIVE' 
+                            ? 'bg-green-100 text-green-800'
+                            : batch.status === 'COMPLETED'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {translateStatus(batch.status)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex justify-end space-x-2">
+                          <button
+                            onClick={() => setSelectedBatch(batch)}
+                            className="text-blue-600 hover:text-blue-900 transition-colors duration-200"
+                            disabled={isActivating || isDeactivating || isSubmitting}
+                          >
+                            Editar
+                          </button>
+                          {batch.status === 'ACTIVE' ? (
+                            <button
+                              onClick={() => handleDeactivateBatch(batch.id)}
+                              className="text-red-600 hover:text-red-900 transition-colors duration-200"
+                              disabled={isDeactivating || isSubmitting}
+                            >
+                              Desativar
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleActivateBatch(batch.id)}
+                              className="text-green-600 hover:text-green-900 transition-colors duration-200"
+                              disabled={isActivating || isSubmitting}
+                            >
+                              Ativar
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                    {expandedBatches.includes(batch.id) && (
+                      <tr>
+                        <td colSpan={4} className="px-6 py-4 bg-gray-50">
+                          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                              <h3 className="text-lg font-semibold text-gray-800">Aviários do Lote</h3>
+                              <button
+                                onClick={() => {
+                                  setSelectedBatch(batch);
+                                  setSelectedAviary(null);
+                                  setIsAviaryModalOpen(true);
+                                }}
+                                className="btn-primary flex items-center px-3 py-1.5 rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors duration-200"
+                              >
+                                <Plus className="w-4 h-4 mr-2" />
+                                Novo Aviário
+                              </button>
+                            </div>
+                            {isLoadingAviaries ? (
+                              <div className="p-4 text-center text-gray-500">
+                                Carregando aviários...
+                              </div>
+                            ) : aviariesData && aviariesData.length > 0 ? (
+                              <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                  <thead className="bg-gray-50">
+                                    <tr>
+                                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Nome
+                                      </th>
+                                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Galos Iniciais
+                                      </th>
+                                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Galinhas Iniciais
+                                      </th>
+                                      <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Ações
+                                      </th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className="bg-white divide-y divide-gray-200">
+                                    {aviariesData.map((aviary: AviaryData) => (
+                                      <tr key={aviary.id} className="hover:bg-gray-50 transition-colors duration-150">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                          {aviary.name}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                          {aviary.initialAmountOfRoosters}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                          {aviary.initialAmountOfChickens}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                          <div className="flex justify-end space-x-2">
+                                            <button
+                                              onClick={() => {
+                                                setSelectedAviary(aviary);
+                                                setIsAviaryModalOpen(true);
+                                              }}
+                                              className="text-blue-600 hover:text-blue-900 transition-colors duration-200"
+                                            >
+                                              Editar
+                                            </button>
+                                            <button
+                                              onClick={() => handleDeleteAviary(aviary.id)}
+                                              className="text-red-600 hover:text-red-900 transition-colors duration-200"
+                                            >
+                                              Excluir
+                                            </button>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            ) : (
+                              <div className="p-4 text-center text-gray-500">
+                                Nenhum aviário encontrado para este lote.
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
+      {/* Modal de Lote */}
       {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3>Novo Lote</h3>
-              <button onClick={() => setIsModalOpen(false)} disabled={isSubmitting}>×</button>
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-gray-900">Novo Lote</h3>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-400 hover:text-gray-500 transition-colors duration-200"
+                disabled={isSubmitting}
+              >
+                ×
+              </button>
             </div>
-            <div className="modal-body">
+            <div className="p-6">
               <form onSubmit={(e) => {
                 e.preventDefault();
                 const formData = new FormData(e.currentTarget);
                 const batchData = {
-                  farmId: 1, // Temporário, deve vir do contexto de autenticação
+                  farmId: 1,
                   name: formData.get('name') as string,
                   startDate: formData.get('startDate') as string,
                   status: (formData.get('status') as Batch['status']) || 'ACTIVE',
@@ -272,48 +441,52 @@ export function BatchManagement() {
               }}>
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="name" className="input-label">
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                       Nome do Lote
                     </label>
                     <input
                       type="text"
                       id="name"
                       name="name"
-                      className={`input-default ${formErrors.name ? 'input-error' : ''}`}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
+                        formErrors.name ? 'border-red-500' : 'border-gray-300'
+                      }`}
                       placeholder="Ex: LOTE001"
                       required
                       disabled={isSubmitting}
                     />
                     {formErrors.name && (
-                      <span className="text-danger text-sm">{formErrors.name}</span>
+                      <p className="mt-1 text-sm text-red-600">{formErrors.name}</p>
                     )}
                   </div>
 
                   <div>
-                    <label htmlFor="startDate" className="input-label">
+                    <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
                       Data de Início
                     </label>
                     <input
                       type="date"
                       id="startDate"
                       name="startDate"
-                      className={`input-default ${formErrors.startDate ? 'input-error' : ''}`}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
+                        formErrors.startDate ? 'border-red-500' : 'border-gray-300'
+                      }`}
                       required
                       disabled={isSubmitting}
                     />
                     {formErrors.startDate && (
-                      <span className="text-danger text-sm">{formErrors.startDate}</span>
+                      <p className="mt-1 text-sm text-red-600">{formErrors.startDate}</p>
                     )}
                   </div>
 
                   <div>
-                    <label htmlFor="status" className="input-label">
+                    <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
                       Status
                     </label>
                     <select
                       id="status"
                       name="status"
-                      className="input-default"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                       required
                       disabled={isSubmitting}
                     >
@@ -327,14 +500,14 @@ export function BatchManagement() {
                     <button
                       type="button"
                       onClick={() => setIsModalOpen(false)}
-                      className="btn-secondary"
+                      className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                       disabled={isSubmitting}
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
-                      className="btn-primary"
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"
                       disabled={isCreating || isActivating || isDeactivating || isSubmitting}
                     >
                       {isSubmitting ? 'Criando...' : 'Criar Lote'}
@@ -347,96 +520,102 @@ export function BatchManagement() {
         </div>
       )}
 
-      {selectedBatch && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3>Editar Lote</h3>
-              <button onClick={() => setSelectedBatch(null)} disabled={isSubmitting}>×</button>
+      {/* Modal de Aviário */}
+      {isAviaryModalOpen && selectedBatch && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {selectedAviary ? 'Editar Aviário' : 'Novo Aviário'}
+              </h3>
+              <button
+                onClick={() => {
+                  setIsAviaryModalOpen(false);
+                  setSelectedAviary(null);
+                }}
+                className="text-gray-400 hover:text-gray-500 transition-colors duration-200"
+              >
+                ×
+              </button>
             </div>
-            <div className="modal-body">
+            <div className="p-6">
               <form onSubmit={(e) => {
                 e.preventDefault();
                 const formData = new FormData(e.currentTarget);
-                const batchData = {
+                const aviaryData = {
                   name: formData.get('name') as string,
-                  startDate: formData.get('startDate') as string,
-                  status: formData.get('status') as Batch['status'],
+                  initialAmountOfRoosters: Number(formData.get('initialAmountOfRoosters')),
+                  initialAmountOfChickens: Number(formData.get('initialAmountOfChickens')),
+                  batchId: selectedBatch.id,
                 };
 
-                handleUpdateBatch(selectedBatch.id, batchData);
+                if (selectedAviary) {
+                  handleUpdateAviary(selectedAviary.id, aviaryData);
+                } else {
+                  handleCreateAviary(aviaryData);
+                }
               }}>
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="name" className="input-label">
-                      Nome do Lote
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                      Nome do Aviário
                     </label>
                     <input
                       type="text"
                       id="name"
                       name="name"
-                      defaultValue={selectedBatch.name}
-                      className={`input-default ${formErrors.name ? 'input-error' : ''}`}
-                      placeholder="Ex: LOTE001"
+                      defaultValue={selectedAviary?.name}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                       required
-                      disabled={isSubmitting}
                     />
-                    {formErrors.name && (
-                      <span className="text-danger text-sm">{formErrors.name}</span>
-                    )}
                   </div>
 
                   <div>
-                    <label htmlFor="startDate" className="input-label">
-                      Data de Início
+                    <label htmlFor="initialAmountOfRoosters" className="block text-sm font-medium text-gray-700 mb-1">
+                      Quantidade Inicial de Galos
                     </label>
                     <input
-                      type="date"
-                      id="startDate"
-                      name="startDate"
-                      defaultValue={selectedBatch.startDate}
-                      className={`input-default ${formErrors.startDate ? 'input-error' : ''}`}
+                      type="number"
+                      id="initialAmountOfRoosters"
+                      name="initialAmountOfRoosters"
+                      defaultValue={selectedAviary?.initialAmountOfRoosters}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                       required
-                      disabled={isSubmitting}
+                      min="0"
                     />
-                    {formErrors.startDate && (
-                      <span className="text-danger text-sm">{formErrors.startDate}</span>
-                    )}
                   </div>
 
                   <div>
-                    <label htmlFor="status" className="input-label">
-                      Status
+                    <label htmlFor="initialAmountOfChickens" className="block text-sm font-medium text-gray-700 mb-1">
+                      Quantidade Inicial de Galinhas
                     </label>
-                    <select
-                      id="status"
-                      name="status"
-                      defaultValue={selectedBatch.status}
-                      className="input-default"
+                    <input
+                      type="number"
+                      id="initialAmountOfChickens"
+                      name="initialAmountOfChickens"
+                      defaultValue={selectedAviary?.initialAmountOfChickens}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                       required
-                      disabled={isSubmitting}
-                    >
-                      <option value="ACTIVE">Ativo</option>
-                      <option value="COMPLETED">Concluído</option>
-                      <option value="CANCELLED">Cancelado</option>
-                    </select>
+                      min="0"
+                    />
                   </div>
 
                   <div className="flex justify-end space-x-3 mt-6">
                     <button
                       type="button"
-                      onClick={() => setSelectedBatch(null)}
-                      className="btn-secondary"
-                      disabled={isSubmitting}
+                      onClick={() => {
+                        setIsAviaryModalOpen(false);
+                        setSelectedAviary(null);
+                      }}
+                      className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
-                      className="btn-primary"
-                      disabled={isUpdating || isSubmitting}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"
                     >
-                      {isSubmitting ? 'Salvando...' : 'Salvar Lote'}
+                      {selectedAviary ? 'Salvar' : 'Criar'}
                     </button>
                   </div>
                 </div>

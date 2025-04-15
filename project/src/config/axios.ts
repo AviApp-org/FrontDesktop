@@ -3,7 +3,7 @@ import { API_URL } from './api';
 
 // Configuração base do Axios
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: API_URL, // Usando o proxy do Vite
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
