@@ -7,19 +7,21 @@ import CollectionReview from '../pages/CollectionReview';
 import DataEntry from '../pages/DataEntry';
 import Layout from '../components/Layout';
 import { BatchManagement } from '../pages/BatchManagement';
+import EmployeesPage from '../pages/EmployeesPage';
 
 interface PrivateRouteProps {
   children: React.ReactNode;
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
-
   const isAuthenticated = true; 
-
   return isAuthenticated ? <Layout>{children}</Layout> : <Navigate to="/login" />;
 };
 
 export function AppRoutes() {
+  // Podemos obter o farmId de um contexto global ou do localStorage
+  const farmId = localStorage.getItem('farmId') || 'default';
+  
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -77,8 +79,17 @@ export function AppRoutes() {
           </PrivateRoute>
         }
       />
+
+      <Route
+        path="/employees"
+        element={
+          <PrivateRoute>
+            <EmployeesPage />
+          </PrivateRoute>
+        }
+      />
       
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
-} 
+}
