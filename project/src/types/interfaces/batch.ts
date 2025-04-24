@@ -1,10 +1,10 @@
 import { AviaryData } from '../../@types/AviaryData';
 
 export interface Batch {
-  id: number;
+  id: string;
   name: string;
   startDate: string;
   status: 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
-  farmId: number;
+  farmId: string;
   aviaries?: AviaryData[];
 } 

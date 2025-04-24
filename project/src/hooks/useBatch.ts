@@ -6,7 +6,7 @@ import { AxiosError } from 'axios';
 import { formatDateToDDMMYYYY } from '../utils/formatDate';
 
 // Funções para operações CRUD usando a API real
-const fetchBatchById = async (id: number): Promise<Batch> => {
+const fetchBatchById = async (id: string): Promise<Batch> => {
   try {
     console.log('Buscando lote por ID:', id);
     const response = await api.get(`${API_ENDPOINTS.batches}/${id}`);
@@ -81,7 +81,7 @@ const postData = async (batch: Omit<Batch, 'id'>): Promise<Batch> => {
   }
 };
 
-const activateBatch = async (id: number): Promise<void> => {
+const activateBatch = async (id: string): Promise<void> => {
   try {
     console.log('Ativando lote:', id);
     await api.patch(`${API_ENDPOINTS.batches}/${id}/activate`);
@@ -92,7 +92,7 @@ const activateBatch = async (id: number): Promise<void> => {
   }
 };
 
-const deactivateBatch = async (id: number): Promise<void> => {
+const deactivateBatch = async (id: string): Promise<void> => {
   try {
     console.log('Desativando lote:', id);
     await api.patch(`${API_ENDPOINTS.batches}/${id}/deactivate`);
@@ -104,7 +104,7 @@ const deactivateBatch = async (id: number): Promise<void> => {
 };
 
 // Hooks para gerenciar os dados
-export const useBatchById = (id: number) => {
+export const useBatchById = (id: string) => {
   return useQuery({
     queryKey: ['batch', id],
     queryFn: () => fetchBatchById(id),
@@ -139,7 +139,7 @@ export function useUpdateBatchData() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: Partial<Omit<Batch, 'id'>> }) => {
+    mutationFn: async ({ id, data }: { id: string; data: Partial<Omit<Batch, 'id'>> }) => {
       const formattedData = {
         ...data,
         startDate: data.startDate ? formatDateToDDMMYYYY(data.startDate) : undefined,
@@ -160,7 +160,7 @@ export function useActivateBatchData() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       const response = await api.patch(`/api/batches/${id}/activate`);
       return response.data;
     },
@@ -174,7 +174,7 @@ export function useDeactivateBatchData() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       const response = await api.patch(`/api/batches/${id}/deactivate`);
       return response.data;
     },

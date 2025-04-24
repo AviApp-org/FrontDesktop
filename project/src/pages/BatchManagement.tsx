@@ -25,7 +25,7 @@ export function BatchManagement() {
   const [isAviaryModalOpen, setIsAviaryModalOpen] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null);
   const [selectedAviary, setSelectedAviary] = useState<AviaryData | null>(null);
-  const [expandedBatches, setExpandedBatches] = useState<number[]>([]);
+  const [expandedBatches, setExpandedBatches] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [batches, setBatches] = useState<Batch[]>([]);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -41,10 +41,10 @@ export function BatchManagement() {
 
   // Buscar aviários quando um lote é expandido
   const { data: aviariesData, isLoading: isLoadingAviaries } = useAviaries(
-    expandedBatches.length > 0 ? expandedBatches[expandedBatches.length - 1] : 0
+    expandedBatches.length > 0 ? expandedBatches[expandedBatches.length - 1] : '0'
   );
 
-  const toggleBatchExpansion = (batchId: number) => {
+  const toggleBatchExpansion = (batchId: string) => {
     setExpandedBatches(prev =>
       prev.includes(batchId)
         ? prev.filter(id => id !== batchId)
@@ -67,7 +67,7 @@ export function BatchManagement() {
     });
   };
 
-  const handleUpdateAviary = (id: number, updatedData: Partial<AviaryData>) => {
+  const handleUpdateAviary = (id: string, updatedData: Partial<AviaryData>) => {
     updateAviary({ id, data: updatedData }, {
       onSuccess: () => {
         setIsAviaryModalOpen(false);
@@ -80,7 +80,7 @@ export function BatchManagement() {
     });
   };
 
-  const handleDeleteAviary = (id: number) => {
+  const handleDeleteAviary = (id: string) => {
     deleteAviary(id, {
       onError: (error) => {
         const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao deletar aviário';
@@ -123,7 +123,7 @@ export function BatchManagement() {
       name: newBatch.name,
       startDate: newBatch.startDate,
       status: newBatch.status || 'ACTIVE',
-      farmId: newBatch.farmId
+      farmId: "1"
     };
     
     createBatch(batchData, {
@@ -140,7 +140,7 @@ export function BatchManagement() {
     });
   };
 
-  const handleActivateBatch = (id: number) => {
+  const handleActivateBatch = (id: string) => {
     setError(null);
     activateBatch(id, {
       onSuccess: () => {
@@ -155,7 +155,7 @@ export function BatchManagement() {
     });
   };
 
-  const handleDeactivateBatch = (id: number) => {
+  const handleDeactivateBatch = (id: string) => {
     setError(null);
     deactivateBatch(id, {
       onSuccess: () => {
@@ -170,7 +170,7 @@ export function BatchManagement() {
     });
   };
 
-  const handleUpdateBatch = (id: number, updatedData: Partial<Omit<Batch, 'id'>>) => {
+  const handleUpdateBatch = (id: string, updatedData: Partial<Omit<Batch, 'id'>>) => {
     setError(null);
     setFormErrors({});
     setIsSubmitting(true);
@@ -263,10 +263,10 @@ export function BatchManagement() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <button
-                            onClick={() => toggleBatchExpansion(batch.id)}
+                            onClick={() => toggleBatchExpansion(batch.id as string)}
                             className="mr-3 text-gray-400 hover:text-gray-600 transition-colors duration-200"
                           >
-                            {expandedBatches.includes(batch.id) ? (
+                            {expandedBatches.includes(batch.id as string) ? (
                               <ChevronDown className="w-5 h-5" />
                             ) : (
                               <ChevronUp className="w-5 h-5" />
@@ -300,7 +300,7 @@ export function BatchManagement() {
                           </button>
                           {batch.status === 'ACTIVE' ? (
                             <button
-                              onClick={() => handleDeactivateBatch(batch.id)}
+                              onClick={() => handleDeactivateBatch(batch.id as string)}
                               className="text-red-600 hover:text-red-900 transition-colors duration-200"
                               disabled={isDeactivating || isSubmitting}
                             >
@@ -308,7 +308,7 @@ export function BatchManagement() {
                             </button>
                           ) : (
                             <button
-                              onClick={() => handleActivateBatch(batch.id)}
+                              onClick={() => handleActivateBatch(batch.id as string)}
                               className="text-green-600 hover:text-green-900 transition-colors duration-200"
                               disabled={isActivating || isSubmitting}
                             >
@@ -318,7 +318,7 @@ export function BatchManagement() {
                         </div>
                       </td>
                     </tr>
-                    {expandedBatches.includes(batch.id) && (
+                    {expandedBatches.includes(batch.id as string) && (
                       <tr>
                         <td colSpan={4} className="px-6 py-4 bg-gray-50">
                           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -383,7 +383,7 @@ export function BatchManagement() {
                                               Editar
                                             </button>
                                             <button
-                                              onClick={() => handleDeleteAviary(aviary.id)}
+                                              onClick={() => handleDeleteAviary(aviary.id as string)}
                                               className="text-red-600 hover:text-red-900 transition-colors duration-200"
                                             >
                                               Excluir
@@ -431,7 +431,7 @@ export function BatchManagement() {
                 e.preventDefault();
                 const formData = new FormData(e.currentTarget);
                 const batchData = {
-                  farmId: 1,
+                  farmId: "1",
                   name: formData.get('name') as string,
                   startDate: formData.get('startDate') as string,
                   status: (formData.get('status') as Batch['status']) || 'ACTIVE',
@@ -546,11 +546,32 @@ export function BatchManagement() {
                   name: formData.get('name') as string,
                   initialAmountOfRoosters: Number(formData.get('initialAmountOfRoosters')),
                   initialAmountOfChickens: Number(formData.get('initialAmountOfChickens')),
-                  batchId: selectedBatch.id,
+                  batchId: selectedBatch.id as string,
+                  waterQuantity: 0,
+                  temperature: {
+                    max: 0,
+                    min: 0
+                  },
+                  liveBirds: {
+                    male: 0,
+                    female: 0
+                  },
+                  eggs: {
+                    total: 0,
+                    cracked: 0,
+                    dirtyNest: 0,
+                    small: 0,
+                    incubatable: 0,
+                    broken: 0,
+                    deformed: 0,
+                    thinShell: 0,
+                    eliminated: 0,
+                    market: 0
+                  }
                 };
 
                 if (selectedAviary) {
-                  handleUpdateAviary(selectedAviary.id, aviaryData);
+                  handleUpdateAviary(selectedAviary.id as string, aviaryData);
                 } else {
                   handleCreateAviary(aviaryData);
                 }

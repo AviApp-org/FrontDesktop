@@ -2,44 +2,51 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AviaryData } from '../@types/AviaryData';
 import { aviaryService } from '../services/aviaryService';
 
-export function useAviaries(batchId: number) {
+export const useAviaries = (batchId: string) => {
   return useQuery({
     queryKey: ['aviaries', batchId],
-    queryFn: () => aviaryService.getAll(batchId),
-    enabled: !!batchId,
+    queryFn: () => aviaryService.getAll(batchId)
   });
-}
+};
 
-export function useCreateAviary() {
+export const useAviary = (id: string) => {
+  return useQuery({
+    queryKey: ['aviary', id],
+    queryFn: () => aviaryService.getById(id)
+  });
+};
+
+export const useCreateAviary = () => {
   const queryClient = useQueryClient();
-
+  
   return useMutation({
     mutationFn: (aviary: Omit<AviaryData, 'id'>) => aviaryService.create(aviary),
-    onSuccess: (_, variables) => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['aviaries', variables.batchId] });
-    },
+    }
   });
-}
+};
 
-export function useUpdateAviary() {
+export const useUpdateAviary = () => {
   const queryClient = useQueryClient();
-
+  
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<AviaryData> }) => 
+    mutationFn: ({ id, data }: { id: string; data: Partial<AviaryData> }) => 
       aviaryService.update(id, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['aviaries', variables.data.batchId] });
-    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['aviary', data.id] });
+      queryClient.invalidateQueries({ queryKey: ['aviaries', data.batchId] });
+    }
   });
-}
+};
 
-export function useDeleteAviary() {
+export const useDeleteAviary = () => {
   const queryClient = useQueryClient();
-
+  
   return useMutation({
-    mutationFn: (id: number) => aviaryService.delete(id),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['aviaries'] });
-    },
+    mutationFn: (id: string) => aviaryService.delete(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['aviary', id] });
+    }
   });
-}
+};
