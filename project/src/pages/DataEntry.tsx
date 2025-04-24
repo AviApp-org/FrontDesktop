@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Save } from 'lucide-react';
-import { AviaryData, AvailableAviary } from '../@types/interfaces/aviary';
-import { DataSubmission } from '../@types/interfaces/submission';
+import { AviaryData,} from '../@types/AviaryData';
+import { DataSubmission } from '../@types/submission';
 
 // Valores padrão
 const defaultEggData = {
