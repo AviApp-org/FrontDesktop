@@ -1,5 +1,4 @@
 export interface CollectChickenData {
-
     id : number;
     collectId : number;
     deadRoosters : number;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, 
   Button, 
@@ -25,7 +25,8 @@ import {
   Chip,
   Avatar,
   IconButton,
-  Tooltip
+  Tooltip,
+  Alert
 } from '@mui/material';
 import { green, blue, orange, grey } from '@mui/material/colors';
 import SearchIcon from '@mui/icons-material/Search';
@@ -35,29 +36,75 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee } from '../hooks/useEmployees';
-import { EmployeeData } from '../@types/EmployeeData';
+import { EmployeeData, EmployeeRole } from '../@types/EmployeeData';
 import { useFarm } from '../contexts/FarmContext';
 
 interface EmployeeFormData {
   name: string;
   cpf: string;
   phone: string;
-  role: number;
-  farmId: string;
+  role: EmployeeRole;
+  farmId: number;
 }
 
 const initialFormData: EmployeeFormData = {
   name: '',
   cpf: '',
   phone: '',
-  role: 1,
-  farmId: ''
+  role: EmployeeRole.WORKER,
+  farmId: 0
+};
+
+// Função para validar CPF
+const isValidCPF = (cpf: string): boolean => {
+  cpf = cpf.replace(/[^\d]/g, '');
+  
+  if (cpf.length !== 11) return false;
+  
+  if (/^(\d)\1{10}$/.test(cpf)) return false;
+  
+  let sum = 0;
+  let remainder;
+  
+  for (let i = 1; i <= 9; i++) {
+    sum = sum + parseInt(cpf.substring(i-1, i)) * (11 - i);
+  }
+  
+  remainder = (sum * 10) % 11;
+  if ((remainder === 10) || (remainder === 11)) remainder = 0;
+  if (remainder !== parseInt(cpf.substring(9, 10))) return false;
+  
+  sum = 0;
+  for (let i = 1; i <= 10; i++) {
+    sum = sum + parseInt(cpf.substring(i-1, i)) * (12 - i);
+  }
+  
+  remainder = (sum * 10) % 11;
+  if ((remainder === 10) || (remainder === 11)) remainder = 0;
+  if (remainder !== parseInt(cpf.substring(10, 11))) return false;
+  
+  return true;
+};
+
+// Função para formatar CPF
+const formatCPF = (cpf: string): string => {
+  return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+};
+
+// Função para formatar telefone
+const formatPhone = (phone: string): string => {
+  const cleaned = phone.replace(/\D/g, '');
+  const match = cleaned.match(/^(\d{2})(\d{5})(\d{4})$/);
+  if (match) {
+    return `(${match[1]}) ${match[2]}-${match[3]}`;
+  }
+  return phone;
 };
 
 const EmployeesPage: React.FC = () => {
   const { farmId } = useFarm();
   
-  const { data: employees, isLoading, isError } = useEmployees(farmId);
+  const { data: employees, isLoading, isError, refetch } = useEmployees(farmId);
   const createEmployee = useCreateEmployee();
   const updateEmployee = useUpdateEmployee();
   const deleteEmployee = useDeleteEmployee();
@@ -67,6 +114,14 @@ const EmployeesPage: React.FC = () => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  // Forçar atualização da lista após operações
+  useEffect(() => {
+    if (createEmployee.isSuccess || updateEmployee.isSuccess || deleteEmployee.isSuccess) {
+      refetch();
+    }
+  }, [createEmployee.isSuccess, updateEmployee.isSuccess, deleteEmployee.isSuccess, refetch]);
 
   const handleOpenDialog = (employee?: EmployeeData) => {
     if (employee) {
@@ -79,9 +134,10 @@ const EmployeesPage: React.FC = () => {
       });
       setEditingId(employee.id);
     } else {
-      setFormData({ ...initialFormData, farmId });
+      setFormData({ ...initialFormData, farmId: Number(farmId) });
       setEditingId(null);
     }
+    setFormErrors({});
     setOpenDialog(true);
   };
 
@@ -89,31 +145,83 @@ const EmployeesPage: React.FC = () => {
     setOpenDialog(false);
     setFormData(initialFormData);
     setEditingId(null);
+    setFormErrors({});
+  };
+
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+    
+    if (!formData.name.trim()) {
+      errors.name = 'Nome é obrigatório';
+    }
+    
+    if (!formData.cpf.trim()) {
+      errors.cpf = 'CPF é obrigatório';
+    } else if (!isValidCPF(formData.cpf)) {
+      errors.cpf = 'CPF inválido';
+    }
+    
+    if (!formData.phone.trim()) {
+      errors.phone = 'Telefone é obrigatório';
+    } else if (formData.phone.replace(/\D/g, '').length < 10) {
+      errors.phone = 'Telefone inválido';
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent
   ) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: name === 'role' ? Number(value) : value,
-    });
+    
+    if (name === 'cpf') {
+      const cleaned = value.replace(/\D/g, '');
+      if (cleaned.length <= 11) {
+        setFormData({
+          ...formData,
+          [name]: cleaned,
+        });
+      }
+    } else if (name === 'phone') {
+      const cleaned = value.replace(/\D/g, '');
+      if (cleaned.length <= 11) {
+        setFormData({
+          ...formData,
+          [name]: cleaned,
+        });
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
 
   const handleSubmit = async () => {
+    if (!validateForm()) return;
+
     try {
+      const formattedData = {
+        ...formData,
+        cpf: formatCPF(formData.cpf),
+        phone: formatPhone(formData.phone)
+      };
+
       if (editingId) {
         await updateEmployee.mutateAsync({
           id: editingId,
-          data: formData,
+          data: formattedData,
         });
       } else {
-        await createEmployee.mutateAsync(formData);
+        await createEmployee.mutateAsync(formattedData);
       }
       handleCloseDialog();
     } catch (error) {
       console.error('Erro ao salvar funcionário:', error);
+      setFormErrors({ submit: 'Erro ao salvar funcionário. Tente novamente.' });
     }
   };
 
@@ -136,23 +244,19 @@ const EmployeesPage: React.FC = () => {
     setSearchTerm(e.target.value);
   };
 
-  // Filtrar funcionários com base no termo de pesquisa
   const filteredEmployees = employees?.filter(employee => 
     employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     employee.cpf.includes(searchTerm) ||
     employee.phone.includes(searchTerm)
   ) || [];
 
-  const roleLabels: Record<number, string> = {
-    1: 'Administrador',
-    2: 'Gerente',
-    3: 'Funcionário',
-    4: 'Visitante',
+  const roleLabels: Record<EmployeeRole, string> = {
+    [EmployeeRole.MANAGER]: 'Gerente',
+    [EmployeeRole.WORKER]: 'Colaborador'
   };
 
   return (
     <Box>
-      {/* Título da página */}
       <Typography 
         variant="h4" 
         component="h1" 
@@ -163,9 +267,7 @@ const EmployeesPage: React.FC = () => {
         Funcionários
       </Typography>
       
-      {/* Box para organizar o conteúdo */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        {/* Filtros e ações */}
         <Box>
           <Card elevation={0} sx={{ bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
             <CardContent>
@@ -205,9 +307,8 @@ const EmployeesPage: React.FC = () => {
           </Card>
         </Box>
 
-        {/* Estatísticas rápidas */}
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Card sx={{ flex: 1, border: '1px solid', borderColor: 'divider', bgcolor: blue[50] }}>
+        <Box>
+          <Card sx={{ border: '1px solid', borderColor: 'divider', bgcolor: blue[50] }}>
             <CardContent>
               <Typography variant="h6" fontWeight="bold" color={blue[700]}>
                 {employees?.length || 0}
@@ -217,42 +318,8 @@ const EmployeesPage: React.FC = () => {
               </Typography>
             </CardContent>
           </Card>
-          
-          <Card sx={{ flex: 1, border: '1px solid', borderColor: 'divider', bgcolor: green[50] }}>
-            <CardContent>
-              <Typography variant="h6" fontWeight="bold" color={green[700]}>
-                {employees?.filter(e => e.role === 3)?.length || 0}
-              </Typography>
-              <Typography variant="body2" color={green[900]}>
-                Funcionários
-              </Typography>
-            </CardContent>
-          </Card>
-          
-          <Card sx={{ flex: 1, border: '1px solid', borderColor: 'divider', bgcolor: orange[50] }}>
-            <CardContent>
-              <Typography variant="h6" fontWeight="bold" color={orange[700]}>
-                {employees?.filter(e => e.role === 2)?.length || 0}
-              </Typography>
-              <Typography variant="body2" color={orange[900]}>
-                Gerentes
-              </Typography>
-            </CardContent>
-          </Card>
-          
-          <Card sx={{ flex: 1, border: '1px solid', borderColor: 'divider', bgcolor: grey[100] }}>
-            <CardContent>
-              <Typography variant="h6" fontWeight="bold" color={grey[700]}>
-                {employees?.filter(e => e.role === 1)?.length || 0}
-              </Typography>
-              <Typography variant="body2" color={grey[900]}>
-                Administradores
-              </Typography>
-            </CardContent>
-          </Card>
         </Box>
 
-        {/* Tabela de funcionários */}
         <Box>
           <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
             <CardContent sx={{ p: 0 }}>
@@ -288,9 +355,15 @@ const EmployeesPage: React.FC = () => {
                                 {employee.name}
                               </Box>
                             </TableCell>
-                            <TableCell>{employee.cpf}</TableCell>
-                            <TableCell>{employee.phone}</TableCell>
-                            <TableCell>{roleLabels[employee.role] || 'Desconhecido'}</TableCell>
+                            <TableCell>{formatCPF(employee.cpf)}</TableCell>
+                            <TableCell>{formatPhone(employee.phone)}</TableCell>
+                            <TableCell>
+                              <Chip 
+                                label={roleLabels[employee.role]} 
+                                color={employee.role === EmployeeRole.MANAGER ? 'primary' : 'default'}
+                                size="small"
+                              />
+                            </TableCell>
                             <TableCell align="right">
                               <Tooltip title="Visualizar detalhes">
                                 <IconButton size="small" sx={{ color: blue[700] }}>
@@ -334,9 +407,8 @@ const EmployeesPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* Confirmar exclusão */}
-      <Dialog
-        open={!!confirmDelete}
+      <Dialog 
+        open={!!confirmDelete} 
         onClose={() => setConfirmDelete(null)}
       >
         <DialogTitle>Confirmar Exclusão</DialogTitle>
@@ -353,58 +425,80 @@ const EmployeesPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Dialog de cadastro/edição */}
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>{editingId ? 'Editar Funcionário' : 'Adicionar Funcionário'}</DialogTitle>
+      <Dialog 
+        open={openDialog} 
+        onClose={handleCloseDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          {editingId ? 'Editar Funcionário' : 'Adicionar Funcionário'}
+        </DialogTitle>
         <DialogContent>
-          <TextField
-            label="Nome"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            fullWidth
-            required
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            label="CPF"
-            name="cpf"
-            value={formData.cpf}
-            onChange={handleInputChange}
-            fullWidth
-            required
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            label="Telefone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleInputChange}
-            fullWidth
-            required
-            sx={{ mb: 2 }}
-          />
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel>Cargo</InputLabel>
-            <Select
-              name="role"
-              value={String(formData.role)}
+          {formErrors.submit && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {formErrors.submit}
+            </Alert>
+          )}
+          <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <TextField
+              label="Nome"
+              name="name"
+              value={formData.name}
               onChange={handleInputChange}
-              label="Cargo"
-            >
-              {Object.entries(roleLabels).map(([key, label]) => (
-                <MenuItem key={key} value={key}>
-                  {label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+              error={!!formErrors.name}
+              helperText={formErrors.name}
+              fullWidth
+              required
+            />
+            <TextField
+              label="CPF"
+              name="cpf"
+              value={formData.cpf}
+              onChange={handleInputChange}
+              error={!!formErrors.cpf}
+              helperText={formErrors.cpf}
+              fullWidth
+              required
+              inputProps={{ maxLength: 11 }}
+            />
+            <TextField
+              label="Telefone"
+              name="phone"
+              value={formData.phone}
+              onChange={handleInputChange}
+              error={!!formErrors.phone}
+              helperText={formErrors.phone}
+              fullWidth
+              required
+              inputProps={{ maxLength: 11 }}
+            />
+            <FormControl fullWidth>
+              <InputLabel>Cargo</InputLabel>
+              <Select
+                name="role"
+                value={formData.role}
+                onChange={handleInputChange}
+                label="Cargo"
+              >
+                {Object.entries(roleLabels).map(([key, label]) => (
+                  <MenuItem key={key} value={key}>
+                    {label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="primary">
             Cancelar
           </Button>
-          <Button onClick={handleSubmit} color="primary">
+          <Button 
+            onClick={handleSubmit} 
+            color="primary"
+            variant="contained"
+          >
             {editingId ? 'Salvar' : 'Adicionar'}
           </Button>
         </DialogActions>

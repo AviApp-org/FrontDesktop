@@ -6,6 +6,18 @@ import { AxiosError } from 'axios';
 import { formatDateToDDMMYYYY } from '../utils/formatDate';
 
 // Funções para operações CRUD usando a API real
+const fetchAllBatches = async (): Promise<Batch[]> => {
+  try {
+    console.log('Buscando todos os lotes da granja');
+    const response = await api.get(API_ENDPOINTS.batches);
+    console.log('Lotes encontrados:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao buscar lotes:', error);
+    throw error;
+  }
+};
+
 const fetchBatchById = async (id: string): Promise<Batch> => {
   try {
     console.log('Buscando lote por ID:', id);
@@ -37,7 +49,7 @@ const postData = async (batch: Omit<Batch, 'id'>): Promise<Batch> => {
       name: batch.name,
       startDate: formatDateToDDMMYYYY(batch.startDate),
       status: batch.status || 'ACTIVE',
-      farmId: batch.farmId
+      farmId: batch.farmId || "1" // Garantir que sempre tenha um farmId
     };
     
     console.log('Dados formatados para envio:', formattedBatch);
@@ -47,36 +59,6 @@ const postData = async (batch: Omit<Batch, 'id'>): Promise<Batch> => {
     return response.data;
   } catch (error) {
     console.error('Erro ao criar lote:', error);
-    
-    // Tratamento específico para erro 400
-    if (error instanceof AxiosError && error.response?.status === 400) {
-      // Tentar extrair a mensagem de erro do backend
-      let errorMessage = 'Dados inválidos. Verifique os campos e tente novamente.';
-      
-      if (error.response.data) {
-        // Se o backend retornar uma mensagem de erro
-        if (typeof error.response.data === 'string') {
-          errorMessage = error.response.data;
-        } else if (error.response.data.message) {
-          errorMessage = error.response.data.message;
-        } else if (error.response.data.error) {
-          errorMessage = error.response.data.error;
-        } else if (typeof error.response.data === 'object') {
-          // Tentar extrair mensagens de erro de validação
-          const validationErrors = Object.entries(error.response.data)
-            .map(([field, message]) => `${field}: ${message}`)
-            .join(', ');
-          
-          if (validationErrors) {
-            errorMessage = `Erro de validação: ${validationErrors}`;
-          }
-        }
-      }
-      
-      console.error('Detalhes do erro 400:', error.response.data);
-      throw new Error(errorMessage);
-    }
-    
     throw error;
   }
 };
@@ -104,6 +86,15 @@ const deactivateBatch = async (id: string): Promise<void> => {
 };
 
 // Hooks para gerenciar os dados
+export const useBatches = () => {
+  return useQuery({
+    queryKey: ['batches'],
+    queryFn: fetchAllBatches,
+    staleTime: 1000 * 60 * 5, // 5 minutos
+    cacheTime: 1000 * 60 * 30, // 30 minutos
+  });
+};
+
 export const useBatchById = (id: string) => {
   return useQuery({
     queryKey: ['batch', id],
@@ -126,7 +117,7 @@ export function usePostBatchData() {
 
       console.log('Dados formatados para envio:', formattedBatch);
 
-      const response = await api.post<Batch>('/api/batches', formattedBatch);
+      const response = await api.post<Batch>(API_ENDPOINTS.batches, formattedBatch);
       return response.data;
     },
     onSuccess: () => {
@@ -147,7 +138,7 @@ export function useUpdateBatchData() {
 
       console.log('Dados formatados para atualização:', formattedData);
 
-      const response = await api.put<Batch>(`/api/batches/${id}`, formattedData);
+      const response = await api.put<Batch>(`${API_ENDPOINTS.batches}/${id}`, formattedData);
       return response.data;
     },
     onSuccess: () => {
@@ -161,7 +152,7 @@ export function useActivateBatchData() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await api.patch(`/api/batches/${id}/activate`);
+      const response = await api.patch(`${API_ENDPOINTS.batches}/${id}/activate`);
       return response.data;
     },
     onSuccess: () => {
@@ -175,7 +166,7 @@ export function useDeactivateBatchData() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await api.patch(`/api/batches/${id}/deactivate`);
+      const response = await api.patch(`${API_ENDPOINTS.batches}/${id}/deactivate`);
       return response.data;
     },
     onSuccess: () => {

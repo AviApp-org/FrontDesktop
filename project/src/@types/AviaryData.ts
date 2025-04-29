@@ -4,8 +4,8 @@ export interface AviaryData {
   initialAmountOfRoosters: number;
   initialAmountOfChickens: number;
   batchId: string;
-  waterQuantity: number;
-  temperature: {
+  waterQuantity?: number;
+  temperature?: {
     max: number;
     min: number;
   };
@@ -13,7 +13,7 @@ export interface AviaryData {
     male: number;
     female: number;
   };
-  eggs: {
+  eggs?: {
     total: number;
     cracked: number;
     dirtyNest: number;
@@ -27,15 +27,3 @@ export interface AviaryData {
   };
 }
 
-export interface AvailableAviary {
-  id: string;
-  name: string;
-}
-
-export interface DataSubmission {
-  id: string;
-  timestamp: string;
-  aviaryId: string;
-  aviaryName: string;
-  data: AviaryData;
-}

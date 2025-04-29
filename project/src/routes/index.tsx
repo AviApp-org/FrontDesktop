@@ -5,23 +5,13 @@ import Reports from '../pages/Reports';
 import Financial from '../pages/Financial';
 import CollectionReview from '../pages/CollectionReview';
 import DataEntry from '../pages/DataEntry';
-import Layout from '../components/Layout';
 import { BatchManagement } from '../pages/BatchManagement';
 import EmployeesPage from '../pages/EmployeesPage';
-
-interface PrivateRouteProps {
-  children: React.ReactNode;
-}
-
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
-  const isAuthenticated = true; 
-  return isAuthenticated ? <Layout>{children}</Layout> : <Navigate to="/login" />;
-};
+import ClientRegister from '../pages/ClientRegister';
+import FarmRegister from '../pages/FarmRegister';
+import ProtectedRoute from '../components/ProtectedRoute';
 
 export function AppRoutes() {
-  // Podemos obter o farmId de um contexto global ou do localStorage
-  const farmId = localStorage.getItem('farmId') || 'default';
-  
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -29,63 +19,81 @@ export function AppRoutes() {
       <Route
         path="/dashboard"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <Dashboard />
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       />
       
       <Route
         path="/reports"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <Reports />
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       />
       
       <Route
         path="/financial"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <Financial />
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       />
       
       <Route
         path="/review"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <CollectionReview />
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       />
       
       <Route
         path="/data-entry"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <DataEntry />
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       />
       
       <Route
         path="/batches"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <BatchManagement />
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       />
 
       <Route
         path="/employees"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <EmployeesPage />
-          </PrivateRoute>
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route
+        path="/clients/register"
+        element={
+          <ProtectedRoute>
+            <ClientRegister />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/farms/register"
+        element={
+          <ProtectedRoute>
+            <FarmRegister />
+          </ProtectedRoute>
         }
       />
       

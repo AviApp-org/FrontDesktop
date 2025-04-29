@@ -4,6 +4,9 @@ import { API_ENDPOINTS } from '../config/api';
 
 export const aviaryService = {
   getAll: async (batchId: string): Promise<AviaryData[]> => {
+    if (!batchId) {
+      throw new Error('batchId é obrigatório para buscar aviários');
+    }
     const response = await api.get(`${API_ENDPOINTS.aviaries}`, {
       params: { batchId }
     });

@@ -1,7 +1,10 @@
+import { AviaryData } from './AviaryData';
+
 export interface BatchData {
-  id: number;
+  id: string;
   name: string;
   startDate: string;
-  status: string;
-  farmId: number;
+  status: 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+  farmId: string;
+  aviaries?: AviaryData[];
 }

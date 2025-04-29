@@ -1,9 +1,14 @@
+export enum EmployeeRole {
+  MANAGER = 'MANAGER',
+  WORKER = 'WORKER'
+}
+
 export interface EmployeeData {
     id: number;
     name: string;
     cpf: string;
     phone: string;
-    role: number;
+    role: EmployeeRole;
     createdAt: string;
-    farmId: string;
+    farmId: number;
 }

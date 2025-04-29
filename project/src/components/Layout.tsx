@@ -9,6 +9,8 @@ import {
   DollarSign,
   FileInput,
   Egg,
+  UserPlus,
+  Building2
 } from 'lucide-react';
 
 const sidebarItems = [
@@ -17,6 +19,8 @@ const sidebarItems = [
   { icon: FileBarChart, text: 'Relatórios', path: '/reports' },
   { icon: Home, text: 'Lotes e aviários', path: '/batches' },
   { icon: Users, text: 'Funcionários', path: '/employees' },
+  { icon: UserPlus, text: 'Cadastro de Clientes', path: '/clients/register' },
+  { icon: Building2, text: 'Cadastro de Granjas', path: '/farms/register' },
   { icon: DollarSign, text: 'Financeiro', path: '/financial' },
   { icon: FileInput, text: 'Entrada de dados', path: '/data-entry' },
 ];

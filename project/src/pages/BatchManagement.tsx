@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { usePostBatchData, useUpdateBatchData, useActivateBatchData, useDeactivateBatchData } from '../hooks/useBatch';
+import { usePostBatchData, useUpdateBatchData, useActivateBatchData, useDeactivateBatchData, useBatches } from '../hooks/useBatch';
 import { useAviaries, useCreateAviary, useUpdateAviary, useDeleteAviary } from '../hooks/useAviary';
-import { Batch } from '../types/interfaces/batch';
-import { AviaryData } from '../@types/AviaryData';
+import { BatchData as Batch } from '../@types/BatchData';
+
 import { Plus, Edit, Trash2, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { formatDate } from '../utils/formatDate';
+import { AviaryData } from '@/@types/AviaryData';
 
 // Função para traduzir o status para português
 const translateStatus = (status: string): string => {
@@ -27,10 +28,10 @@ export function BatchManagement() {
   const [selectedAviary, setSelectedAviary] = useState<AviaryData | null>(null);
   const [expandedBatches, setExpandedBatches] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [batches, setBatches] = useState<Batch[]>([]);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const { data: batches = [], isLoading: isLoadingBatches } = useBatches() as { data: Batch[], isLoading: boolean };
   const { mutate: createBatch, isPending: isCreating } = usePostBatchData();
   const { mutate: updateBatch, isPending: isUpdating } = useUpdateBatchData();
   const { mutate: activateBatch, isPending: isActivating } = useActivateBatchData();
@@ -45,6 +46,8 @@ export function BatchManagement() {
   );
 
   const toggleBatchExpansion = (batchId: string) => {
+    if (!batchId) return;
+    
     setExpandedBatches(prev =>
       prev.includes(batchId)
         ? prev.filter(id => id !== batchId)
@@ -127,8 +130,7 @@ export function BatchManagement() {
     };
     
     createBatch(batchData, {
-      onSuccess: (createdBatch) => {
-        setBatches([...batches, createdBatch]);
+      onSuccess: () => {
         setIsModalOpen(false);
         setIsSubmitting(false);
       },
@@ -143,11 +145,6 @@ export function BatchManagement() {
   const handleActivateBatch = (id: string) => {
     setError(null);
     activateBatch(id, {
-      onSuccess: () => {
-        setBatches(batches.map(batch => 
-          batch.id === id ? { ...batch, status: 'ACTIVE' as const } : batch
-        ));
-      },
       onError: (error) => {
         const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao ativar lote';
         setError('Erro ao ativar lote: ' + errorMessage);
@@ -158,11 +155,6 @@ export function BatchManagement() {
   const handleDeactivateBatch = (id: string) => {
     setError(null);
     deactivateBatch(id, {
-      onSuccess: () => {
-        setBatches(batches.map(batch => 
-          batch.id === id ? { ...batch, status: 'CANCELLED' as const } : batch
-        ));
-      },
       onError: (error) => {
         const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao desativar lote';
         setError('Erro ao desativar lote: ' + errorMessage);
@@ -193,10 +185,7 @@ export function BatchManagement() {
     }
     
     updateBatch({ id, data: updatedData }, {
-      onSuccess: (updatedBatch) => {
-        setBatches(batches.map(batch => 
-          batch.id === id ? updatedBatch : batch
-        ));
+      onSuccess: () => {
         setSelectedBatch(null);
         setIsSubmitting(false);
       },
@@ -360,7 +349,9 @@ export function BatchManagement() {
                                     </tr>
                                   </thead>
                                   <tbody className="bg-white divide-y divide-gray-200">
-                                    {aviariesData.map((aviary: AviaryData) => (
+                                    {aviariesData
+                                      .filter(aviary => aviary.batchId === batch.id)
+                                      .map((aviary: AviaryData) => (
                                       <tr key={aviary.id} className="hover:bg-gray-50 transition-colors duration-150">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                           {aviary.name}
@@ -430,10 +421,14 @@ export function BatchManagement() {
               <form onSubmit={(e) => {
                 e.preventDefault();
                 const formData = new FormData(e.currentTarget);
+                const dateValue = formData.get('startDate') as string;
+                const [year, month, day] = dateValue.split('-');
+                const formattedDate = `${day}/${month}/${year}`;
+                
                 const batchData = {
                   farmId: "1",
                   name: formData.get('name') as string,
-                  startDate: formData.get('startDate') as string,
+                  startDate: formattedDate,
                   status: (formData.get('status') as Batch['status']) || 'ACTIVE',
                 };
 
@@ -547,26 +542,9 @@ export function BatchManagement() {
                   initialAmountOfRoosters: Number(formData.get('initialAmountOfRoosters')),
                   initialAmountOfChickens: Number(formData.get('initialAmountOfChickens')),
                   batchId: selectedBatch.id as string,
-                  waterQuantity: 0,
-                  temperature: {
-                    max: 0,
-                    min: 0
-                  },
                   liveBirds: {
                     male: 0,
                     female: 0
-                  },
-                  eggs: {
-                    total: 0,
-                    cracked: 0,
-                    dirtyNest: 0,
-                    small: 0,
-                    incubatable: 0,
-                    broken: 0,
-                    deformed: 0,
-                    thinShell: 0,
-                    eliminated: 0,
-                    market: 0
                   }
                 };
 

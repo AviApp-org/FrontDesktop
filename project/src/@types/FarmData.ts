@@ -1,5 +1,5 @@
 export interface FarmData {
-  id: number;
+  id?: number;
   name: string;
   addressId: number;
   clientId: number;

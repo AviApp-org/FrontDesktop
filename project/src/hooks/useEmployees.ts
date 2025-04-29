@@ -3,11 +3,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { EmployeeData } from '../@types/EmployeeData';
 import { employeeService } from '../services/EmployeeService';
 
-export function useEmployees(farmId: string) {
+export function useEmployees(farmId: number) {
   return useQuery({
     queryKey: ['employees', farmId],
     queryFn: () => employeeService.getAll(farmId),
     enabled: !!farmId,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 }
 

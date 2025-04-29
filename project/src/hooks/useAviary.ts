@@ -5,7 +5,8 @@ import { aviaryService } from '../services/aviaryService';
 export const useAviaries = (batchId: string) => {
   return useQuery({
     queryKey: ['aviaries', batchId],
-    queryFn: () => aviaryService.getAll(batchId)
+    queryFn: () => aviaryService.getAll(batchId),
+    enabled: !!batchId
   });
 };
 

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Save } from 'lucide-react';
-import { AviaryData, AvailableAviary, DataSubmission } from '../@types/AviaryData';
+import { AviaryData } from '../@types/AviaryData';
+import { AvailableAviary } from '../@types/AvailableAviary';
+import { DataSubmission } from '../@types/DataSubmission';
 
 // Valores padrão
 const defaultEggData = {
@@ -63,13 +65,26 @@ function DataEntry() {
       if (field === 'waterQuantity') {
         updatedData.waterQuantity = value;
       } else if (field === 'tempMax') {
-        updatedData.temperature = { ...updatedData.temperature, max: value };
+        updatedData.temperature = {
+          max: value,
+          min: updatedData.temperature?.min ?? 0
+        };
       } else if (field === 'tempMin') {
-        updatedData.temperature = { ...updatedData.temperature, min: value };
+        updatedData.temperature = {
+          max: updatedData.temperature?.max ?? 0,
+          min: value
+        };
       } else if (field === 'male' || field === 'female') {
-        updatedData.liveBirds = { ...updatedData.liveBirds, [field]: value };
+        updatedData.liveBirds = {
+          male: field === 'male' ? value : (updatedData.liveBirds?.male ?? 0),
+          female: field === 'female' ? value : (updatedData.liveBirds?.female ?? 0)
+        };
       } else {
-        updatedData.eggs = { ...updatedData.eggs, [field]: value };
+        updatedData.eggs = {
+          ...defaultEggData,
+          ...updatedData.eggs,
+          [field]: value
+        };
       }
 
       return updatedData;
@@ -159,7 +174,7 @@ function DataEntry() {
                 </label>
                 <input
                   type="number"
-                  value={aviaryData.temperature.max}
+                  value={aviaryData.temperature?.max ?? 0}
                   onChange={e => updateAviaryData('tempMax', Number(e.target.value))}
                   className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                 />
@@ -170,7 +185,7 @@ function DataEntry() {
                 </label>
                 <input
                   type="number"
-                  value={aviaryData.temperature.min}
+                  value={aviaryData.temperature?.min ?? 0}
                   onChange={e => updateAviaryData('tempMin', Number(e.target.value))}
                   className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                 />
@@ -186,7 +201,7 @@ function DataEntry() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Machos</label>
                 <input
                   type="number"
-                  value={aviaryData.liveBirds.male}
+                  value={aviaryData.liveBirds?.male ?? 0}
                   onChange={e => updateAviaryData('male', Number(e.target.value))}
                   className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                 />
@@ -195,7 +210,7 @@ function DataEntry() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Fêmeas</label>
                 <input
                   type="number"
-                  value={aviaryData.liveBirds.female}
+                  value={aviaryData.liveBirds?.female ?? 0}
                   onChange={e => updateAviaryData('female', Number(e.target.value))}
                   className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                 />
@@ -213,7 +228,7 @@ function DataEntry() {
                 </label>
                 <input
                   type="number"
-                  value={aviaryData.eggs.total}
+                  value={aviaryData.eggs?.total ?? 0}
                   onChange={e => updateAviaryData('total', Number(e.target.value))}
                   className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                 />
@@ -224,7 +239,7 @@ function DataEntry() {
                 </label>
                 <input
                   type="number"
-                  value={aviaryData.eggs.cracked}
+                  value={aviaryData.eggs?.cracked ?? 0}
                   onChange={e => updateAviaryData('cracked', Number(e.target.value))}
                   className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                 />
@@ -235,7 +250,7 @@ function DataEntry() {
                 </label>
                 <input
                   type="number"
-                  value={aviaryData.eggs.dirtyNest}
+                  value={aviaryData.eggs?.dirtyNest ?? 0}
                   onChange={e => updateAviaryData('dirtyNest', Number(e.target.value))}
                   className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                 />
@@ -246,7 +261,7 @@ function DataEntry() {
                 </label>
                 <input
                   type="number"
-                  value={aviaryData.eggs.small}
+                  value={aviaryData.eggs?.small ?? 0}
                   onChange={e => updateAviaryData('small', Number(e.target.value))}
                   className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                 />
@@ -257,7 +272,7 @@ function DataEntry() {
                 </label>
                 <input
                   type="number"
-                  value={aviaryData.eggs.incubatable}
+                  value={aviaryData.eggs?.incubatable ?? 0}
                   onChange={e => updateAviaryData('incubatable', Number(e.target.value))}
                   className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                 />
@@ -268,7 +283,7 @@ function DataEntry() {
                 </label>
                 <input
                   type="number"
-                  value={aviaryData.eggs.broken}
+                  value={aviaryData.eggs?.broken ?? 0}
                   onChange={e => updateAviaryData('broken', Number(e.target.value))}
                   className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                 />
@@ -279,7 +294,7 @@ function DataEntry() {
                 </label>
                 <input
                   type="number"
-                  value={aviaryData.eggs.deformed}
+                  value={aviaryData.eggs?.deformed ?? 0}
                   onChange={e => updateAviaryData('deformed', Number(e.target.value))}
                   className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                 />
@@ -290,7 +305,7 @@ function DataEntry() {
                 </label>
                 <input
                   type="number"
-                  value={aviaryData.eggs.thinShell}
+                  value={aviaryData.eggs?.thinShell ?? 0}
                   onChange={e => updateAviaryData('thinShell', Number(e.target.value))}
                   className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                 />
@@ -299,7 +314,7 @@ function DataEntry() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Eliminados</label>
                 <input
                   type="number"
-                  value={aviaryData.eggs.eliminated}
+                  value={aviaryData.eggs?.eliminated ?? 0}
                   onChange={e => updateAviaryData('eliminated', Number(e.target.value))}
                   className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                 />
@@ -310,7 +325,7 @@ function DataEntry() {
                 </label>
                 <input
                   type="number"
-                  value={aviaryData.eggs.market}
+                  value={aviaryData.eggs?.market ?? 0}
                   onChange={e => updateAviaryData('market', Number(e.target.value))}
                   className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-green-500"
                 />
@@ -333,7 +348,7 @@ function DataEntry() {
                   <p className="text-sm text-gray-500">
                     {new Date(submission.timestamp).toLocaleString()}
                   </p>
-                  <p className="text-sm">Total de Ovos: {submission.data.eggs.total}</p>
+                  <p className="text-sm">Total de Ovos: {submission.data.eggs?.total ?? 0}</p>
                 </div>
                 <button
                   onClick={() => handleEdit(submission)}

@@ -1,8 +1,13 @@
+export enum ClientStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE'
+}
+
 export interface ClientData {
-  id: number;
+  id?: number;
   name: string;
   email: string;
   cnpj: string;
   phone: string;
-  status: string;
+  status: ClientStatus;
 }
