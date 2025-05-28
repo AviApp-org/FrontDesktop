@@ -6,6 +6,7 @@ import { BatchData as Batch } from '../@types/BatchData';
 import { Plus, Edit, Trash2, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { formatDate } from '../utils/formatDate';
 import { AviaryData } from '@/@types/AviaryData';
+import Button from '@/components/Button';
 
 // Função para traduzir o status para português
 const translateStatus = (status: string): string => {
@@ -47,7 +48,7 @@ export function BatchManagement() {
 
   const toggleBatchExpansion = (batchId: string) => {
     if (!batchId) return;
-    
+
     setExpandedBatches(prev =>
       prev.includes(batchId)
         ? prev.filter(id => id !== batchId)
@@ -94,19 +95,19 @@ export function BatchManagement() {
 
   const validateBatchData = (data: Omit<Batch, 'id'>): boolean => {
     const errors: Record<string, string> = {};
-    
+
     if (!data.name || data.name.trim() === '') {
       errors.name = 'Nome do lote é obrigatório';
     }
-    
+
     if (!data.startDate) {
       errors.startDate = 'Data de início é obrigatória';
     }
-    
+
     if (!data.farmId) {
       errors.farmId = 'ID da fazenda é obrigatório';
     }
-    
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -115,12 +116,12 @@ export function BatchManagement() {
     setError(null);
     setFormErrors({});
     setIsSubmitting(true);
-    
+
     if (!validateBatchData(newBatch)) {
       setIsSubmitting(false);
       return;
     }
-    
+
     // Garantir que apenas os campos necessários sejam enviados
     const batchData = {
       name: newBatch.name,
@@ -128,7 +129,7 @@ export function BatchManagement() {
       status: newBatch.status || 'ACTIVE',
       farmId: "1"
     };
-    
+
     createBatch(batchData, {
       onSuccess: () => {
         setIsModalOpen(false);
@@ -166,24 +167,24 @@ export function BatchManagement() {
     setError(null);
     setFormErrors({});
     setIsSubmitting(true);
-    
+
     // Validar apenas os campos que estão sendo atualizados
     const errors: Record<string, string> = {};
-    
+
     if (updatedData.name !== undefined && (!updatedData.name || updatedData.name.trim() === '')) {
       errors.name = 'Nome do lote é obrigatório';
     }
-    
+
     if (updatedData.startDate !== undefined && !updatedData.startDate) {
       errors.startDate = 'Data de início é obrigatória';
     }
-    
+
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       setIsSubmitting(false);
       return;
     }
-    
+
     updateBatch({ id, data: updatedData }, {
       onSuccess: () => {
         setSelectedBatch(null);
@@ -205,14 +206,10 @@ export function BatchManagement() {
             <h1 className="text-3xl font-bold text-gray-900">Gerenciamento de Lotes e Aviários</h1>
             <p className="mt-2 text-sm text-gray-600">Gerencie seus lotes e aviários de forma eficiente</p>
           </div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="btn-primary flex items-center px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors duration-200"
-            disabled={isCreating || isSubmitting}
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            {isCreating || isSubmitting ? 'Criando...' : 'Novo Lote'}
-          </button>
+          <Button variant="primary" onClick={() => setIsModalOpen(true)} >
+            <Plus className="w-4 h-4 mr-2" />
+            Novo Lote
+          </Button>
         </div>
 
         {error && (
@@ -268,13 +265,12 @@ export function BatchManagement() {
                         {formatDate(batch.startDate)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          batch.status === 'ACTIVE' 
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${batch.status === 'ACTIVE'
                             ? 'bg-green-100 text-green-800'
                             : batch.status === 'COMPLETED'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}>
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}>
                           {translateStatus(batch.status)}
                         </span>
                       </td>
@@ -313,17 +309,14 @@ export function BatchManagement() {
                           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                             <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                               <h3 className="text-lg font-semibold text-gray-800">Aviários do Lote</h3>
-                              <button
-                                onClick={() => {
+                              <Button variant='primary' onClick={() => {
                                   setSelectedBatch(batch);
                                   setSelectedAviary(null);
                                   setIsAviaryModalOpen(true);
-                                }}
-                                className="btn-primary flex items-center px-3 py-1.5 rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors duration-200"
-                              >
+                                }}>
                                 <Plus className="w-4 h-4 mr-2" />
                                 Novo Aviário
-                              </button>
+                              </Button>
                             </div>
                             {isLoadingAviaries ? (
                               <div className="p-4 text-center text-gray-500">
@@ -352,37 +345,37 @@ export function BatchManagement() {
                                     {aviariesData
                                       .filter(aviary => aviary.batchId === batch.id)
                                       .map((aviary: AviaryData) => (
-                                      <tr key={aviary.id} className="hover:bg-gray-50 transition-colors duration-150">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                          {aviary.name}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                          {aviary.initialAmountOfRoosters}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                          {aviary.initialAmountOfChickens}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                          <div className="flex justify-end space-x-2">
-                                            <button
-                                              onClick={() => {
-                                                setSelectedAviary(aviary);
-                                                setIsAviaryModalOpen(true);
-                                              }}
-                                              className="text-blue-600 hover:text-blue-900 transition-colors duration-200"
-                                            >
-                                              Editar
-                                            </button>
-                                            <button
-                                              onClick={() => handleDeleteAviary(aviary.id as string)}
-                                              className="text-red-600 hover:text-red-900 transition-colors duration-200"
-                                            >
-                                              Excluir
-                                            </button>
-                                          </div>
-                                        </td>
-                                      </tr>
-                                    ))}
+                                        <tr key={aviary.id} className="hover:bg-gray-50 transition-colors duration-150">
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                            {aviary.name}
+                                          </td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {aviary.initialAmountOfRoosters}
+                                          </td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {aviary.initialAmountOfChickens}
+                                          </td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div className="flex justify-end space-x-2">
+                                              <button
+                                                onClick={() => {
+                                                  setSelectedAviary(aviary);
+                                                  setIsAviaryModalOpen(true);
+                                                }}
+                                                className="text-blue-600 hover:text-blue-900 transition-colors duration-200"
+                                              >
+                                                Editar
+                                              </button>
+                                              <button
+                                                onClick={() => handleDeleteAviary(aviary.id as string)}
+                                                className="text-red-600 hover:text-red-900 transition-colors duration-200"
+                                              >
+                                                Excluir
+                                              </button>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      ))}
                                   </tbody>
                                 </table>
                               </div>
@@ -424,7 +417,7 @@ export function BatchManagement() {
                 const dateValue = formData.get('startDate') as string;
                 const [year, month, day] = dateValue.split('-');
                 const formattedDate = `${day}/${month}/${year}`;
-                
+
                 const batchData = {
                   farmId: "1",
                   name: formData.get('name') as string,
@@ -443,9 +436,8 @@ export function BatchManagement() {
                       type="text"
                       id="name"
                       name="name"
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
-                        formErrors.name ? 'border-red-500' : 'border-gray-300'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${formErrors.name ? 'border-red-500' : 'border-gray-300'
+                        }`}
                       placeholder="Ex: LOTE001"
                       required
                       disabled={isSubmitting}
@@ -463,9 +455,8 @@ export function BatchManagement() {
                       type="date"
                       id="startDate"
                       name="startDate"
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
-                        formErrors.startDate ? 'border-red-500' : 'border-gray-300'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${formErrors.startDate ? 'border-red-500' : 'border-gray-300'
+                        }`}
                       required
                       disabled={isSubmitting}
                     />
