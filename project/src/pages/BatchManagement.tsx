@@ -314,7 +314,7 @@ export function BatchManagement() {
                                   setSelectedAviary(null);
                                   setIsAviaryModalOpen(true);
                                 }}>
-                                <Plus className="w-4 h-4 mr-2" />
+                                    <Plus className="w-4 h-4 mr-2" />
                                 Novo Aviário
                               </Button>
                             </div>

@@ -82,9 +82,9 @@ function Reports() {
       {filteredReports.map((report, index) => (
         <ReportCard
           key={index}
-          report={report}
+          report={report.statistics}
           reportType={reportType}
-          onView={setSelectedReport}
+          onView={() => setSelectedReport(report)}
         />
       ))}
     </div>
