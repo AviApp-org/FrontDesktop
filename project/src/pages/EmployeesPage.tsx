@@ -42,6 +42,7 @@ import { useFarm } from '../contexts/FarmContext';
 interface EmployeeFormData {
   name: string;
   cpf: string;
+  birthDate: string;
   phone: string;
   role: EmployeeRole;
   farmId: number;
@@ -50,6 +51,7 @@ interface EmployeeFormData {
 const initialFormData: EmployeeFormData = {
   name: '',
   cpf: '',
+  birthDate: '',
   phone: '',
   role: EmployeeRole.WORKER,
   farmId: 0
@@ -128,6 +130,7 @@ const EmployeesPage: React.FC = () => {
       setFormData({
         name: employee.name,
         cpf: employee.cpf,
+        birthDate: employee.birthDate,
         phone: employee.phone,
         role: employee.role,
         farmId: employee.farmId
@@ -160,7 +163,11 @@ const EmployeesPage: React.FC = () => {
     } else if (!isValidCPF(formData.cpf)) {
       errors.cpf = 'CPF inválido';
     }
-    
+
+    if (!formData.birthDate.trim()) {
+      errors.birthDate = 'Data de nascimento é obrigatória';
+    }
+
     if (!formData.phone.trim()) {
       errors.phone = 'Telefone é obrigatório';
     } else if (formData.phone.replace(/\D/g, '').length < 10) {
@@ -338,6 +345,7 @@ const EmployeesPage: React.FC = () => {
                       <TableRow>
                         <TableCell sx={{ fontWeight: 'bold' }}>Nome</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }}>CPF</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>BirthDate</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }}>Telefone</TableCell>
                         <TableCell sx={{ fontWeight: 'bold' }}>Cargo</TableCell>
                         <TableCell align="right" sx={{ fontWeight: 'bold' }}>Ações</TableCell>
@@ -461,6 +469,17 @@ const EmployeesPage: React.FC = () => {
               fullWidth
               required
               inputProps={{ maxLength: 11 }}
+            />
+            <TextField
+              label="Data de Nascimento"
+              name="birthDate"
+              type="date"
+              value={formData.birthDate}
+              onChange={handleInputChange}
+              error={!!formErrors.birthDate}
+              helperText={formErrors.birthDate}
+              fullWidth
+              required
             />
             <TextField
               label="Telefone"

@@ -1,10 +1,9 @@
 export const API_URL = "";
-
 export const API_ENDPOINTS = {
-  batches: `/api/batches/farm/1`,
-  aviaries: `/api/aviaries`,
-  reports: `/api/reports`,
-  employees: `/api/employees`,
-  financial: `/api/financial`,
-  collections: `/api/collections`,
-}; 
+  batches: `/api/batches`,        // ✅ COM /api (proxy vai redirecionar)
+  aviaries: `/api/aviaries`,      // ✅ COM /api
+  reports: `/api/reports`,        // ✅ COM /api
+  employees: `/api/employees`,    // ✅ COM /api
+  financial: `/api/financial`,   // ✅ COM /api
+  collections: `/api/collections`, // ✅ COM /api
+};

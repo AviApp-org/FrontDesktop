@@ -1,17 +1,17 @@
 export interface AviaryData {
-  id: string;
+  id?: number;                        // ✅ Mudado para number
   name: string;
   initialAmountOfRoosters: number;
   initialAmountOfChickens: number;
-  batchId: string;
+  batchId: number;                    // ✅ Mudado para number
+  currentAmountOfRooster?: number | null;   // ✅ Novo campo
+  currentAmountOfChickens?: number | null;  // ✅ Novo campo
+  
+  // Campos opcionais (podem não existir no backend):
   waterQuantity?: number;
   temperature?: {
     max: number;
     min: number;
-  };
-  liveBirds: {
-    male: number;
-    female: number;
   };
   eggs?: {
     total: number;
@@ -27,3 +27,10 @@ export interface AviaryData {
   };
 }
 
+// ✅ Tipo específico para criação
+export interface CreateAviaryData {
+  name: string;
+  initialAmountOfRoosters: number;
+  initialAmountOfChickens: number;
+  batchId: number;
+}

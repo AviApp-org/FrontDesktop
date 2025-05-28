@@ -5,11 +5,12 @@ import { API_ENDPOINTS } from '../config/api';
 import { AxiosError } from 'axios';
 import { formatDateToDDMMYYYY } from '../utils/formatDate';
 
-// Funções para operações CRUD usando a API real
+// ✅ Buscar TODOS os lotes de uma granja
 const fetchAllBatches = async (): Promise<BatchData[]> => {
   try {
     console.log('Buscando todos os lotes da granja');
-    const response = await api.get(API_ENDPOINTS.batches);
+    const farmId = "1"; // ID da granja
+    const response = await api.get(`${API_ENDPOINTS.batches}/farm/${farmId}`);
     console.log('Lotes encontrados:', response.data);
     return response.data;
   } catch (error) {
@@ -18,6 +19,7 @@ const fetchAllBatches = async (): Promise<BatchData[]> => {
   }
 };
 
+// ✅ Buscar UM lote específico por ID
 const fetchBatchById = async (id: string): Promise<BatchData> => {
   try {
     console.log('Buscando lote por ID:', id);
@@ -30,26 +32,24 @@ const fetchBatchById = async (id: string): Promise<BatchData> => {
   }
 };
 
+// ✅ Criar novo lote
 const postData = async (batch: Omit<BatchData, 'id'>): Promise<BatchData> => {
   try {
     console.log('Criando novo lote:', batch);
     
-    // Validar dados antes de enviar
     if (!batch.name || !batch.startDate || !batch.farmId) {
       throw new Error('Nome, data de início e ID da fazenda são obrigatórios');
     }
     
-    // Garantir que o status seja um dos valores permitidos
     if (batch.status && !['ACTIVE', 'COMPLETED', 'CANCELLED'].includes(batch.status)) {
-      batch.status = 'ACTIVE'; // Valor padrão
+      batch.status = 'ACTIVE';
     }
     
-    // Formatar datas para o formato esperado pelo backend (DD/MM/YYYY)
     const formattedBatch = {
       name: batch.name,
       startDate: formatDateToDDMMYYYY(batch.startDate),
       status: batch.status || 'ACTIVE',
-      farmId: batch.farmId || "1" // Garantir que sempre tenha um farmId
+      farmId: batch.farmId || "1"
     };
     
     console.log('Dados formatados para envio:', formattedBatch);
@@ -63,6 +63,7 @@ const postData = async (batch: Omit<BatchData, 'id'>): Promise<BatchData> => {
   }
 };
 
+// ✅ Ativar lote
 const activateBatch = async (id: string): Promise<void> => {
   try {
     console.log('Ativando lote:', id);
@@ -74,6 +75,7 @@ const activateBatch = async (id: string): Promise<void> => {
   }
 };
 
+// ✅ Desativar lote
 const deactivateBatch = async (id: string): Promise<void> => {
   try {
     console.log('Desativando lote:', id);
@@ -85,7 +87,7 @@ const deactivateBatch = async (id: string): Promise<void> => {
   }
 };
 
-// Hooks para gerenciar os dados
+// ✅ Hook para buscar TODOS os lotes
 export const useBatches = () => {
   return useQuery({
     queryKey: ['batches'],
@@ -95,6 +97,7 @@ export const useBatches = () => {
   });
 };
 
+// ✅ Hook para buscar UM lote por ID
 export const useBatchById = (id: string) => {
   return useQuery({
     queryKey: ['batch', id],
@@ -105,6 +108,7 @@ export const useBatchById = (id: string) => {
   });
 };
 
+// ✅ Hook para criar lote
 export function usePostBatchData() {
   const queryClient = useQueryClient();
 
@@ -126,6 +130,7 @@ export function usePostBatchData() {
   });
 }
 
+// ✅ Hook para atualizar lote
 export function useUpdateBatchData() {
   const queryClient = useQueryClient();
 
@@ -147,6 +152,7 @@ export function useUpdateBatchData() {
   });
 }
 
+// ✅ Hook para ativar lote
 export function useActivateBatchData() {
   const queryClient = useQueryClient();
 
@@ -161,6 +167,7 @@ export function useActivateBatchData() {
   });
 }
 
+// ✅ Hook para desativar lote
 export function useDeactivateBatchData() {
   const queryClient = useQueryClient();
 
