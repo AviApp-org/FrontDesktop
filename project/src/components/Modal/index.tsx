@@ -28,7 +28,7 @@ const Modal: React.FC<ModalProps> = ({
           {showCloseButton && (
             <Button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-500 transition-colors duration-200"
+              variant='destructive'
             >
               <X className="h-6 w-6" />
             </Button>
