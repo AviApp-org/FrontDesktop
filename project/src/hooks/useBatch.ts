@@ -1,12 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Batch } from '../types/interfaces/batch';
+import { BatchData } from '@/@types/BatchData'
 import api from '../config/axios';
 import { API_ENDPOINTS } from '../config/api';
 import { AxiosError } from 'axios';
 import { formatDateToDDMMYYYY } from '../utils/formatDate';
 
 // Funções para operações CRUD usando a API real
-const fetchAllBatches = async (): Promise<Batch[]> => {
+const fetchAllBatches = async (): Promise<BatchData[]> => {
   try {
     console.log('Buscando todos os lotes da granja');
     const response = await api.get(API_ENDPOINTS.batches);
@@ -18,7 +18,7 @@ const fetchAllBatches = async (): Promise<Batch[]> => {
   }
 };
 
-const fetchBatchById = async (id: string): Promise<Batch> => {
+const fetchBatchById = async (id: string): Promise<BatchData> => {
   try {
     console.log('Buscando lote por ID:', id);
     const response = await api.get(`${API_ENDPOINTS.batches}/${id}`);
@@ -30,7 +30,7 @@ const fetchBatchById = async (id: string): Promise<Batch> => {
   }
 };
 
-const postData = async (batch: Omit<Batch, 'id'>): Promise<Batch> => {
+const postData = async (batch: Omit<BatchData, 'id'>): Promise<BatchData> => {
   try {
     console.log('Criando novo lote:', batch);
     
@@ -109,7 +109,7 @@ export function usePostBatchData() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: Omit<Batch, 'id'>) => {
+    mutationFn: async (data: Omit<BatchData, 'id'>) => {
       const formattedBatch = {
         ...data,
         startDate: formatDateToDDMMYYYY(data.startDate),
@@ -117,7 +117,7 @@ export function usePostBatchData() {
 
       console.log('Dados formatados para envio:', formattedBatch);
 
-      const response = await api.post<Batch>(API_ENDPOINTS.batches, formattedBatch);
+      const response = await api.post<BatchData>(API_ENDPOINTS.batches, formattedBatch);
       return response.data;
     },
     onSuccess: () => {
@@ -130,7 +130,7 @@ export function useUpdateBatchData() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Partial<Omit<Batch, 'id'>> }) => {
+    mutationFn: async ({ id, data }: { id: string; data: Partial<Omit<BatchData, 'id'>> }) => {
       const formattedData = {
         ...data,
         startDate: data.startDate ? formatDateToDDMMYYYY(data.startDate) : undefined,
@@ -138,7 +138,7 @@ export function useUpdateBatchData() {
 
       console.log('Dados formatados para atualização:', formattedData);
 
-      const response = await api.put<Batch>(`${API_ENDPOINTS.batches}/${id}`, formattedData);
+      const response = await api.put<BatchData>(`${API_ENDPOINTS.batches}/${id}`, formattedData);
       return response.data;
     },
     onSuccess: () => {
