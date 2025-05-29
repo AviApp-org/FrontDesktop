@@ -1,7 +1,4 @@
-export enum ClientStatus {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE'
-}
+import { ClientStatus } from '../Enums';
 
 export interface ClientData {
   id?: number;

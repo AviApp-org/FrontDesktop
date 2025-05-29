@@ -1,7 +1,4 @@
-export enum EmployeeRole {
-  MANAGER = 'MANAGER',
-  WORKER = 'WORKER'
-}
+import { EmployeeRole } from '../Enums';
 
 export interface EmployeeData {
     id: number;

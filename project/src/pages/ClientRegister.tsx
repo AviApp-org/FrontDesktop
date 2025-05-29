@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Form, Input, Select, message, Spin } from 'antd';
-import { ClientData, ClientStatus } from '../@types/ClientData';
+import { ClientData,} from '../@types/ClientData';
+import { ClientStatus } from '../Enums';
 import { validateCNPJ } from '../utils/validators';
 import { clientService } from '../services/clientService';
 import { showErrorMessage } from '../utils/errorHandler';

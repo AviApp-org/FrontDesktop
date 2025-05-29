@@ -35,3 +35,42 @@ export function formatDate(dateString: string): string {
 export function formatDateToDDMMYYYY(dateString: string): string {
   return formatDate(dateString);
 } 
+
+// Converter de YYYY-MM-DD (input date) para DD/MM/YYYY (backend)
+export const formatDateForBackend = (dateString: string): string => {
+  if (!dateString) return '';
+  
+  try {
+    const [year, month, day] = dateString.split('-');
+    return `${day}/${month}/${year}`;
+  } catch (error) {
+    console.error('Erro ao formatar data para backend:', error);
+    return dateString;
+  }
+};
+
+// Converter de DD/MM/YYYY (backend) para YYYY-MM-DD (input date)
+export const formatDateForFrontend = (dateString: string): string => {
+  if (!dateString) return '';
+  
+  try {
+    const [day, month, year] = dateString.split('/');
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  } catch (error) {
+    console.error('Erro ao formatar data para frontend:', error);
+    return dateString;
+  }
+};
+
+// Para exibir na tabela (DD/MM/YYYY)
+export const formatDateForDisplay = (dateString: string): string => {
+  if (!dateString) return '';
+  
+  // Se já está no formato DD/MM/YYYY, retorna como está
+  if (dateString.includes('/')) {
+    return dateString;
+  }
+  
+  // Se está no formato YYYY-MM-DD, converte
+  return formatDateForBackend(dateString);
+};

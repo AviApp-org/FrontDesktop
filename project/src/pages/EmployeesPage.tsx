@@ -28,7 +28,7 @@ import {
   Tooltip,
   Alert
 } from '@mui/material';
-import { green, blue, orange, grey } from '@mui/material/colors';
+import { green, blue,} from '@mui/material/colors';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import AddIcon from '@mui/icons-material/Add';
@@ -36,10 +36,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee } from '../hooks/useEmployees';
-import { EmployeeData, EmployeeRole } from '../@types/EmployeeData';
+import { EmployeeData, } from '../@types/EmployeeData';
+import { EmployeeRole } from '../Enums';
 import { useFarm } from '../contexts/FarmContext';
+import { formatDateForBackend, formatDateForFrontend, formatDateForDisplay } from '../utils/formatDate';
 
-interface EmployeeFormData {
+export interface EmployeeFormData {
   name: string;
   cpf: string;
   birthDate: string;

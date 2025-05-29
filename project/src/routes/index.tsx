@@ -4,7 +4,7 @@ import Dashboard from '../pages/Dashboard';
 import Reports from '../pages/Reports';
 import Financial from '../pages/Financial';
 import CollectionReview from '../pages/CollectionReview';
-import DataEntry from '../pages/DataEntry';
+//import DataEntry from '../pages/DataEntry';
 import { BatchManagement } from '../pages/BatchManagement';
 import EmployeesPage from '../pages/EmployeesPage';
 import ClientRegister from '../pages/ClientRegister';
@@ -52,7 +52,7 @@ export function AppRoutes() {
         }
       />
       
-      <Route
+      {/* <Route
         path="/data-entry"
         element={
           <ProtectedRoute>
@@ -60,7 +60,7 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      
+       */}
       <Route
         path="/batches"
         element={

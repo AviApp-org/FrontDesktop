@@ -1,5 +1,6 @@
 import React from 'react';
-import { AviaryData, CreateAviaryData } from '../../@types/AviaryData';
+import { AviaryData, } from '../../@types/AviaryData';
+import { CreateAviaryData } from '../../@types/CreateAviaryData';
 
 interface AviaryModalProps {
   isOpen: boolean;

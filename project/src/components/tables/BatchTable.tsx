@@ -39,6 +39,7 @@ export const BatchTable: React.FC<BatchTableProps> = ({
   onEdit,
   onAction,
   children
+
 }) => (
   <div className="bg-white rounded-xl shadow-sm overflow-hidden">
     <div className="px-6 py-4 border-b border-gray-200">
