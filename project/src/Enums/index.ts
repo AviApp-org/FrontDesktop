@@ -1,4 +1,4 @@
-export * from './enumeggtype';
+export * from './enumEggtype';
 
 export * from './enumClientStatus';
 

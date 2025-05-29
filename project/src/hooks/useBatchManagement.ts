@@ -4,7 +4,7 @@ import { useAviaries, useCreateAviary, useUpdateAviary, useDeleteAviary } from '
 import { BatchData as Batch } from '../@types/BatchData';
 import { AviaryData } from '../@types/AviaryData';
 import { showErrorMessage } from '../utils/errorHandler';
-import { CreateAviaryData } from '../@types/AviaryData';
+import { CreateAviaryData } from '../@types/CreateAviaryData';
 
 export const useBatchManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
