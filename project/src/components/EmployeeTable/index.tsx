@@ -13,17 +13,25 @@ import {
   IconButton,
   Tooltip,
   Box,
-  Typography
+  Typography,
+  CircularProgress
 } from '@mui/material';
 import { blue } from '@mui/material/colors';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { EmployeeData } from '../../@types/EmployeeData';
 import { EmployeeRole } from '../../Enums';
 import { formatCPF, formatPhone } from '../../utils/validators';
 import { formatDateForDisplay } from '../../utils/formatDate';
-import { EmployeeTableProps } from './types';
 
+interface EmployeeTableProps {
+  employees: EmployeeData[];
+  isLoading: boolean;
+  isError: boolean;
+  onEdit: (employee: EmployeeData) => void;
+  onDelete: (id: number) => void;
+}
 
 const roleLabels: Record<EmployeeRole, string> = {
   [EmployeeRole.MANAGER]: 'Gerente',
@@ -42,7 +50,8 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
       <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
         <CardContent>
           <Box display="flex" justifyContent="center" my={4}>
-            <Typography>Carregando funcionários...</Typography>
+            <CircularProgress sx={{ color: 'primary.main' }} />
+            <Typography sx={{ ml: 2 }}>Carregando funcionários...</Typography>
           </Box>
         </CardContent>
       </Card>
@@ -72,7 +81,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
               <TableRow>
                 <TableCell sx={{ fontWeight: 'bold' }}>Nome</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>CPF</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Data Nascimento</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Data Nascimento</TableCell> {/* ✅ Coluna da data */}
                 <TableCell sx={{ fontWeight: 'bold' }}>Telefone</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Cargo</TableCell>
                 <TableCell align="right" sx={{ fontWeight: 'bold' }}>Ações</TableCell>
@@ -91,7 +100,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                       </Box>
                     </TableCell>
                     <TableCell>{formatCPF(employee.cpf)}</TableCell>
-                    <TableCell>{formatDateForDisplay(employee.birthDate)}</TableCell>
+                    <TableCell>{formatDateForDisplay(employee.birthDate)}</TableCell> {/* ✅ Exibir data formatada */}
                     <TableCell>{formatPhone(employee.phone)}</TableCell>
                     <TableCell>
                       <Chip 
@@ -129,7 +138,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} align="center">
+                  <TableCell colSpan={6} align="center"> {/* ✅ Ajustar colSpan para 6 */}
                     Nenhum funcionário encontrado.
                   </TableCell>
                 </TableRow>

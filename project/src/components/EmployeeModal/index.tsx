@@ -12,11 +12,21 @@ import {
   Button,
   Box,
   Alert,
-
+  SelectChangeEvent
 } from '@mui/material';
-
+import { EmployeeFormData } from '../../hooks/useEmployeeManagement';
 import { EmployeeRole } from '../../Enums';
-import { EmployeeModalProps } from './types';
+
+interface EmployeeModalProps {
+  open: boolean;
+  editingId: number | null;
+  formData: EmployeeFormData;
+  formErrors: Record<string, string>;
+  isSubmitting: boolean;
+  onClose: () => void;
+  onSubmit: () => void;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => void;
+}
 
 const roleLabels: Record<EmployeeRole, string> = {
   [EmployeeRole.MANAGER]: 'Gerente',
@@ -61,6 +71,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             required
             disabled={isSubmitting}
           />
+          
           <TextField
             label="CPF"
             name="cpf"
@@ -74,6 +85,8 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             inputProps={{ maxLength: 11 }}
             placeholder="Digite apenas números"
           />
+          
+          {/* ✅ Campo de Data de Nascimento */}
           <TextField
             label="Data de Nascimento"
             name="birthDate"
@@ -89,6 +102,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
               shrink: true,
             }}
           />
+          
           <TextField
             label="Telefone"
             name="phone"
@@ -102,6 +116,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             inputProps={{ maxLength: 11 }}
             placeholder="Digite apenas números"
           />
+          
           <FormControl fullWidth disabled={isSubmitting}>
             <InputLabel>Cargo</InputLabel>
             <Select

@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react';
 import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee } from './useEmployees';
 import { EmployeeData } from '../@types/EmployeeData';
 import { EmployeeRole } from '../Enums';
-import { formatDateForBackend, formatDateForFrontend } from '../utils/formatDate';
+import { formatDateForBackend, formatDateForFrontend } from '../utils/formatDate'; // ✅ Importar funções de data
 import { formatCPF, formatPhone, isValidCPF } from '../utils/validators';
 
 export interface EmployeeFormData {
   name: string;
   cpf: string;
   birthDate: string;
-  phone: string;
   role: EmployeeRole;
+  phone: string;
   farmId: number;
 }
 
@@ -77,14 +77,18 @@ export const useEmployeeManagement = (farmId: number) => {
   // Handlers
   const handleOpenDialog = (employee?: EmployeeData) => {
     if (employee) {
+      console.log('🔍 Data original do funcionário:', employee.birthDate); // ✅ Debug
+      
       setFormData({
         name: employee.name,
         cpf: employee.cpf,
-        birthDate: formatDateForFrontend(employee.birthDate),
+        birthDate: formatDateForFrontend(employee.birthDate), // ✅ Converter DD/MM/YYYY → YYYY-MM-DD
         phone: employee.phone,
         role: employee.role,
         farmId: employee.farmId
       });
+      
+      console.log('🔍 Data formatada para o form:', formatDateForFrontend(employee.birthDate)); // ✅ Debug
       setEditingId(employee.id);
     } else {
       setFormData({ ...initialFormData, farmId });
@@ -127,14 +131,16 @@ export const useEmployeeManagement = (farmId: number) => {
     setFormErrors({});
 
     try {
+      console.log('🔍 Data do form antes da formatação:', formData.birthDate); // ✅ Debug
+      
       const formattedData = {
         ...formData,
         cpf: formatCPF(formData.cpf),
         phone: formatPhone(formData.phone),
-        birthDate: formatDateForBackend(formData.birthDate),
+        birthDate: formatDateForBackend(formData.birthDate), // ✅ Converter YYYY-MM-DD → DD/MM/YYYY
       };
 
-      console.log('🔍 Dados sendo enviados:', formattedData);
+      console.log('🔍 Dados sendo enviados:', formattedData); // ✅ Debug
 
       if (editingId) {
         await updateEmployee.mutateAsync({
@@ -156,7 +162,7 @@ export const useEmployeeManagement = (farmId: number) => {
     }
   };
 
-  const handleDeleteClick = (id: number) => {
+  const handleDeleteClick = (id: number | null) => { // ✅ Aceitar null
     setConfirmDelete(id);
   };
 

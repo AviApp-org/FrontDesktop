@@ -27,42 +27,41 @@ export function formatDate(dateString: string): string {
   return `${day}/${month}/${year}`;
 }
 
-/**
- * Formata uma data para o formato DD/MM/YYYY para envio ao backend
- * @param dateString - Data em formato ISO ou qualquer formato válido
- * @returns Data formatada como DD/MM/YYYY
- */
-export function formatDateToDDMMYYYY(dateString: string): string {
-  return formatDate(dateString);
-} 
-
-// Converter de YYYY-MM-DD (input date) para DD/MM/YYYY (backend)
+// ✅ Converter de YYYY-MM-DD (input date) para DD/MM/YYYY (backend)
 export const formatDateForBackend = (dateString: string): string => {
   if (!dateString) return '';
   
+  console.log('📅 formatDateForBackend input:', dateString);
+  
   try {
     const [year, month, day] = dateString.split('-');
-    return `${day}/${month}/${year}`;
+    const result = `${day}/${month}/${year}`;
+    console.log('📅 formatDateForBackend output:', result);
+    return result;
   } catch (error) {
     console.error('Erro ao formatar data para backend:', error);
     return dateString;
   }
 };
 
-// Converter de DD/MM/YYYY (backend) para YYYY-MM-DD (input date)
+// ✅ Converter de DD/MM/YYYY (backend) para YYYY-MM-DD (input date)
 export const formatDateForFrontend = (dateString: string): string => {
   if (!dateString) return '';
   
+  console.log('📅 formatDateForFrontend input:', dateString);
+  
   try {
     const [day, month, year] = dateString.split('/');
-    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    const result = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    console.log('📅 formatDateForFrontend output:', result);
+    return result;
   } catch (error) {
     console.error('Erro ao formatar data para frontend:', error);
     return dateString;
   }
 };
 
-// Para exibir na tabela (DD/MM/YYYY)
+// ✅ Para exibir na tabela (DD/MM/YYYY)
 export const formatDateForDisplay = (dateString: string): string => {
   if (!dateString) return '';
   
@@ -71,6 +70,10 @@ export const formatDateForDisplay = (dateString: string): string => {
     return dateString;
   }
   
-  // Se está no formato YYYY-MM-DD, converte
-  return formatDateForBackend(dateString);
+  // Se está no formato YYYY-MM-DD, converte para DD/MM/YYYY
+  if (dateString.includes('-')) {
+    return formatDateForBackend(dateString);
+  }
+  
+  return dateString;
 };
