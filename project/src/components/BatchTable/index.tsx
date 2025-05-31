@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { BatchData as Batch } from '../../@types/BatchData';
 import { formatDate } from '../../utils/formatDate';
+import { BatchTableProps } from './types';
 
 const translateStatus = (status: string) => {
   const translations = { ACTIVE: 'Ativo', COMPLETED: 'Concluído', CANCELLED: 'Cancelado' };
@@ -17,17 +17,6 @@ const getStatusClasses = (status: string) => {
   return classes[status as keyof typeof classes] || classes.default;
 };
 
-interface BatchTableProps {
-  batches: Batch[];
-  expandedBatches: string[];
-  isActivating: boolean;
-  isDeactivating: boolean;
-  isSubmitting: boolean;
-  onToggleExpansion: (id: string) => void;
-  onEdit: (batch: Batch) => void;
-  onAction: (action: 'activate' | 'deactivate', id: string) => void;
-  children?: (batch: Batch) => React.ReactNode;
-}
 
 export const BatchTable: React.FC<BatchTableProps> = ({
   batches,

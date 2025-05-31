@@ -5,5 +5,5 @@ export interface ClientFormProps {
   formErrors: Record<string, string>;
   isSubmitting: boolean;
   onInputChange: (e: any) => void;
-  onSubmit: () => Promise<boolean>;
+  onSubmit: () => Promise<void>;
 }

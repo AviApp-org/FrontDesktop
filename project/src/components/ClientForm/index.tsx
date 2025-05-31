@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button, Form, Input, Select, Spin } from 'antd';
 import { ClientStatus } from '../../Enums';
-import { ClientFormData } from '../../hooks/useClientManagement';
 import { ClientFormProps } from './types';
 
 const { Option } = Select;

@@ -1,8 +1,10 @@
 import React from 'react';
 import { Plus, AlertCircle } from 'lucide-react';
 import { useBatchManagement } from '../hooks/useBatchManagement';
-import { BatchTable, AviaryTable } from '../components/tables';
-import { BatchModal, AviaryModal } from '../components/modals';
+import { BatchTable } from '../components/BatchTable';
+import { AviaryTable } from '../components/AviaryTable';
+import { BatchModal } from '../components/BatchModal';
+import { AviaryModal } from '../components/AviaryModal';
 import Button from '../components/Button';
 
 export function BatchManagement() {

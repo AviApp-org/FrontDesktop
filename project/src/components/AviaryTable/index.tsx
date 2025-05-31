@@ -1,17 +1,8 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
-import { AviaryData } from '../../@types/AviaryData';
-import { BatchData as Batch } from '../../@types/BatchData';
+import { AviaryTableProps } from './types';
 import Button from '../Button';
 
-interface AviaryTableProps {
-  batch: Batch;
-  aviariesData: AviaryData[] | undefined;
-  isLoadingAviaries: boolean;
-  onCreateAviary: () => void;
-  onEditAviary: (aviary: AviaryData) => void;
-  onDeleteAviary: (id: string) => void;
-}
 
 export const AviaryTable: React.FC<AviaryTableProps> = ({
   batch,
@@ -21,7 +12,11 @@ export const AviaryTable: React.FC<AviaryTableProps> = ({
   onEditAviary,
   onDeleteAviary
 }) => {
-  const batchAviaries = aviariesData?.filter(aviary => aviary.batchId === batch.id) || [];
+  // Filtrar aviários do lote atual
+  const batchAviaries = aviariesData?.filter(aviary => {
+    // Converter ambos para string para comparação segura
+    return String(aviary.batchId) === String(batch.id);
+  }) || [];
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -42,19 +37,44 @@ export const AviaryTable: React.FC<AviaryTableProps> = ({
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Galos Iniciais</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Galinhas Iniciais</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Nome
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Galos Iniciais
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Galinhas Iniciais
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Galos Atuais
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Galinhas Atuais
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Ações
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {batchAviaries.map((aviary) => (
                 <tr key={aviary.id} className="hover:bg-gray-50 transition-colors duration-150">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{aviary.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text
--sm text-gray-500">{aviary.initialAmountOfRoosters}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{aviary.initialAmountOfChickens}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {aviary.name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {aviary.initialAmountOfRoosters}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {aviary.initialAmountOfChickens}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {aviary.currentAmountOfRooster ?? aviary.initialAmountOfRoosters}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {aviary.currentAmountOfChickens ?? aviary.initialAmountOfChickens}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex justify-end space-x-2">
                       <button
@@ -64,7 +84,7 @@ export const AviaryTable: React.FC<AviaryTableProps> = ({
                         Editar
                       </button>
                       <button
-                        onClick={() => onDeleteAviary(aviary.id as string)}
+                        onClick={() => onDeleteAviary(String(aviary.id))}
                         className="text-red-600 hover:text-red-900 transition-colors duration-200"
                       >
                         Excluir

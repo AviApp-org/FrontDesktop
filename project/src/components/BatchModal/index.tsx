@@ -1,14 +1,5 @@
 import React from 'react';
-import { BatchData as Batch } from '../../@types/BatchData';
-
-interface BatchModalProps {
-  isOpen: boolean;
-  batch?: Batch | null;
-  isSubmitting: boolean;
-  formErrors: Record<string, string>;
-  onClose: () => void;
-  onSubmit: (data: any) => void;
-}
+import { BatchModalProps } from './types';
 
 export const BatchModal: React.FC<BatchModalProps> = ({
   isOpen,

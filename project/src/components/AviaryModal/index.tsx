@@ -1,14 +1,7 @@
 import React from 'react';
-import { AviaryData, } from '../../@types/AviaryData';
 import { CreateAviaryData } from '../../@types/CreateAviaryData';
+import { AviaryModalProps } from './types';
 
-interface AviaryModalProps {
-  isOpen: boolean;
-  aviary?: AviaryData | null;
-  selectedBatch?: { id: string | number } | null; // ✅ Adicionar selectedBatch
-  onClose: () => void;
-  onSubmit: (data: CreateAviaryData) => void; // ✅ Tipo específico
-}
 
 export const AviaryModal: React.FC<AviaryModalProps> = ({
   isOpen,

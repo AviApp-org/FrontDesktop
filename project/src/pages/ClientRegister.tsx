@@ -1,5 +1,5 @@
 import React from 'react';
-import { message, notification } from 'antd';
+import { notification } from 'antd';
 import { useClientManagement } from '../hooks/useClientManagement';
 import { ClientPageHeader } from '../components/ClientPageHeader';
 import { ClientForm } from '../components/ClientForm';
@@ -18,7 +18,6 @@ const ClientRegister: React.FC = () => {
     const success = await handleSubmit();
     
     if (success) {
-      // ✅ Usar notification do Ant Design
       notification.success({
         message: 'Sucesso!',
         description: 'Cliente cadastrado com sucesso!',
@@ -41,7 +40,7 @@ const ClientRegister: React.FC = () => {
             formErrors={formErrors}
             isSubmitting={isSubmitting}
             onInputChange={handleInputChange}
-            onSubmit={handleFormSubmit}
+            onSubmit={handleFormSubmit} 
           />
         </div>
       </div>
