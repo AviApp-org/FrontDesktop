@@ -21,7 +21,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { EmployeeData } from '../../@types/EmployeeData';
-import { EmployeeRole } from '../../Enums';
+import { EmployeeRole } from '../../@types/enums/enumEmployeeRole';
 import { formatCPF, formatPhone } from '../../utils/validators';
 import { formatDateForDisplay } from '../../utils/formatDate';
 
@@ -128,7 +128,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                         <IconButton 
                           size="small" 
                           sx={{ color: blue[700] }}
-                          onClick={() => onDelete(employee.id)}
+                          onClick={() => onDelete(employee.id ?? 0)}
                         >
                           <DeleteIcon fontSize="small" />
                         </IconButton>

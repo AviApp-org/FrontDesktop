@@ -1,4 +1,4 @@
 export interface AnomalyData {
-  id: number;
+  id?: number;
   description: string;
 }

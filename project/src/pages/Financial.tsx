@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Download, ChevronDown } from 'lucide-react';
-import { PriceHistory, EggData, MonthlyData } from '../@types/interfaces/financial';
+import { PriceHistory, EggData, MonthlyData } from '../@types/financial';
 
 function Financial() {
   const [unitPrice, setUnitPrice] = useState(0.07);

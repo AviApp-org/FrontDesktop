@@ -1,5 +1,5 @@
 export interface EggValueData {
-    id: number;
+    id?: number;
     egg: string;
     timeStamp: string;
     value: number;

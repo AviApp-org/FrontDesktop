@@ -1,6 +1,8 @@
+import { EggDetail } from './EggDatail';
+
 export interface CollectChickenData {
-  id: number;
-  collectId: number;
-  egg: number;
-  quantity: number;
+  id?: number;
+  aviaryId: number;
+  eggDetail: EggDetail[];
+  collectionDate: string;
 }

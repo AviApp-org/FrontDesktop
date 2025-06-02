@@ -15,7 +15,7 @@ import {
   SelectChangeEvent
 } from '@mui/material';
 import { EmployeeFormData } from '../../hooks/useEmployeeManagement';
-import { EmployeeRole } from '../../Enums';
+import { EmployeeRole } from '../../@types/enums/enumEmployeeRole';
 
 interface EmployeeModalProps {
   open: boolean;

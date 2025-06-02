@@ -1,6 +1,7 @@
-import { EggType } from '../Enums';
+import { EggType } from './enums/enumEggtype';
 
-export interface EggDetailDTO {
+export interface EggDetail {
+  id?: number;
   type: EggType;
   quantity: number;
 }

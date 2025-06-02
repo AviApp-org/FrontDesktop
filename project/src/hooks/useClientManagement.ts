@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ClientData } from '../@types/ClientData';
-import { ClientStatus } from '../Enums';
+import { ClientStatus } from '../@types/enums/enumClientStatus';
 import { validateCNPJ } from '../utils/validators';
 import { clientService } from '../services/clientService';
 import { showErrorMessage } from '../utils/errorHandler';

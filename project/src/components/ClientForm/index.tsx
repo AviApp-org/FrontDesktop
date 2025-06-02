@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Form, Input, Select, Spin } from 'antd';
-import { ClientStatus } from '../../Enums';
+import { ClientStatus } from '../../@types/enums/enumClientStatus';
 import { ClientFormProps } from './types';
 
 const { Option } = Select;

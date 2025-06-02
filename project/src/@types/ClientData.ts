@@ -1,4 +1,4 @@
-import { ClientStatus } from '../Enums';
+import { ClientStatus } from './enums/enumClientStatus';
 
 export interface ClientData {
   id?: number;
