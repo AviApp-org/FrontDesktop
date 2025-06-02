@@ -5,28 +5,21 @@ import { EmployeeRole } from '../@types/enums/enumEmployeeRole';
 import { formatDateForBackend, formatDateForFrontend } from '../utils/formatDate'; // ✅ Importar funções de data
 import { formatCPF, formatPhone, isValidCPF } from '../utils/validators';
 
-export interface EmployeeFormData {
-  name: string;
-  cpf: string;
-  birthDate: string;
-  role: EmployeeRole;
-  phone: string;
-  farmId: number;
-}
 
-const initialFormData: EmployeeFormData = {
+const initialFormData: EmployeeData = {
   name: '',
   cpf: '',
   birthDate: '',
   phone: '',
   role: EmployeeRole.WORKER,
+  createdAt: '',
   farmId: 0
 };
 
 export const useEmployeeManagement = (farmId: number) => {
   // Estados
   const [openDialog, setOpenDialog] = useState(false);
-  const [formData, setFormData] = useState<EmployeeFormData>(initialFormData);
+  const [formData, setFormData] = useState<EmployeeData>(initialFormData);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -85,6 +78,7 @@ export const useEmployeeManagement = (farmId: number) => {
         birthDate: formatDateForFrontend(employee.birthDate), // ✅ Converter DD/MM/YYYY → YYYY-MM-DD
         phone: employee.phone,
         role: employee.role,
+        createdAt: employee.createdAt,
         farmId: employee.farmId
       });
       

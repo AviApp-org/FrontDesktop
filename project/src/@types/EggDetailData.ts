@@ -1,6 +1,6 @@
 import { EggType } from './enums/enumEggtype';
 
-export interface EggDetail {
+export interface EggDetailData {
   id?: number;
   type: EggType;
   quantity: number;

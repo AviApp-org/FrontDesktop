@@ -1,8 +1,8 @@
-import { EggDetail } from './EggDatail';
+import { EggDetailData } from './EggDetailData';
 
-export interface CollectChickenData {
+export interface CollectEggData {
   id?: number;
   aviaryId: number;
-  eggDetail: EggDetail[];
+  eggDetail: EggDetailData[];
   collectionDate: string;
 }
