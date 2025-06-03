@@ -1,44 +1,152 @@
 import React from 'react';
-import { Plus } from 'lucide-react';
-import SearchInput from '../SearchInput';
-import { ReportFiltersProps, FilterState } from './types'; 
+import { Card, Form, Select, DatePicker, Button, Row, Col } from 'antd';
+import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
+import { ReportFiltersProps } from './types';
+
+const { Option } = Select;
+const { RangePicker } = DatePicker;
 
 
-const ReportFilters: React.FC<ReportFiltersProps> = ({
-  searchTerm,
-  onSearchChange,
+
+export const ReportFilters: React.FC<ReportFiltersProps> = ({
   filters,
-  onFilterChange
+  batches,
+  aviaries,
+  isLoading,
+  onFilterChange,
+  onSearch
 }) => {
-  const filterOptions = [
-    { key: 'showMaisRecente' as const, label: 'Mais recente' },
-    { key: 'showMaisAntigo' as const, label: 'Mais antigo' },
-    { key: 'showUltimoVisualizado' as const, label: 'Último visualizado' }
-  ];
-
   return (
-    <>
-      <SearchInput
-        value={searchTerm}
-        onChange={onSearchChange}
-        className="mb-6"
-      />
+    <Card className="mb-6 shadow-sm">
+      <Form layout="vertical">
+        <Row gutter={16}>
+          <Col span={6}>
+            <Form.Item label="Tipo de Relatório">
+              <Select
+                value={filters.type}
+                onChange={(value) => onFilterChange({ type: value })}
+                placeholder="Selecione o tipo"
+              >
+                <Option value="daily">Relatório Diário</Option>
+                <Option value="weekly">Relatório Semanal</Option>
+              </Select>
+            </Form.Item>
+          </Col>
 
-      <div className="filter-section">
-        <h3 className="section-title">Filtrar por</h3>
-        {filterOptions.map(({ key, label }) => (
-          <button 
-            key={key}
-            onClick={() => onFilterChange(key)} 
-            className="filter-button"
-          >
-            <Plus className={`h-4 w-4 ${filters[key] ? 'transform rotate-45' : ''}`} />
-            <span className="text-gray-700">{label}</span>
-          </button>
-        ))}
-      </div>
-    </>
+          <Col span={6}>
+            <Form.Item label="Lote">
+              <Select
+                value={filters.batchId}
+                onChange={(value) => onFilterChange({ batchId: value })}
+                placeholder="Selecione o lote"
+              >
+                {batches.map(batch => (
+                  <Option key={batch.id} value={Number(batch.id)}>
+                    {batch.name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
+
+          <Col span={8}>
+            <Form.Item label={filters.type === 'daily' ? 'Período' : 'Data de Início da Semana'}>
+              {filters.type === 'daily' ? (
+                <RangePicker
+                  value={[
+                    dayjs(filters.startDate),
+                    dayjs(filters.endDate)
+                  ]}
+                  onChange={(dates) => {
+                    if (dates) {
+                      onFilterChange({
+                        startDate: dates[0]?.format('YYYY-MM-DD') || '',
+                        endDate: dates[1]?.format('YYYY-MM-DD') || ''
+                      });
+                    }
+                  }}
+                  format="DD/MM/YYYY"
+                  placeholder={['Data inicial', 'Data final']}
+                  style={{ width: '100%' }}
+                />
+              ) : (
+                <DatePicker
+                  value={dayjs(filters.startDate)}
+                  onChange={(date) => {
+                    if (date) {
+                      const dateStr = date.format('YYYY-MM-DD');
+                      onFilterChange({
+                        startDate: dateStr,
+                        endDate: dateStr
+                      });
+                    }
+                  }}
+                  format="DD/MM/YYYY"
+                  placeholder="Selecione a data"
+                  style={{ width: '100%' }}
+                />
+              )}
+            </Form.Item>
+          </Col>
+
+          <Col span={4}>
+            <Form.Item label=" " style={{ visibility: 'hidden' }}>
+              <div className="flex space-x-2">
+                <Button
+                  type="primary"
+                  icon={<SearchOutlined />}
+                  onClick={onSearch}
+                  loading={isLoading}
+                  block
+                >
+                  Buscar
+                </Button>
+              </div>
+            </Form.Item>
+          </Col>
+        </Row>
+
+        {/* Filtro de aviário apenas para relatórios diários */}
+        {filters.type === 'daily' && (
+          <Row gutter={16}>
+            <Col span={6}>
+              <Form.Item label="Aviário (Opcional)">
+                <Select
+                  value={filters.aviaryId}
+                  onChange={(value) => onFilterChange({ aviaryId: value })}
+                  placeholder="Todos os aviários"
+                  allowClear
+                >
+                  {aviaries.map(aviary => (
+                    <Option key={aviary.id} value={Number(aviary.id)}>
+                      {aviary.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+
+            <Col span={6}>
+              <Form.Item label=" " style={{ visibility: 'hidden' }}>
+                <Button
+                  icon={<ReloadOutlined />}
+                  onClick={() => {
+                    onFilterChange({
+                      startDate: dayjs().format('YYYY-MM-DD'),
+                      endDate: dayjs().format('YYYY-MM-DD'),
+                      batchId: batches[0]?.id ? Number(batches[0].id) : 1,
+                      aviaryId: undefined
+                    });
+                  }}
+                >
+                  Limpar Filtros
+                </Button>
+              </Form.Item>
+            </Col>
+          </Row>
+        )}
+      </Form>
+    </Card>
   );
 };
-
-export default ReportFilters;

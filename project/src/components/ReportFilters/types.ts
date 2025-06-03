@@ -1,12 +1,12 @@
-export interface FilterState {
-  showMaisRecente: boolean;
-  showMaisAntigo: boolean;
-  showUltimoVisualizado: boolean;
-}
+import { ReportFiltersState } from '../../hooks/useReportsManagement';
+import { BatchData } from '../../@types/BatchData';
+import { AviaryData } from '../../@types/AviaryData';
 
 export interface ReportFiltersProps {
-  searchTerm: string;
-  onSearchChange: (value: string) => void;
-  filters: FilterState;
-  onFilterChange: (filterKey: keyof FilterState) => void;
+  filters: ReportFiltersState;
+  batches: BatchData[];
+  aviaries: AviaryData[];
+  isLoading: boolean;
+  onFilterChange: (filters: Partial<ReportFiltersState>) => void;
+  onSearch: () => void;
 }
