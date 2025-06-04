@@ -1,10 +1,10 @@
 import { AviaryData } from './AviaryData';
-
+import { BatchStatus } from './enums/enumBatchStatus';
 export interface BatchData {
-  id: string;
+  id: number;
   name: string;
   startDate: string;
-  status: 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
-  farmId: string;
+  status: BatchStatus;
+  farmId: number;
   aviaries?: AviaryData[];
 }

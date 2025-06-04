@@ -1,5 +1,5 @@
 export interface AddressData {
-  id: number;
+  id?: number;
   street: string;
   number: string;
   cep: string;

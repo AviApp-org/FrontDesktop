@@ -1,15 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Batch } from '../types/interfaces/batch';
+import { BatchData } from '@/@types/BatchData'
 import api from '../config/axios';
 import { API_ENDPOINTS } from '../config/api';
 import { AxiosError } from 'axios';
-import { formatDateToDDMMYYYY } from '../utils/formatDate';
+import { formatDateForBackend } from '../utils/formatDate';
 
-// Funções para operações CRUD usando a API real
-const fetchAllBatches = async (): Promise<Batch[]> => {
+// ✅ Buscar TODOS os lotes de uma granja
+const fetchAllBatches = async (): Promise<BatchData[]> => {
   try {
     console.log('Buscando todos os lotes da granja');
-    const response = await api.get(API_ENDPOINTS.batches);
+    const farmId = "1"; // ID da granja
+    const response = await api.get(`${API_ENDPOINTS.batches}/farm/${farmId}`);
     console.log('Lotes encontrados:', response.data);
     return response.data;
   } catch (error) {
@@ -18,7 +19,8 @@ const fetchAllBatches = async (): Promise<Batch[]> => {
   }
 };
 
-const fetchBatchById = async (id: string): Promise<Batch> => {
+// ✅ Buscar UM lote específico por ID
+const fetchBatchById = async (id: string): Promise<BatchData> => {
   try {
     console.log('Buscando lote por ID:', id);
     const response = await api.get(`${API_ENDPOINTS.batches}/${id}`);
@@ -30,26 +32,24 @@ const fetchBatchById = async (id: string): Promise<Batch> => {
   }
 };
 
-const postData = async (batch: Omit<Batch, 'id'>): Promise<Batch> => {
+// ✅ Criar novo lote
+const postData = async (batch: Omit<BatchData, 'id'>): Promise<BatchData> => {
   try {
     console.log('Criando novo lote:', batch);
     
-    // Validar dados antes de enviar
     if (!batch.name || !batch.startDate || !batch.farmId) {
       throw new Error('Nome, data de início e ID da fazenda são obrigatórios');
     }
     
-    // Garantir que o status seja um dos valores permitidos
     if (batch.status && !['ACTIVE', 'COMPLETED', 'CANCELLED'].includes(batch.status)) {
-      batch.status = 'ACTIVE'; // Valor padrão
+      batch.status = 'ACTIVE';
     }
     
-    // Formatar datas para o formato esperado pelo backend (DD/MM/YYYY)
     const formattedBatch = {
       name: batch.name,
-      startDate: formatDateToDDMMYYYY(batch.startDate),
+      startDate: formatDateForBackend(batch.startDate),
       status: batch.status || 'ACTIVE',
-      farmId: batch.farmId || "1" // Garantir que sempre tenha um farmId
+      farmId: batch.farmId || "1"
     };
     
     console.log('Dados formatados para envio:', formattedBatch);
@@ -63,6 +63,7 @@ const postData = async (batch: Omit<Batch, 'id'>): Promise<Batch> => {
   }
 };
 
+// ✅ Ativar lote
 const activateBatch = async (id: string): Promise<void> => {
   try {
     console.log('Ativando lote:', id);
@@ -74,6 +75,7 @@ const activateBatch = async (id: string): Promise<void> => {
   }
 };
 
+// ✅ Desativar lote
 const deactivateBatch = async (id: string): Promise<void> => {
   try {
     console.log('Desativando lote:', id);
@@ -85,16 +87,16 @@ const deactivateBatch = async (id: string): Promise<void> => {
   }
 };
 
-// Hooks para gerenciar os dados
+// ✅ Hook para buscar TODOS os lotes
 export const useBatches = () => {
   return useQuery({
     queryKey: ['batches'],
     queryFn: fetchAllBatches,
     staleTime: 1000 * 60 * 5, // 5 minutos
-    cacheTime: 1000 * 60 * 30, // 30 minutos
   });
 };
 
+// ✅ Hook para buscar UM lote por ID
 export const useBatchById = (id: string) => {
   return useQuery({
     queryKey: ['batch', id],
@@ -105,19 +107,20 @@ export const useBatchById = (id: string) => {
   });
 };
 
+// ✅ Hook para criar lote
 export function usePostBatchData() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: Omit<Batch, 'id'>) => {
+    mutationFn: async (data: Omit<BatchData, 'id'>) => {
       const formattedBatch = {
         ...data,
-        startDate: formatDateToDDMMYYYY(data.startDate),
+        startDate: formatDateForBackend(data.startDate),
       };
 
       console.log('Dados formatados para envio:', formattedBatch);
 
-      const response = await api.post<Batch>(API_ENDPOINTS.batches, formattedBatch);
+      const response = await api.post<BatchData>(API_ENDPOINTS.batches, formattedBatch);
       return response.data;
     },
     onSuccess: () => {
@@ -126,19 +129,20 @@ export function usePostBatchData() {
   });
 }
 
+// ✅ Hook para atualizar lote
 export function useUpdateBatchData() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Partial<Omit<Batch, 'id'>> }) => {
+    mutationFn: async ({ id, data }: { id: string; data: Partial<Omit<BatchData, 'id'>> }) => {
       const formattedData = {
         ...data,
-        startDate: data.startDate ? formatDateToDDMMYYYY(data.startDate) : undefined,
+        startDate: data.startDate ? formatDateForBackend(data.startDate) : undefined,
       };
 
       console.log('Dados formatados para atualização:', formattedData);
 
-      const response = await api.put<Batch>(`${API_ENDPOINTS.batches}/${id}`, formattedData);
+      const response = await api.put<BatchData>(`${API_ENDPOINTS.batches}/${id}`, formattedData);
       return response.data;
     },
     onSuccess: () => {
@@ -147,6 +151,7 @@ export function useUpdateBatchData() {
   });
 }
 
+// ✅ Hook para ativar lote
 export function useActivateBatchData() {
   const queryClient = useQueryClient();
 
@@ -161,6 +166,7 @@ export function useActivateBatchData() {
   });
 }
 
+// ✅ Hook para desativar lote
 export function useDeactivateBatchData() {
   const queryClient = useQueryClient();
 

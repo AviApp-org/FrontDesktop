@@ -1,18 +1,21 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 interface FarmContextType {
-  farmId: string;
-  setFarmId: (id: string) => void;
+  farmId: number;  // ✅ Mudado para number
+  setFarmId: (id: number) => void;
 }
 
 const FarmContext = createContext<FarmContextType | undefined>(undefined);
 
 export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [farmId, setFarmId] = useState<string>(localStorage.getItem('farmId') || '1');
+  // ✅ Converter localStorage para number
+  const [farmId, setFarmId] = useState<number>(
+    Number(localStorage.getItem('farmId')) || 1
+  );
 
-  const handleSetFarmId = (id: string) => {
+  const handleSetFarmId = (id: number) => {
     setFarmId(id);
-    localStorage.setItem('farmId', id);
+    localStorage.setItem('farmId', String(id)); // ✅ Salvar como string no localStorage
   };
 
   return (

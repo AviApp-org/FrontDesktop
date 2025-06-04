@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { Info } from 'lucide-react';
-import { Aviary, Category, CollectionEntry, DeadBirds, } from '@/@types/Collection';
+import { Aviary, Category, CollectionEntry, DeadBirds, } from '@/@types/collection';
 
 function CollectionReview() {
   
