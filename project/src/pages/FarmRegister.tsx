@@ -38,22 +38,18 @@ const FarmRegister: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      <div className="flex-1 py-8">
-        <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-sm p-8">
-          <FarmPageHeader />
-          
-          <FarmForm
-            formData={formData}
-            formErrors={formErrors}
-            isSubmitting={isSubmitting}
-            clients={clients}
-            onInputChange={handleInputChange}
-            onSubmit={handleFormSubmit}
-          />
-        </div>
+    <div className="flex flex-col min-h-screen bg-gray-50 px-4 pt-16 pb-8">
+      <div className="flex flex-col gap-6">
+        <FarmPageHeader />
+        <FarmForm
+          formData={formData}
+          formErrors={formErrors}
+          isSubmitting={isSubmitting}
+          clients={clients}
+          onInputChange={handleInputChange}
+          onSubmit={handleFormSubmit}
+        />
       </div>
-
       <LoadingOverlay 
         show={isSubmitting}
         message="Cadastrando granja e endereço..."

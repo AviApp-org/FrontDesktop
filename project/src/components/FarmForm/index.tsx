@@ -203,7 +203,7 @@ export const FarmForm: React.FC<FarmFormProps> = ({
             type="primary" 
             htmlType="submit" 
             loading={isSubmitting}
-            className="w-full rounded-md"
+            className="btn-primary-sm"
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Cadastrando...' : 'Cadastrar Granja'}

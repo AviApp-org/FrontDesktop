@@ -15,11 +15,38 @@ const initialFormData: ClientFormData = {
   status: ClientStatus.ACTIVE
 };
 
-export const useClientManagement = () => {
+export const useClientManagement = (farmId: number) => {
   // Estados
   const [formData, setFormData] = useState<ClientFormData>(initialFormData);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Estados para gerenciamento de clientes
+  const [clients, setClients] = useState<ClientData[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [openDialog, setOpenDialog] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
+
+  // Exemplo de handlers para os estados acima (implemente conforme necessário)
+  const handleSearch = (term: string) => setSearchTerm(term);
+  const handleOpenDialog = (id?: number) => {
+    setOpenDialog(true);
+    setEditingId(id ?? null);
+  };
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setEditingId(null);
+  };
+  const handleDeleteClick = (id: number | null) => setConfirmDelete(id);
+  const handleConfirmDelete = async () => {
+    if (confirmDelete !== null) {
+      // Implemente a lógica de exclusão aqui
+      setConfirmDelete(null);
+    }
+  };
 
   // Validação do formulário
   const validateForm = (): boolean => {
@@ -117,15 +144,29 @@ export const useClientManagement = () => {
     setFormErrors({});
   };
 
-  return {
-    // Estados
+ return {
+    // Estados de clientes
+    clients,
+    isLoading,
+    isError,
+    searchTerm,
+    openDialog,
+    editingId,
+    confirmDelete,
+
+    // Estados do formulário
     formData,
     formErrors,
     isSubmitting,
-    
+
     // Handlers
-    handleInputChange,
+    handleSearch,
+    handleOpenDialog,
+    handleCloseDialog,
     handleSubmit,
+    handleInputChange,
+    handleDeleteClick,
+    handleConfirmDelete,
     handleFormReset,
   };
 };

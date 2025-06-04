@@ -31,9 +31,9 @@ export function BatchManagement() {
   } = useBatchManagement();
 
   return (
-    <div className="page-container bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
+    <div className="px-4 pt-16 pb-8 min-h-screen bg-gray-50">
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Gerenciamento de Lotes e Aviários</h1>
             <p className="mt-2 text-sm text-gray-600">Gerencie seus lotes e aviários de forma eficiente</p>
@@ -45,7 +45,7 @@ export function BatchManagement() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded-lg flex items-center">
+          <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg flex items-center">
             <AlertCircle className="w-5 h-5 text-red-400 mr-2" />
             <p className="text-red-700">{error}</p>
           </div>
@@ -61,7 +61,6 @@ export function BatchManagement() {
           onEdit={setSelectedBatch}
           onAction={handleBatchAction}
         >
-
           {(batch) => (
             <AviaryTable
               batch={batch}
@@ -94,18 +93,18 @@ export function BatchManagement() {
           onSubmit={(data) => handleBatchSubmit(data, !!selectedBatch)}
         />
 
-<AviaryModal
-  isOpen={isAviaryModalOpen}
-  aviary={selectedAviary}
-  selectedBatch={selectedBatch}
-  onClose={() => {
-    setIsAviaryModalOpen(false);
-    setSelectedAviary(null);
-  }}
-  onSubmit={handleAviarySubmit}
-/>
+        <AviaryModal
+          isOpen={isAviaryModalOpen}
+          aviary={selectedAviary}
+          selectedBatch={selectedBatch}
+          onClose={() => {
+            setIsAviaryModalOpen(false);
+            setSelectedAviary(null);
+          }}
+          onSubmit={handleAviarySubmit}
+        />
       </div>
-    </div> 
+    </div>
   );
 }
 
