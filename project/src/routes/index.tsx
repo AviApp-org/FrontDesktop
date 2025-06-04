@@ -2,8 +2,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from '../pages/Dashboard';
-// import Reports from '../pages/Reports'; // Comentar a antiga
-import ReportsPage from '../pages/Reports'; // Nova página
+import Reports from '../pages/Reports';
 import Financial from '../pages/Financial';
 import CollectionReview from '../pages/CollectionReview';
 //import DataEntry from '../pages/DataEntry';
@@ -30,7 +29,7 @@ export function AppRoutes() {
         path="/reports"
         element={
           <ProtectedRoute>
-            <ReportsPage />
+            <Reports />
           </ProtectedRoute>
         }
       />
