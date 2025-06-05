@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ClientData } from '../@types/ClientData';
 import { ClientStatus } from '../@types/enums/enumClientStatus';
 import { validateCNPJ } from '../utils/validators';
@@ -144,6 +144,20 @@ export const useClientManagement = (farmId: number) => {
     setFormErrors({});
   };
 
+  const loadClients = async () => {
+    setIsLoading(true);
+    setIsError(false);
+    try {
+      // Replace with your actual API/service call
+      const data = await clientService.list(farmId);
+      setClients(data);
+    } catch (e) {
+      setIsError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
  return {
     // Estados de clientes
     clients,
@@ -168,5 +182,6 @@ export const useClientManagement = (farmId: number) => {
     handleDeleteClick,
     handleConfirmDelete,
     handleFormReset,
+    loadClients,
   };
 };

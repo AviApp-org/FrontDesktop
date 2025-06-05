@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box } from '@mui/material';
 import { useFarm } from '../contexts/FarmContext';
 import { useClientManagement } from '../hooks/useClientManagement';
@@ -10,6 +10,10 @@ import { DeleteConfirmDialog } from '../components/DeleteButton';
 const ClientRegister: React.FC = () => {
   const { farmId } = useFarm();
   const clientManagement = useClientManagement(farmId);
+
+  useEffect(() => {
+    clientManagement.loadClients();
+  }, [farmId]);
 
   return (
     <Box>
