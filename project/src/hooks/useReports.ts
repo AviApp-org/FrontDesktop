@@ -1,249 +1,97 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import api from '../config/axios';
-import { ReportData, SummaryData, ReportType } from '../@types/reportTypes';
-import { formatDateForAPI, generateDateRange, formatDateForDisplay } from '../utils/reportUtils';
-import { normalizeAviaryData, isValidAviaryData } from '../utils/aviaryUtils';
 
 export const useReports = () => {
-  const [reportType, setReportType] = useState<ReportType>('Diário');
+  const [reportType, setReportType] = useState<'Diário' | 'Semanal' | 'Mensal'>('Diário');
   const [selectedDate, setSelectedDate] = useState<string>('');
-  const [batchId, setBatchId] = useState<number>(36);
+  const [batchId, setBatchId] = useState<string>('36');
   const [loading, setLoading] = useState(false);
-  const [reportData, setReportData] = useState<ReportData | null>(null);
-  const [summaryData, setSummaryData] = useState<SummaryData | null>(null);
+  const [reportData, setReportData] = useState<any>(null);
+  const [summaryData, setSummaryData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-  const [expandedAviaries, setExpandedAviaries] = useState<Set<string>>(new Set());
+  const [expandedAviaries, setExpandedAviaries] = useState<number[]>([]);
 
-  // Função para processar dados do relatório
-  const processReportData = (data: ReportData): ReportData => {
-    console.log('🔍 Processando dados do relatório:', data);
-    console.log('🏠 Aviários brutos recebidos:', data.aviaryReports);
-    
-    if (!data.aviaryReports || !Array.isArray(data.aviaryReports)) {
-      console.warn('⚠️ aviaryReports não é um array válido:', data.aviaryReports);
-      return {
-        ...data,
-        aviaryReports: []
-      };
-    }
-
-    const processedAviaries = data.aviaryReports.map((aviary, index) => {
-      console.log(`🏠 Processando aviário ${index + 1}:`, {
-        aviaryId: aviary.aviaryId,
-        id: aviary.id,
-        name: aviary.aviaryName || aviary.name,
-        eggCollections: aviary.eggCollections?.length || 0,
-        deathRecords: aviary.deathRecords?.length || 0,
-        rawData: aviary
-      });
-      
-      const normalized = normalizeAviaryData(aviary);
-      
-      if (!isValidAviaryData(normalized)) {
-        console.warn(`⚠️ Aviário ${index + 1} será rejeitado:`, normalized);
-        return null;
-      }
-      
-      console.log(`✅ Aviário ${index + 1} aceito:`, normalized);
-      return normalized;
-    }).filter((aviary): aviary is NonNullable<typeof aviary> => aviary !== null);
-
-    const processedData = {
-      ...data,
-      aviaryReports: processedAviaries
-    };
-
-    console.log('✅ Dados processados:', {
-      totalAviariesReceived: data.aviaryReports.length,
-      totalAviariesProcessed: processedAviaries.length,
-      aviariesWithDetails: processedAviaries.filter(a => 
-        (a.eggCollections && a.eggCollections.length > 0) || 
-        (a.deathRecords && a.deathRecords.length > 0)
-      ).length,
-      processedAviaries: processedAviaries.map(a => ({
-        id: a.aviaryId,
-        name: a.aviaryName,
-        collections: a.eggCollections?.length || 0,
-        deaths: a.deathRecords?.length || 0
-      }))
-    });
-
-    return processedData;
+  const handleReportTypeChange = (type: 'Diário' | 'Semanal' | 'Mensal') => {
+    console.log('🔄 Mudando tipo de relatório para:', type);
+    setReportType(type);
+    setReportData(null);
+    setSummaryData(null);
+    setError(null);
   };
 
-  // Função para buscar múltiplos relatórios e calcular médias
-  const fetchMultipleReports = async (dates: string[]): Promise<SummaryData> => {
-    const reports: ReportData[] = [];
-    
-    for (const date of dates) {
-      try {
-        const formattedDate = formatDateForAPI(date);
-        const endpoint = `/api/daily-report/${batchId}/${formattedDate}`;
-        const response = await api.get(endpoint);
-        
-        const processedData = processReportData(response.data);
-        reports.push(processedData);
-      } catch (err) {
-        console.log(`⚠️ Sem dados para ${date}`);
-      }
-    }
-
-    if (reports.length === 0) {
-      throw new Error('Nenhum dado encontrado para o período selecionado');
-    }
-
-    // Calcular médias
-    const totalDays = reports.length;
-    const totalEggs = reports.reduce((sum, r) => sum + r.totalEggsCollected, 0);
-    const totalDeaths = reports.reduce((sum, r) => sum + r.totalDeadBirds, 0);
-    const avgProduction = reports.reduce((sum, r) => sum + r.production, 0) / totalDays;
-    const avgMortality = reports.reduce((sum, r) => sum + r.mortality, 0) / totalDays;
-    const avgChickens = reports.reduce((sum, r) => sum + r.currentChickens, 0) / totalDays;
-    const avgRoosters = reports.reduce((sum, r) => sum + r.currentRoosters, 0) / totalDays;
-
-    // Calcular média dos tipos de ovos
-    const eggTypesMap = new Map<string, number[]>();
-    reports.forEach(report => {
-      report.percentageByEggType?.forEach(egg => {
-        if (!eggTypesMap.has(egg.type)) {
-          eggTypesMap.set(egg.type, []);
-        }
-        eggTypesMap.get(egg.type)!.push(egg.percentage);
-      });
-    });
-
-    const eggTypesAverage = Array.from(eggTypesMap.entries()).map(([type, percentages]) => ({
-      type,
-      percentage: percentages.reduce((sum, p) => sum + p, 0) / percentages.length
-    }));
-
-    const startDate = formatDateForDisplay(dates[0]);
-        const endDate = formatDateForDisplay(dates[dates.length - 1]);
-
-    return {
-      period: `${startDate} até ${endDate}`,
-      totalDays,
-      avgEggsPerDay: totalEggs / totalDays,
-      avgDeathsPerDay: totalDeaths / totalDays,
-      avgProduction,
-      avgMortality,
-      avgChickens,
-      avgRoosters,
-      totalEggs,
-      totalDeaths,
-      eggTypesAverage
-    };
-  };
-
-  // Função principal para buscar relatórios
-  const fetchReport = async () => {
-    if (!selectedDate) {
-      setError('Por favor, selecione uma data');
+  const fetchReport = useCallback(async () => {
+    if (!selectedDate || !batchId) {
+      setError('Por favor, selecione uma data e um lote.');
       return;
     }
+
+    console.log('🚀 Iniciando busca de relatório:', {
+      type: reportType,
+      date: selectedDate,
+      batchId: batchId
+    });
 
     setLoading(true);
     setError(null);
     setReportData(null);
     setSummaryData(null);
-    setExpandedAviaries(new Set());
 
     try {
-      if (reportType === 'Diário') {
-        const formattedDate = formatDateForAPI(selectedDate);
-        const endpoint = `/api/daily-report/${batchId}/${formattedDate}`;
-        
-        console.log('🔍 Buscando relatório diário:', { 
-          batchId, 
-          selectedDate, 
-          formattedDate, 
-          endpoint 
-        });
-
-        const response = await api.get(endpoint);
-        
-        console.log('📥 Dados brutos recebidos da API:', response.data);
-        
-        // ✅ Verificar se temos aviaryReports
-        if (!response.data.aviaryReports) {
-          console.warn('⚠️ API não retornou aviaryReports, criando array vazio');
-          response.data.aviaryReports = [];
-        }
-        
-        // Processar e normalizar dados
-        const processedData = processReportData(response.data);
-        
-        console.log('✅ Dados finais processados:', processedData);
-        
-        // ✅ Sempre definir reportData, mesmo se não houver aviários
-        setReportData(processedData);
-        
-      } else if (reportType === 'Semanal') {
-        console.log('🔍 Buscando relatório semanal a partir de:', selectedDate);
-        const dates = generateDateRange(selectedDate, 7);
-        const summary = await fetchMultipleReports(dates);
-        setSummaryData(summary);
-        
-      } else if (reportType === 'Mensal') {
-        console.log('🔍 Buscando relatório mensal a partir de:', selectedDate);
-        const dates = generateDateRange(selectedDate, 30);
-        const summary = await fetchMultipleReports(dates);
-        setSummaryData(summary);
-      }
+      // Converter YYYY-MM-DD para DD-MM-YYYY
+      const [year, month, day] = selectedDate.split('-');
+      const formattedDate = `${day}-${month}-${year}`;
       
+      let endpoint = '';
+      
+      if (reportType === 'Diário') {
+        endpoint = `/api/daily-report/${batchId}/${formattedDate}`; // ✅ COM /api
+      } else if (reportType === 'Semanal') {
+        endpoint = `/api/weekly-report/${batchId}/${formattedDate}`; // ✅ COM /api
+      } else if (reportType === 'Mensal') {
+        endpoint = `/api/monthly-report/${batchId}/${formattedDate}`; // ✅ COM /api
+      }
+
+      console.log('🔍 Endpoint final:', endpoint);
+      console.log('🔍 URL completa será:', `http://localhost:8080${endpoint}`);
+      
+      const response = await api.get(endpoint);
+      
+      if (reportType === 'Diário') {
+        console.log('✅ Dados do relatório diário:', response.data);
+        setReportData(response.data);
+      } else {
+        console.log('✅ Dados do relatório semanal/mensal:', response.data);
+        setSummaryData(response.data);
+      }
+
     } catch (err: any) {
       console.error('❌ Erro ao buscar relatório:', err);
       
-      let errorMessage = 'Erro ao buscar relatório';
-      if (err.response?.status === 404) {
-        errorMessage = `Nenhum relatório encontrado para o lote ${batchId} na data ${formatDateForDisplay(selectedDate)}`;
-      } else if (err.response?.data?.message) {
-        errorMessage = err.response.data.message;
-      } else if (err.message) {
-        errorMessage = err.message;
+      if (err.response) {
+        setError(`Erro ${err.response.status}: ${err.response.data?.message || err.response.statusText}`);
+      } else if (err.request) {
+        setError('Erro de conexão. Verifique se o backend está rodando.');
+      } else {
+        setError(err.message || 'Erro ao carregar relatório');
       }
-      
-      setError(errorMessage);
     } finally {
       setLoading(false);
     }
+  }, [selectedDate, batchId, reportType]);
+
+  const toggleAviario = (index: number) => {
+    setExpandedAviaries(prev =>
+      prev.includes(index)
+        ? prev.filter(i => i !== index)
+        : [...prev, index]
+    );
   };
 
-  // Limpar dados quando mudar o tipo de relatório
-  const handleReportTypeChange = (newType: ReportType) => {
-    setReportType(newType);
-    setReportData(null);
-    setSummaryData(null);
-    setError(null);
-    setExpandedAviaries(new Set());
-  };
-
-  // ✅ Função para controlar expansão individual - usando string como chave para ser mais flexível
-  const toggleAviario = (aviaryId: string | number) => {
-    const id = String(aviaryId); // Converter para string para ser mais flexível
-    console.log('🔄 Toggling aviário:', id);
-    setExpandedAviaries(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-        console.log('➖ Fechando aviário:', id);
-      } else {
-        newSet.add(id);
-        console.log('➕ Abrindo aviário:', id);
-      }
-      console.log('📋 Aviários expandidos:', Array.from(newSet));
-      return newSet;
-    });
-  };
-
-  // ✅ Função para verificar se aviário está expandido
-  const isAviaryExpanded = (aviaryId: string | number): boolean => {
-    const id = String(aviaryId);
-    return expandedAviaries.has(id);
+  const isAviaryExpanded = (index: number) => {
+    return expandedAviaries.includes(index);
   };
 
   return {
-    // Estados
     reportType,
     selectedDate,
     batchId,
@@ -252,16 +100,11 @@ export const useReports = () => {
     summaryData,
     error,
     expandedAviaries,
-    
-    // Setters
     setSelectedDate,
     setBatchId,
-    
-    // Handlers
     handleReportTypeChange,
     fetchReport,
     toggleAviario,
     isAviaryExpanded,
   };
 };
-

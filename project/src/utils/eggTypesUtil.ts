@@ -1,3 +1,4 @@
+
 import { translateEggType } from '../@types/reportTypes';
 
 // ✅ Tipos de ovos padrão que sempre devem aparecer na tabela

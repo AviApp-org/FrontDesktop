@@ -1,18 +1,22 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080', // ✅ SEM /api/ aqui, pois já está no controller
-  timeout: 10000,
+  baseURL: 'http://localhost:8080', // ✅ SEM /api no baseURL
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
+  timeout: 10000,
 });
 
-// Interceptor para log das requisições
+// Interceptor para logs
 api.interceptors.request.use(
   (config) => {
-    console.log(`🚀 Requisição ${config.method?.toUpperCase()} para ${config.url}`, config.data);
+    console.log('🚀 Fazendo requisição:', {
+      method: config.method?.toUpperCase(),
+      url: config.url,
+      fullURL: `${config.baseURL}${config.url}`
+    });
     return config;
   },
   (error) => {
@@ -21,21 +25,21 @@ api.interceptors.request.use(
   }
 );
 
-// Interceptor para log das respostas
 api.interceptors.response.use(
   (response) => {
-    console.log(`✅ Resposta de ${response.config.url}: ${response.status}`, response.data);
+    console.log('✅ Resposta recebida:', {
+      status: response.status,
+      url: response.config.url,
+      data: response.data
+    });
     return response;
   },
   (error) => {
-    console.error('❌ Erro na resposta:', error.response?.status, error.response?.data);
-    
-    if (error.response?.status === 404) {
-      console.error('🔍 Recurso não encontrado. Verifique se a URL está correta.');
-    } else if (error.response?.status === 500) {
-      console.error('💥 Erro interno do servidor.');
-    }
-    
+    console.error('❌ Erro na resposta:', {
+      status: error.response?.status,
+      url: error.config?.url,
+      message: error.message
+    });
     return Promise.reject(error);
   }
 );
