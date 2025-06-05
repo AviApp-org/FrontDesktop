@@ -35,7 +35,7 @@ export const ClientHeader: React.FC<ClientHeaderProps> = ({
       </Typography>
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        {/* Search bar and add button */}
+        
         <Card elevation={0} sx={{ bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
           <CardContent>
             <Box display="flex" justifyContent="space-between" alignItems="center">

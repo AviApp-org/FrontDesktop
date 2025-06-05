@@ -51,10 +51,10 @@ export const BatchTable: React.FC<BatchTableProps> = ({
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <button
-                      onClick={() => onToggleExpansion(batch.id as string)}
+                      onClick={() => onToggleExpansion(String(batch.id))}
                       className="mr-3 text-gray-400 hover:text-gray-600 transition-colors duration-200"
                     >
-                      {expandedBatches.includes(batch.id as string) ? 
+                      {expandedBatches.includes(String(batch.id)) ? 
                         <ChevronDown className="w-5 h-5" /> : 
                         <ChevronUp className="w-5 h-5" />
                       }
@@ -80,7 +80,7 @@ export const BatchTable: React.FC<BatchTableProps> = ({
                       Editar
                     </button>
                     <button
-                      onClick={() => onAction(batch.status === 'ACTIVE' ? 'deactivate' : 'activate', batch.id as string)}
+                      onClick={() => onAction(batch.status === 'ACTIVE' ? 'deactivate' : 'activate', String(batch.id))}
                       className={`transition-colors duration-200 ${
                         batch.status === 'ACTIVE' 
                           ? 'text-red-600 hover:text-red-900' 
@@ -93,7 +93,7 @@ export const BatchTable: React.FC<BatchTableProps> = ({
                   </div>
                 </td>
               </tr>
-              {expandedBatches.includes(batch.id as string) && children && (
+              {expandedBatches.includes(String(batch.id)) && children && (
                 <tr>
                   <td colSpan={4} className="px-6 py-4 bg-gray-50">
                     {children(batch)}
