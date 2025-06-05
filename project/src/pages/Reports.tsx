@@ -1,16 +1,18 @@
 import React from 'react';
 import { useReports } from '../hooks/useReports';
-import { formatDateForDisplay } from '../utils/reportUtils';
-
-// Componentes
 import { ReportFilters } from '../components/Reports/ReportFilters';
-import { LoadingState } from '../components/Reports/LoadingState';
-import { ErrorState } from '../components/Reports/ErrorState';
-import { EmptyStateNoDate, EmptyStateWaiting } from '../components/Reports/EmptyStates';
 import { ResumoGeral } from '../components/Reports/ResumoGeral';
 import { ResumoSemanal } from '../components/Reports/ResumoSemanal';
-import { DistribuicaoOvos } from '../components/Reports/DistribuicaoOvos';
 import { Aviario } from '../components/Reports/Aviario';
+import { 
+  EmptyStateNoDate, 
+  EmptyStateWaiting, 
+  EmptyStateNoData,
+  EmptyStateNoAviaries,
+  ErrorState, 
+  LoadingState 
+} from '../components/Reports/EmptyStates';
+import { formatDateForDisplay } from '../utils/formatDate';
 
 const Reports: React.FC = () => {
   const {
@@ -21,17 +23,17 @@ const Reports: React.FC = () => {
     reportData,
     summaryData,
     error,
-    openAviaries,
     setSelectedDate,
     setBatchId,
     handleReportTypeChange,
     fetchReport,
     toggleAviario,
+    isAviaryExpanded,
   } = useReports();
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold mb-6">
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <h1 className="text-3xl font-bold mb-6 text-gray-800">
         📊 Relatório {reportType} 
         {selectedDate && (reportType === 'Diário' ? ` - ${formatDateForDisplay(selectedDate)}` : 
          reportType === 'Semanal' ? ` - Semana de ${formatDateForDisplay(selectedDate)}` :
@@ -56,37 +58,72 @@ const Reports: React.FC = () => {
       {/* Loading */}
       {loading && <LoadingState reportType={reportType} />}
 
-      {/* Conteúdo do Relatório DIÁRIO */}
+      {/* ✅ Conteúdo do Relatório DIÁRIO */}
       {reportData && !loading && reportType === 'Diário' && (
         <>
           <ResumoGeral summary={reportData} />
-          <DistribuicaoOvos eggTypes={reportData.percentageByEggType} />
-          <div className="space-y-4">
-            {reportData.aviaryReports.map((aviary) => (
-              <Aviario
-                key={aviary.aviaryId}
-                aviary={aviary}
-                open={!!openAviaries[aviary.aviaryId]}
-                toggle={() => toggleAviario(aviary.aviaryId)}
-              />
-            ))}
+          
+          {/* ✅ Lista de Aviários - Sempre mostrar seção */}
+          <div className="mb-6">
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+              <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+                <h2 className="text-xl font-semibold text-gray-800">
+                  🏠 Aviários ({reportData.aviaryReports?.length || 0})
+                </h2>
+              </div>
+              
+              <div className="p-6">
+                {/* ✅ Verificar se há aviários válidos */}
+                {reportData.aviaryReports && reportData.aviaryReports.length > 0 ? (
+                  <div className="space-y-4">
+                    {reportData.aviaryReports.map((aviary) => {
+                      // ✅ Usar ID mais flexível
+                      const aviaryId = aviary.aviaryId || aviary.id || Math.random();
+                      const isExpanded = isAviaryExpanded(aviaryId);
+                      
+                      return (
+                        <Aviario
+                          key={String(aviaryId)}
+                          aviary={aviary}
+                          open={isExpanded}
+                          toggle={() => toggleAviario(aviaryId)}
+                        />
+                      );
+                    })}
+                  </div>
+                ) : (
+                  /* ✅ Estado vazio para aviários */
+                  <EmptyStateNoAviaries 
+                    hasReportData={true}
+                    totalEggs={reportData.totalEggsCollected || 0}
+                    totalDeaths={reportData.totalDeadBirds || 0}
+                  />
+                )}
+              </div>
+            </div>
           </div>
         </>
       )}
 
       {/* Conteúdo do Relatório SEMANAL/MENSAL */}
       {summaryData && !loading && (reportType === 'Semanal' || reportType === 'Mensal') && (
-        <>
-          <ResumoSemanal summary={summaryData} type={reportType} />
-          <DistribuicaoOvos eggTypes={summaryData.eggTypesAverage} />
-        </>
+        <ResumoSemanal summary={summaryData} type={reportType} />
       )}
 
-      {/* Estados vazios */}
+      {/* ✅ Estados vazios melhorados */}
       {!selectedDate && !loading && <EmptyStateNoDate reportType={reportType} />}
       
       {selectedDate && !reportData && !summaryData && !loading && !error && (
         <EmptyStateWaiting selectedDate={selectedDate} />
+      )}
+      
+      {/* ✅ Estado quando não há dados mas não há erro */}
+      {selectedDate && !reportData && !summaryData && !loading && !error && (
+        <EmptyStateNoData 
+          selectedDate={selectedDate} 
+          batchId={batchId} 
+          onRetry={fetchReport} 
+        />
       )}
     </div>
   );

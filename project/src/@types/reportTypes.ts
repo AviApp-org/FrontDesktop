@@ -1,32 +1,31 @@
-// Mapeamento de traduções para tipos de ovos
-export const EGG_TYPE_TRANSLATIONS: { [key: string]: string } = {
-  'CRACKED': 'Trincado',
-  'DOUBLE_YOLK': 'Duas Gemas',
-  'DIRTY_NEST': 'Sujo de Ninho',
-  'SMALL': 'Pequeno',
-  'INCUBATABLE': 'Incubável',
-  'BROKEN': 'Quebrado',
-  'DEFORMED': 'Deformado',
-  'THIN_SHELL': 'Casca Fina',
-  'MARKET': 'Mercado',
-  'ELIMINATED': 'Eliminado',
-  'TOTAL': 'Total'
-};
-
-// Função para traduzir tipo de ovo
-export const translateEggType = (type: string): string => {
-  return EGG_TYPE_TRANSLATIONS[type.toUpperCase()] || type;
-};
-
-// Tipos para os dados da API
+// Tipos base
 export interface EggDetail {
   type: string;
   quantity: number;
 }
 
+export interface EggCollection {
+  collectionTime: string;
+  eggDetails: EggDetail[];
+}
+
+export interface DeathRecord {
+  recordTime: string;
+  deadChickens: number;
+  deadRoosters: number;
+  cause?: string;
+  location?: string;
+  observations?: string; // ✅ Campo para observações
+}
+
 export interface AviaryReport {
-  aviaryId: number;
-  aviaryName: string;
+  // ✅ Permitir aviaryId como string ou number
+  aviaryId?: string | number;
+  id?: string | number;
+  aviaryName?: string;
+  name?: string;
+  
+  // Dados numéricos
   totalEggsCollected: number;
   totalDeadBirds: number;
   totalDeadChickens: number;
@@ -35,16 +34,24 @@ export interface AviaryReport {
   currentRoosters: number;
   production: number;
   mortality: number;
-  eggCollections: Array<{
-    collectionTime: string;
-    eggDetails: EggDetail[];
-  }>;
-  deathRecords: Array<{
-    recordTime: string;
-    deadChickens: number;
-    deadRoosters: number;
-    observations?: string;
-  }>;
+  roosterMortality?: number;
+  chickenMortality?: number;
+  
+  // Arrays de detalhes
+  eggCollections?: EggCollection[];
+  deathRecords?: DeathRecord[];
+  
+  // Dados ambientais opcionais
+  waterQuantity?: number;
+  temperature?: {
+    min: number;
+    max: number;
+  };
+}
+
+export interface EggTypeData {
+  type: string;
+  percentage: number;
 }
 
 export interface ReportData {
@@ -58,9 +65,14 @@ export interface ReportData {
   currentRoosters: number;
   totalBirds: number;
   production: number;
+  roosterMortality: number;
+  chickenMortality: number;
   mortality: number;
-  quantityByEggType: EggDetail[];
-  percentageByEggType: Array<{ type: string; percentage: number }>;
+  chickenRoosterProportion: number;
+  percentageByEggType?: EggTypeData[];
+  marketEggs?: number;
+  dumpEggs?: number;
+  incubateEggs?: number;
 }
 
 export interface SummaryData {
@@ -74,7 +86,25 @@ export interface SummaryData {
   avgRoosters: number;
   totalEggs: number;
   totalDeaths: number;
-  eggTypesAverage: Array<{ type: string; percentage: number }>;
+  eggTypesAverage: EggTypeData[];
 }
 
 export type ReportType = 'Diário' | 'Semanal' | 'Mensal';
+
+// ✅ Função para traduzir tipos de ovos em português
+export const translateEggType = (type: string): string => {
+  const translations: Record<string, string> = {
+    'TOTAL': 'Total',
+    'CRACKED': 'Trincados',
+    'DIRTY_NEST': 'Sujos do Ninho',
+    'SMALL': 'Pequenos',
+    'CLEAN': 'Incubáveis',
+    'BROKEN': 'Quebrados',
+    'DEFORMED': 'Deformados',
+    'THIN_SHELL': 'Casca Fina',
+    'ELIMINATED': 'Eliminados',
+    'MARKET': 'Mercado'
+  };
+  
+  return translations[type] || type;
+};

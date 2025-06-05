@@ -2,6 +2,7 @@ import { useState } from 'react';
 import api from '../config/axios';
 import { ReportData, SummaryData, ReportType } from '../@types/reportTypes';
 import { formatDateForAPI, generateDateRange, formatDateForDisplay } from '../utils/reportUtils';
+import { normalizeAviaryData, isValidAviaryData } from '../utils/aviaryUtils';
 
 export const useReports = () => {
   const [reportType, setReportType] = useState<ReportType>('Diário');
@@ -11,7 +12,64 @@ export const useReports = () => {
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [summaryData, setSummaryData] = useState<SummaryData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [openAviaries, setOpenAviaries] = useState<{ [key: number]: boolean }>({});
+  const [expandedAviaries, setExpandedAviaries] = useState<Set<string>>(new Set());
+
+  // Função para processar dados do relatório
+  const processReportData = (data: ReportData): ReportData => {
+    console.log('🔍 Processando dados do relatório:', data);
+    console.log('🏠 Aviários brutos recebidos:', data.aviaryReports);
+    
+    if (!data.aviaryReports || !Array.isArray(data.aviaryReports)) {
+      console.warn('⚠️ aviaryReports não é um array válido:', data.aviaryReports);
+      return {
+        ...data,
+        aviaryReports: []
+      };
+    }
+
+    const processedAviaries = data.aviaryReports.map((aviary, index) => {
+      console.log(`🏠 Processando aviário ${index + 1}:`, {
+        aviaryId: aviary.aviaryId,
+        id: aviary.id,
+        name: aviary.aviaryName || aviary.name,
+        eggCollections: aviary.eggCollections?.length || 0,
+        deathRecords: aviary.deathRecords?.length || 0,
+        rawData: aviary
+      });
+      
+      const normalized = normalizeAviaryData(aviary);
+      
+      if (!isValidAviaryData(normalized)) {
+        console.warn(`⚠️ Aviário ${index + 1} será rejeitado:`, normalized);
+        return null;
+      }
+      
+      console.log(`✅ Aviário ${index + 1} aceito:`, normalized);
+      return normalized;
+    }).filter((aviary): aviary is NonNullable<typeof aviary> => aviary !== null);
+
+    const processedData = {
+      ...data,
+      aviaryReports: processedAviaries
+    };
+
+    console.log('✅ Dados processados:', {
+      totalAviariesReceived: data.aviaryReports.length,
+      totalAviariesProcessed: processedAviaries.length,
+      aviariesWithDetails: processedAviaries.filter(a => 
+        (a.eggCollections && a.eggCollections.length > 0) || 
+        (a.deathRecords && a.deathRecords.length > 0)
+      ).length,
+      processedAviaries: processedAviaries.map(a => ({
+        id: a.aviaryId,
+        name: a.aviaryName,
+        collections: a.eggCollections?.length || 0,
+        deaths: a.deathRecords?.length || 0
+      }))
+    });
+
+    return processedData;
+  };
 
   // Função para buscar múltiplos relatórios e calcular médias
   const fetchMultipleReports = async (dates: string[]): Promise<SummaryData> => {
@@ -22,10 +80,11 @@ export const useReports = () => {
         const formattedDate = formatDateForAPI(date);
         const endpoint = `/api/daily-report/${batchId}/${formattedDate}`;
         const response = await api.get(endpoint);
-        reports.push(response.data);
+        
+        const processedData = processReportData(response.data);
+        reports.push(processedData);
       } catch (err) {
-        console.log(`Sem dados para ${date}`);
-        // Continua mesmo se não tiver dados para alguns dias
+        console.log(`⚠️ Sem dados para ${date}`);
       }
     }
 
@@ -59,7 +118,7 @@ export const useReports = () => {
     }));
 
     const startDate = formatDateForDisplay(dates[0]);
-    const endDate = formatDateForDisplay(dates[dates.length - 1]);
+        const endDate = formatDateForDisplay(dates[dates.length - 1]);
 
     return {
       period: `${startDate} até ${endDate}`,
@@ -87,42 +146,48 @@ export const useReports = () => {
     setError(null);
     setReportData(null);
     setSummaryData(null);
+    setExpandedAviaries(new Set());
 
     try {
       if (reportType === 'Diário') {
-        // Relatório diário
         const formattedDate = formatDateForAPI(selectedDate);
         const endpoint = `/api/daily-report/${batchId}/${formattedDate}`;
         
-        console.log('🔍 Buscando relatório diário:', { batchId, selectedDate, formattedDate, endpoint });
+        console.log('🔍 Buscando relatório diário:', { 
+          batchId, 
+          selectedDate, 
+          formattedDate, 
+          endpoint 
+        });
 
         const response = await api.get(endpoint);
-        console.log('✅ Dados diários recebidos:', response.data);
         
-        setReportData(response.data);
+        console.log('📥 Dados brutos recebidos da API:', response.data);
+        
+        // ✅ Verificar se temos aviaryReports
+        if (!response.data.aviaryReports) {
+          console.warn('⚠️ API não retornou aviaryReports, criando array vazio');
+          response.data.aviaryReports = [];
+        }
+        
+        // Processar e normalizar dados
+        const processedData = processReportData(response.data);
+        
+        console.log('✅ Dados finais processados:', processedData);
+        
+        // ✅ Sempre definir reportData, mesmo se não houver aviários
+        setReportData(processedData);
         
       } else if (reportType === 'Semanal') {
-        // Relatório semanal (7 dias a partir da data selecionada)
         console.log('🔍 Buscando relatório semanal a partir de:', selectedDate);
-        
         const dates = generateDateRange(selectedDate, 7);
-        console.log('📅 Datas para buscar:', dates);
-        
         const summary = await fetchMultipleReports(dates);
-        console.log('✅ Resumo semanal calculado:', summary);
-        
         setSummaryData(summary);
         
       } else if (reportType === 'Mensal') {
-        // Relatório mensal (30 dias a partir da data selecionada)
         console.log('🔍 Buscando relatório mensal a partir de:', selectedDate);
-        
         const dates = generateDateRange(selectedDate, 30);
-        console.log('📅 Datas para buscar:', dates);
-        
         const summary = await fetchMultipleReports(dates);
-        console.log('✅ Resumo mensal calculado:', summary);
-        
         setSummaryData(summary);
       }
       
@@ -132,6 +197,8 @@ export const useReports = () => {
       let errorMessage = 'Erro ao buscar relatório';
       if (err.response?.status === 404) {
         errorMessage = `Nenhum relatório encontrado para o lote ${batchId} na data ${formatDateForDisplay(selectedDate)}`;
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
       } else if (err.message) {
         errorMessage = err.message;
       }
@@ -148,10 +215,31 @@ export const useReports = () => {
     setReportData(null);
     setSummaryData(null);
     setError(null);
+    setExpandedAviaries(new Set());
   };
 
-  const toggleAviario = (id: number) => {
-    setOpenAviaries((prev) => ({ ...prev, [id]: !prev[id] }));
+  // ✅ Função para controlar expansão individual - usando string como chave para ser mais flexível
+  const toggleAviario = (aviaryId: string | number) => {
+    const id = String(aviaryId); // Converter para string para ser mais flexível
+    console.log('🔄 Toggling aviário:', id);
+    setExpandedAviaries(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+        console.log('➖ Fechando aviário:', id);
+      } else {
+        newSet.add(id);
+        console.log('➕ Abrindo aviário:', id);
+      }
+      console.log('📋 Aviários expandidos:', Array.from(newSet));
+      return newSet;
+    });
+  };
+
+  // ✅ Função para verificar se aviário está expandido
+  const isAviaryExpanded = (aviaryId: string | number): boolean => {
+    const id = String(aviaryId);
+    return expandedAviaries.has(id);
   };
 
   return {
@@ -163,7 +251,7 @@ export const useReports = () => {
     reportData,
     summaryData,
     error,
-    openAviaries,
+    expandedAviaries,
     
     // Setters
     setSelectedDate,
@@ -173,5 +261,7 @@ export const useReports = () => {
     handleReportTypeChange,
     fetchReport,
     toggleAviario,
+    isAviaryExpanded,
   };
 };
+
