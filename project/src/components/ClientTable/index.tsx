@@ -21,6 +21,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { ClientTableProps } from './types';
+import { formatCNPJ, formatPhone } from '../../utils/validators';
 
 
 
@@ -86,8 +87,8 @@ export const ClientTable: React.FC<ClientTableProps> = ({
                       </Box>
                     </TableCell>
                     <TableCell>{client.email}</TableCell>
-                    <TableCell>{client.cnpj}</TableCell>
-                    <TableCell>{client.phone}</TableCell>
+                    <TableCell>{formatCNPJ(client.cnpj)}</TableCell>
+                    <TableCell>{formatPhone(client.phone)}</TableCell>
                     <TableCell>
                       <Chip
                         label={client.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}
