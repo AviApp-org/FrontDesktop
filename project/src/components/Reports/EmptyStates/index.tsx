@@ -1,10 +1,7 @@
 import React from 'react';
 import { Card, Button } from 'antd';
 import { formatDateForDisplay } from '../../../utils/reportUtils';
-
-interface EmptyStateNoDateProps {
-  reportType: string;
-}
+import { EmptyStateNoDateProps } from './types';
 
 export const EmptyStateNoDate: React.FC<EmptyStateNoDateProps> = ({ reportType }) => (
   <Card className="text-center py-12">

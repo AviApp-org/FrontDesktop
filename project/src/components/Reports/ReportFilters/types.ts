@@ -1,12 +1,11 @@
-import { ReportType } from '../../../@types/reportTypes';
 
 export interface ReportFiltersProps {
-  reportType: ReportType;
+  reportType: 'Diário' | 'Semanal' | 'Mensal';
   selectedDate: string;
-  batchId: number;
+  batchId: string;
   loading: boolean;
-  onReportTypeChange: (type: ReportType) => void;
+  onReportTypeChange: (type: 'Diário' | 'Semanal' | 'Mensal') => void;
   onDateChange: (date: string) => void;
-  onBatchChange: (batchId: number) => void;
+  onBatchChange: (batchId: string) => void;
   onSearch: () => void;
 }

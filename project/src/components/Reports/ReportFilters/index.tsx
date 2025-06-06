@@ -1,10 +1,10 @@
 import React from 'react';
-import { Button, Card, Select } from 'antd';
+import { Card, Select, Button } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { ReportFiltersProps } from './types';
-import { formatDateForDisplay } from '../../../utils/reportUtils';
-
 const { Option } = Select;
+
+
 
 export const ReportFilters: React.FC<ReportFiltersProps> = ({
   reportType,
@@ -16,9 +16,30 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
   onBatchChange,
   onSearch
 }) => {
+  const getDateLabel = () => {
+    if (reportType === 'Semanal') {
+      return '📅 Data de Início da Semana';
+    }
+    if (reportType === 'Mensal') {
+      return '📅 Data de Início do Mês';
+    }
+    return '📅 Data';
+  };
+
+  const getSearchButtonText = () => {
+    if (reportType === 'Semanal') {
+      return 'Buscar Semana (7 dias)';
+    }
+    if (reportType === 'Mensal') {
+      return 'Buscar Mês (30 dias)';
+    }
+    return 'Buscar Relatório';
+  };
+
   return (
-    <Card className="mb-6">
-      <div className="flex items-center gap-4">
+    <Card className="mb-6" title="Filtros de Relatório">
+      <div className="flex items-center gap-4 flex-wrap">
+        {/* Tipo de Relatório */}
         <div>
           <label className="block text-sm font-medium mb-1">Tipo de Relatório</label>
           <Select
@@ -26,12 +47,13 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
             onChange={onReportTypeChange}
             style={{ width: 120 }}
           >
-            <Option value="Diário">Diário</Option>
-            <Option value="Semanal">Semanal</Option>
-            <Option value="Mensal">Mensal</Option>
+            <Option value="Diário">📅 Diário</Option>
+            <Option value="Semanal">📊 Semanal</Option>
+            <Option value="Mensal">📈 Mensal</Option>
           </Select>
         </div>
 
+        {/* Lote */}
         <div>
           <label className="block text-sm font-medium mb-1">Lote</label>
           <Select
@@ -39,14 +61,15 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
             onChange={onBatchChange}
             style={{ width: 100 }}
           >
-            <Option value={36}>Lote 36</Option>
-            <Option value={1}>Lote 1</Option>
+            <Option value="36">Lote 36</Option>
+            <Option value="1">Lote 1</Option>
           </Select>
         </div>
 
+        {/* Data */}
         <div>
           <label className="block text-sm font-medium mb-1">
-            📅 Data {reportType === 'Semanal' ? '(início da semana)' : reportType === 'Mensal' ? '(início do mês)' : ''}
+            {getDateLabel()}
           </label>
           <input
             type="date"
@@ -57,6 +80,7 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
           />
         </div>
 
+        {/* Botão de Busca */}
         <div style={{ paddingTop: '24px' }}>
           <Button
             type="primary"
@@ -65,17 +89,27 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
             loading={loading}
             disabled={!selectedDate}
           >
-            Buscar Relatório
+            {getSearchButtonText()}
           </Button>
         </div>
       </div>
 
-      {/* Debug Info */}
-      {selectedDate && (
-        <div className="mt-4 p-3 bg-gray-50 rounded text-xs text-gray-600">
-          <strong>Debug:</strong> Lote {batchId} | Tipo: {reportType} | 
-          Data: {formatDateForDisplay(selectedDate)} | 
-          Status: {loading ? 'Carregando...' : 'Aguardando'}
+      {/* Informações adicionais */}
+      {selectedDate && reportType !== 'Diário' && (
+        <div className="mt-4 p-3 bg-blue-50 rounded border border-blue-200">
+          <div className="text-sm text-blue-800">
+            <strong>ℹ️ Como funciona:</strong>
+            <ul className="mt-1 ml-4 list-disc">
+              <li>
+                {reportType === 'Semanal' 
+                  ? 'Mostra 7 dias consecutivos a partir da data selecionada'
+                  : 'Mostra 30 dias consecutivos a partir da data selecionada'
+                }
+              </li>
+              <li>Use as setas para navegar entre os dias</li>
+              <li>Clique nos pontos para ir diretamente para um dia específico</li>
+            </ul>
+          </div>
         </div>
       )}
     </Card>

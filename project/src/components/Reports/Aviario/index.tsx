@@ -1,12 +1,7 @@
 import React from 'react';
 import { Card } from 'antd';
-import { AviaryReport, translateEggType } from '../../../@types/reportTypes';
-
-interface AviarioProps {
-  aviary: AviaryReport;
-  open: boolean;
-  toggle: () => void;
-}
+import { translateEggType } from '../../../@types/reportTypes';
+import { AviarioProps } from './types';
 
 export const Aviario: React.FC<AviarioProps> = ({ aviary, open, toggle }) => {
   return (
