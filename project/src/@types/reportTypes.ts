@@ -3,16 +3,13 @@ export const translateEggType = (type: string): string => {
   const translations: Record<string, string> = {
     'CLEAN': 'Ovos Limpos',
     'DOUBLE_YOLK': 'Gema Dupla',
+    'NEST_DIRTY' : 'Sujo de Ninho',
+    'BED_DIRTY': 'Sujo de Cama',
     'CRACKED': 'Rachados',
     'THIN_SHELL': 'Casca Fina',
-    'TOTAL': 'Total',
-    'INCUBATABLE': 'Incubáveis',
-    'MARKET': 'Mercado',
-    'DIRTY_NEST': 'Sujos',
     'SMALL': 'Pequenos',
     'BROKEN': 'Quebrados',
     'DEFORMED': 'Deformados',
-    'ELIMINATED': 'Eliminados'
   };
   
   return translations[type] || type;
