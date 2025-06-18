@@ -1,14 +1,16 @@
 import React from 'react';
 import { useReports } from '../hooks/useReports';
+import { useBatches } from '../hooks/useBatch'; // ✅ Importar diretamente
 import { ReportFilters } from '../components/Reports/ReportFilters';
 import { DateNavigation } from '../components/Reports/DateNavigation';
 import { ResumoGeral } from '../components/Reports/ResumoGeral';
-import { ResumoSemanal } from '../components/Reports/ResumoSemanal'; // ✅ Import
+import { ResumoSemanal } from '../components/Reports/ResumoSemanal';
 import { Aviario } from '../components/Reports/Aviario';
 import { EmptyStateNoDate, EmptyStateNoAviaries, LoadingState } from '../components/Reports/EmptyStates';
 import { normalizeAviaryData, isValidAviaryData } from '../utils/aviaryUtils';
 
 const Reports: React.FC = () => {
+  // ✅ Usar os dois hooks separadamente
   const {
     reportType,
     selectedDate,
@@ -33,9 +35,13 @@ const Reports: React.FC = () => {
     formatDateForDisplay,
   } = useReports();
 
+  // ✅ Hook separado para os lotes
+  const { data: batches, isLoading: batchesLoading } = useBatches();
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">
+      {/* ✅ TÍTULO COM MARGEM TOP */}
+      <h1 className="text-3xl font-bold pt-4 mt-4 text-gray-800">
         📊 Relatório {reportType} 
         {currentDate && ` - ${formatDateForDisplay(currentDate)}`}
       </h1>
@@ -44,7 +50,8 @@ const Reports: React.FC = () => {
         reportType={reportType}
         selectedDate={selectedDate}
         batchId={batchId}
-        loading={loading}
+        loading={loading || batchesLoading} // ✅ Incluir loading dos lotes
+        batches={batches || []} // ✅ Passar os lotes
         onReportTypeChange={handleReportTypeChange}
         onDateChange={setSelectedDate}
         onBatchChange={setBatchId}
@@ -80,7 +87,6 @@ const Reports: React.FC = () => {
 
       {reportData && !loading && (
         <>
-          {/* ✅ RESUMO CONSOLIDADO usando ResumoSemanal */}
           {reportType !== 'Diário' && (
             <ResumoSemanal
               reportData={reportData}
@@ -90,10 +96,8 @@ const Reports: React.FC = () => {
             />
           )}
           
-          {/* Resumo Geral do Dia */}
           <ResumoGeral summary={reportData} />
           
-          {/* Lista de Aviários */}
           <div className="mb-6">
             <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
               <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 rounded-t-lg">

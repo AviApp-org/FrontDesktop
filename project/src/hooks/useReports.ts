@@ -1,18 +1,32 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import api from '../config/axios';
+import { useBatches } from './useBatch'; // ✅ Importar o hook existente
 
 export const useReports = () => {
+  // ✅ Usar o hook de lotes existente
+  const { data: batches, isLoading: batchesLoading, error: batchesError } = useBatches();
+  
   const [reportType, setReportType] = useState<'Diário' | 'Semanal' | 'Mensal'>('Diário');
   const [selectedDate, setSelectedDate] = useState<string>('');
-  const [batchId, setBatchId] = useState<string>('36');
+  
+  // ✅ Não pré-setar o lote, deixar vazio inicialmente
+  const [batchId, setBatchId] = useState<string>('');
+  
   const [loading, setLoading] = useState(false);
   const [reportData, setReportData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [expandedAviaries, setExpandedAviaries] = useState<number[]>([]);
-  
-  // ✅ Novos estados para navegação
   const [currentDateIndex, setCurrentDateIndex] = useState<number>(0);
   const [dateRange, setDateRange] = useState<string[]>([]);
+
+  // ✅ Selecionar automaticamente o primeiro lote quando os lotes carregarem
+  useEffect(() => {
+    if (batches && batches.length > 0 && !batchId) {
+      const firstBatch = batches[0];
+      setBatchId(firstBatch.id.toString());
+      console.log('🎯 Lote selecionado automaticamente:', firstBatch);
+    }
+  }, [batches, batchId]);
 
   const handleReportTypeChange = (type: 'Diário' | 'Semanal' | 'Mensal') => {
     console.log('🔄 Mudando tipo de relatório para:', type);
@@ -20,19 +34,30 @@ export const useReports = () => {
     setReportData(null);
     setError(null);
     setCurrentDateIndex(0);
+    setExpandedAviaries([]);
     
-    // ✅ Gerar range de datas baseado no tipo
     if (selectedDate) {
       generateDateRange(selectedDate, type);
     }
   };
 
-  // ✅ Função para gerar range de datas
   const generateDateRange = (startDate: string, type: 'Diário' | 'Semanal' | 'Mensal') => {
     const dates: string[] = [];
-    const start = new Date(startDate);
     
-    let days = 1; // Diário = 1 dia
+    let start: Date;
+    
+    if (startDate.includes('/')) {
+      const [day, month, year] = startDate.split('/');
+      start = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    } else if (startDate.includes('-')) {
+      const [year, month, day] = startDate.split('-');
+      start = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    } else {
+      console.error('❌ Formato de data inválido:', startDate);
+      return;
+    }
+    
+    let days = 1;
     if (type === 'Semanal') days = 7;
     if (type === 'Mensal') days = 30;
     
@@ -40,18 +65,17 @@ export const useReports = () => {
       const currentDate = new Date(start);
       currentDate.setDate(start.getDate() + i);
       
+      const day = currentDate.getDate().toString().padStart(2, '0');
+      const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
       const year = currentDate.getFullYear();
-      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-      const day = String(currentDate.getDate()).padStart(2, '0');
       
-      dates.push(`${year}-${month}-${day}`);
+      dates.push(`${day}/${month}/${year}`);
     }
     
     console.log('📅 Range de datas gerado:', { type, startDate, days, dates });
     setDateRange(dates);
   };
 
-  // ✅ Função para buscar relatório de uma data específica
   const fetchReportForDate = useCallback(async (date: string) => {
     if (!date || !batchId) {
       setError('Data ou lote inválido.');
@@ -64,12 +88,20 @@ export const useReports = () => {
     setError(null);
 
     try {
-      // Converter YYYY-MM-DD para DD-MM-YYYY
-      const [year, month, day] = date.split('-');
-      const formattedDate = `${day}-${month}-${year}`;
+      let formattedDate: string;
+      
+      if (date.includes('/')) {
+        const [day, month, year] = date.split('/');
+        formattedDate = `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
+      } else if (date.includes('-')) {
+        const [year, month, day] = date.split('-');
+        formattedDate = `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
+      } else {
+        throw new Error('Formato de data inválido');
+      }
       
       const endpoint = `/api/daily-report/${batchId}/${formattedDate}`;
-      console.log('🔍 Endpoint:', endpoint);
+      console.log('🔍 Endpoint final:', endpoint);
       
       const response = await api.get(endpoint);
       console.log('✅ Dados recebidos para', date, ':', response.data);
@@ -80,7 +112,9 @@ export const useReports = () => {
       console.error('❌ Erro ao buscar relatório para', date, ':', err);
       
       if (err.response?.status === 404) {
-        setError(`Nenhum relatório encontrado para ${formatDateForDisplay(date)}`);
+        setError(`Nenhum relatório encontrado para ${date}`);
+      } else if (err.response?.status === 500) {
+        setError(`Erro interno do servidor. Verifique se a data ${date} está no formato correto.`);
       } else if (err.response) {
         setError(`Erro ${err.response.status}: ${err.response.data?.message || err.response.statusText}`);
       } else if (err.request) {
@@ -95,21 +129,18 @@ export const useReports = () => {
     }
   }, [batchId]);
 
-  // ✅ Função principal para buscar relatório
   const fetchReport = useCallback(async () => {
     if (!selectedDate || !batchId) {
       setError('Por favor, selecione uma data e um lote.');
       return;
     }
 
-    // Gerar range de datas
+    console.log('📊 Iniciando busca do relatório:', { selectedDate, batchId, reportType });
+
     generateDateRange(selectedDate, reportType);
-    
-    // Buscar relatório da primeira data
     await fetchReportForDate(selectedDate);
   }, [selectedDate, batchId, reportType, fetchReportForDate]);
 
-  // ✅ Navegação entre dias
   const goToPreviousDay = useCallback(async () => {
     if (currentDateIndex > 0) {
       const newIndex = currentDateIndex - 1;
@@ -133,14 +164,12 @@ export const useReports = () => {
     }
   }, [dateRange, fetchReportForDate]);
 
-  // ✅ Função para formatar data para exibição
   const formatDateForDisplay = (dateString: string): string => {
-    if (!dateString) return '';
-    const [year, month, day] = dateString.split('-');
-    return `${day}/${month}/${year}`;
+    return dateString || '';
   };
 
   const toggleAviario = (index: number) => {
+    console.log('🔄 Toggling aviário:', index);
     setExpandedAviaries(prev =>
       prev.includes(index)
         ? prev.filter(i => i !== index)
@@ -152,7 +181,6 @@ export const useReports = () => {
     return expandedAviaries.includes(index);
   };
 
-  // ✅ Dados da data atual
   const currentDate = dateRange[currentDateIndex];
   const canGoPrevious = currentDateIndex > 0;
   const canGoNext = currentDateIndex < dateRange.length - 1;
@@ -161,27 +189,25 @@ export const useReports = () => {
     reportType,
     selectedDate,
     batchId,
-    loading,
+    loading: loading || batchesLoading, // ✅ Incluir loading dos lotes
     reportData,
-    error,
+    error: error || batchesError, // ✅ Incluir erro dos lotes
     expandedAviaries,
-    
-    // ✅ Novos retornos para navegação
     currentDate,
     currentDateIndex,
     dateRange,
     canGoPrevious,
     canGoNext,
     
-    // Funções existentes
+    // ✅ Retornar os lotes do hook existente
+    batches: batches || [],
+    
     setSelectedDate,
     setBatchId,
     handleReportTypeChange,
     fetchReport,
     toggleAviario,
     isAviaryExpanded,
-    
-    // ✅ Novas funções de navegação
     goToPreviousDay,
     goToNextDay,
     goToSpecificDay,
