@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box } from '@mui/material';
+import { Box, Container } from '@mui/material';
 import { useFarmManagement } from '../hooks/useFarmManagement';
 import FarmModal from '../components/FarmModal';
 import FarmHeader from '../components/FarmPageHeader';
@@ -23,10 +23,12 @@ const FarmRegister: React.FC = () => {
   const handleCloseDialog = () => setOpen(false);
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#f7f8fa' }}>
-      <FarmHeader onNewFarm={handleOpenDialog} />
-      <FarmTableCard farms={farms} isLoading={isLoading} isError={isError} />
-      <FarmModal open={open} onClose={handleCloseDialog}  />
+    <Box sx={{ minHeight: '100vh',  py: 8 }}>
+      
+        <FarmHeader onNewFarm={handleOpenDialog} />
+        <FarmTableCard farms={farms} isLoading={isLoading} isError={isError} />
+        <FarmModal open={open} onClose={handleCloseDialog} />
+      
     </Box>
   );
 };

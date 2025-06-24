@@ -38,17 +38,17 @@ export const BatchTable: React.FC<BatchTableProps> = ({
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Início</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+            <th className="px-6 py-3 text-left align-middle text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+            <th className="px-6 py-3 text-left align-middle text-xs font-medium text-gray-500 uppercase tracking-wider">Data de Início</th>
+            <th className="px-6 py-3 text-left align-middle text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th className="px-6 py-3 text-right align-middle text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {batches.map((batch) => (
             <React.Fragment key={batch.id}>
               <tr className="hover:bg-gray-50 transition-colors duration-150">
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4 whitespace-nowrap align-middle">
                   <div className="flex items-center">
                     <button
                       onClick={() => onToggleExpansion(String(batch.id))}
@@ -62,15 +62,15 @@ export const BatchTable: React.FC<BatchTableProps> = ({
                     <span className="text-sm font-medium text-gray-900">{batch.name}</span>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap align-middle text-sm text-gray-500">
                   {formatDate(batch.startDate)}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4 whitespace-nowrap align-middle">
                   <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(batch.status)}`}>
                     {translateStatus(batch.status)}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <td className="px-6 py-4 whitespace-nowrap align-middle text-right text-sm font-medium">
                   <div className="flex justify-end space-x-2">
                     <button
                       onClick={() => onEdit(batch)}
