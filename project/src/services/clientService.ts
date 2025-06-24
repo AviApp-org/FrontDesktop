@@ -72,6 +72,10 @@ class ClientService {
       method: 'DELETE',
     });
   }
+
+  async list(farmId: number): Promise<ClientData[]> {
+    return this.makeRequest<ClientData[]>(`/clients?farmId=${farmId}`);
+  }
 }
 
 export const clientService = new ClientService();

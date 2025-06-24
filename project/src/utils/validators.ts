@@ -1,17 +1,14 @@
-// Função para validar CNPJ
 export const validateCNPJ = (cnpj: string): boolean => {
     const cleanCNPJ = cnpj.replace(/[^\d]/g, '');
     
     if (cleanCNPJ.length !== 14) return false;
     
-    // Elimina CNPJs inválidos conhecidos
     if (/^(\d)\1{13}$/.test(cleanCNPJ)) return false;
     
     return validateCNPJDigits(cleanCNPJ);
   };
   
   const validateCNPJDigits = (cnpj: string): boolean => {
-    // Validação do primeiro dígito verificador
     let sum = 0;
     let weight = 5;
     
@@ -25,7 +22,6 @@ export const validateCNPJ = (cnpj: string): boolean => {
     
     if (parseInt(cnpj[12]) !== firstDigit) return false;
     
-    // Validação do segundo dígito verificador
     sum = 0;
     weight = 6;
     
@@ -40,7 +36,6 @@ export const validateCNPJ = (cnpj: string): boolean => {
     return parseInt(cnpj[13]) === secondDigit;
   };
   
-  // Função para validar CPF (já existe no projeto, mantendo consistência)
   export const isValidCPF = (cpf: string): boolean => {
     const cleanCPF = cpf.replace(/[^\d]/g, '');
     
@@ -51,7 +46,6 @@ export const validateCNPJ = (cnpj: string): boolean => {
   };
   
   const validateCPFDigits = (cpf: string): boolean => {
-    // Validação dos dígitos verificadores do CPF
     for (let t = 9; t < 11; t++) {
       let d = 0;
       for (let c = 0; c < t; c++) {
@@ -64,13 +58,11 @@ export const validateCNPJ = (cnpj: string): boolean => {
   };
   
   
-// Função para formatar CPF
 export const formatCPF = (cpf: string): string => {
   const cleanCPF = cpf.replace(/[^\d]/g, '');
   return cleanCPF.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
 };
 
-// Função para formatar telefone
 export const formatPhone = (phone: string): string => {
   const cleaned = phone.replace(/\D/g, '');
   const match = cleaned.match(/^(\d{2})(\d{5})(\d{4})$/);
@@ -78,4 +70,10 @@ export const formatPhone = (phone: string): string => {
     return `(${match[1]}) ${match[2]}-${match[3]}`;
   }
   return phone;
+};
+
+
+export const formatCNPJ = (cnpj: string): string => {
+  const cleanCNPJ = cnpj.replace(/[^\d]/g, '');
+  return cleanCNPJ.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
 };

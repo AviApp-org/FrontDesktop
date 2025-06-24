@@ -33,6 +33,9 @@ export const useFarmManagement = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [clients, setClients] = useState<Array<{ id: number; name: string }>>([]);
+  const [farms, setFarms] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   // Carregar clientes
   const loadClients = async () => {
@@ -45,6 +48,24 @@ export const useFarmManagement = () => {
     } catch (error) {
       console.error('Erro ao carregar clientes:', error);
       setFormErrors({ clients: 'Erro ao carregar lista de clientes' });
+    }
+  };
+
+  // Carregar fazendas
+  const loadFarms = async () => {
+    setIsLoading(true);
+    setIsError(false);
+    try {
+      // Replace with your actual API/service call
+      const response = await fetch('http://localhost:8080/api/farms');
+      if (response.ok) {
+        const data = await response.json();
+        setFarms(data);
+      }
+    } catch (e) {
+      setIsError(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -230,17 +251,26 @@ export const useFarmManagement = () => {
     setFormErrors({});
   };
 
+  const handleOpenDialog = () => {
+    // Your logic to open the farm registration dialog
+  };
+
   return {
     // Estados
     formData,
     formErrors,
     isSubmitting,
     clients,
+    farms,
+    isLoading,
+    isError,
     
     // Handlers
     handleInputChange,
     handleSubmit,
     handleFormReset,
     loadClients,
+    loadFarms,
+    handleOpenDialog,
   };
 };

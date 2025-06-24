@@ -158,6 +158,10 @@
   }
 
   /* Buttons */
+  .btn-primary-sm {
+    @apply px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors;
+  }
+
   .btn-primary {
     @apply px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors;
   }
@@ -189,7 +193,7 @@
 
   /* Filters */
   .filter-section {
-    @apply space-y-3;                                                   
+    @apply space-y-3;
   }
 
   .filter-button {

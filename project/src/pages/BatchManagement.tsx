@@ -6,13 +6,18 @@ import { AviaryTable } from '../components/AviaryTable';
 import { BatchModal } from '../components/BatchModal';
 import { AviaryModal } from '../components/AviaryModal';
 import Button from '../components/Button';
+import { BatchHeader } from '../components/BatchHeader';
 
 export function BatchManagement() {
   const {
-    isModalOpen, setIsModalOpen,
-    isAviaryModalOpen, setIsAviaryModalOpen,
-    selectedBatch, setSelectedBatch,
-    selectedAviary, setSelectedAviary,
+    isModalOpen,
+    setIsModalOpen,
+    isAviaryModalOpen,
+    setIsAviaryModalOpen,
+    selectedBatch,
+    setSelectedBatch,
+    selectedAviary,
+    setSelectedAviary,
     expandedBatches,
     error,
     formErrors,
@@ -31,26 +36,10 @@ export function BatchManagement() {
   } = useBatchManagement();
 
   return (
-    <div className="page-container bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Gerenciamento de Lotes e Aviários</h1>
-            <p className="mt-2 text-sm text-gray-600">Gerencie seus lotes e aviários de forma eficiente</p>
-          </div>
-          <Button variant="primary" onClick={() => setIsModalOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Novo Lote
-          </Button>
-        </div>
+    <div className="pt-16 pb-8 min-h-screen bg-gray-50 w-full">
+      <BatchHeader onNewBatch={() => setIsModalOpen(true)} error={error ?? undefined} />
 
-        {error && (
-          <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded-lg flex items-center">
-            <AlertCircle className="w-5 h-5 text-red-400 mr-2" />
-            <p className="text-red-700">{error}</p>
-          </div>
-        )}
-
+      <div className="flex flex-col gap-6 w-full bg-white rounded-xl shadow px-6 py-4">
         <BatchTable
           batches={batches}
           expandedBatches={expandedBatches}
@@ -61,8 +50,7 @@ export function BatchManagement() {
           onEdit={setSelectedBatch}
           onAction={handleBatchAction}
         >
-
-          {(batch) => (
+          {batch => (
             <AviaryTable
               batch={batch}
               aviariesData={aviariesData}
@@ -72,7 +60,7 @@ export function BatchManagement() {
                 setSelectedAviary(null);
                 setIsAviaryModalOpen(true);
               }}
-              onEditAviary={(aviary) => {
+              onEditAviary={aviary => {
                 setSelectedBatch(batch);
                 setSelectedAviary(aviary);
                 setIsAviaryModalOpen(true);
@@ -91,21 +79,21 @@ export function BatchManagement() {
             setIsModalOpen(false);
             setSelectedBatch(null);
           }}
-          onSubmit={(data) => handleBatchSubmit(data, !!selectedBatch)}
+          onSubmit={data => handleBatchSubmit(data, !!selectedBatch)}
         />
 
-<AviaryModal
-  isOpen={isAviaryModalOpen}
-  aviary={selectedAviary}
-  selectedBatch={selectedBatch}
-  onClose={() => {
-    setIsAviaryModalOpen(false);
-    setSelectedAviary(null);
-  }}
-  onSubmit={handleAviarySubmit}
-/>
+        <AviaryModal
+          isOpen={isAviaryModalOpen}
+          aviary={selectedAviary}
+          selectedBatch={selectedBatch}
+          onClose={() => {
+            setIsAviaryModalOpen(false);
+            setSelectedAviary(null);
+          }}
+          onSubmit={handleAviarySubmit}
+        />
       </div>
-    </div> 
+    </div>
   );
 }
 

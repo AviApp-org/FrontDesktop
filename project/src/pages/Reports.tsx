@@ -39,6 +39,7 @@ const Reports: React.FC = () => {
   const { data: batches, isLoading: batchesLoading } = useBatches();
 
   return (
+
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* ✅ TÍTULO COM MARGEM TOP */}
       <h1 className="text-3xl font-bold pt-4 mt-4 text-gray-800">
