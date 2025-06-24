@@ -25,7 +25,7 @@ export const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
           const typeLabels: Record<string, string> = {
             TOTAL: 'Total',
             CRACKED: 'Rachados',
-            DIRTY_NEST: 'Sujos do Ninho',
+            NEST_DIRTY: 'Sujos de Ninho',
             SMALL: 'Pequenos',
             INCUBATABLE: 'Incubáveis',
             DOUBLE_YOLK: 'Gema Dupla',
