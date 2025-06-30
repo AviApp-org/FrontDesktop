@@ -43,7 +43,7 @@ const Reports: React.FC = () => {
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* ✅ TÍTULO COM MARGEM TOP */}
       <h1 className="text-3xl font-bold pt-4 mt-4 text-gray-800">
-        📊 Relatório {reportType} 
+        Relatório {reportType} 
         {currentDate && ` - ${formatDateForDisplay(currentDate)}`}
       </h1>
 
@@ -103,7 +103,7 @@ const Reports: React.FC = () => {
             <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
               <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 rounded-t-lg">
                 <h2 className="text-xl font-semibold text-gray-800">
-                  🏠 Aviários do Lote {batchId}
+                   Aviários do Lote {batchId}
                   {reportType !== 'Diário' && (
                     <span className="text-sm font-normal text-gray-600 ml-2">
                       ({reportType} - Dia {currentDateIndex + 1})
