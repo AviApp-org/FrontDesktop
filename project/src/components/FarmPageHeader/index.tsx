@@ -8,31 +8,35 @@ interface FarmHeaderProps {
 }
 
 export const FarmHeader: React.FC<FarmHeaderProps> = ({ onNewFarm }) => (
-  <>
+  <Box
+    sx={{
+      mb: 3,
+      bgcolor: 'background.paper',
+      borderRadius: 3,
+      boxShadow: 1,
+      px: { xs: 2, sm: 4 },
+      py: 3,
+    }}
+  >
     <Box
-      display="flex"
-      justifyContent="space-between"
-      alignItems="flex-start"
-      mb={3}
-      mt={6} // Increased top margin to lower the header section
+      sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column', sm: 'row' },
+        alignItems: { xs: 'stretch', sm: 'center' },
+        justifyContent: 'space-between',
+        gap: 3,
+        mb: 1,
+      }}
     >
-      <Box>
-        <Typography
-          variant="h4"
-          component="h1"
-          fontWeight="bold"
-          color="text.primary"
-          mb={1}
-        >
-          Lista de Granjas
-        </Typography>
-        <Typography
-          variant="body2"
-          color="text.secondary"
-        >
-          Gerencie suas granjas cadastradas de forma eficiente
-        </Typography>
-      </Box>
+      <Typography
+        variant="h4"
+        component="h1"
+        fontWeight="bold"
+        color="text.primary"
+        mb={0}
+      >
+        Lista de Granjas
+      </Typography>
       <Button
         variant="contained"
         startIcon={<AddIcon />}
@@ -42,13 +46,15 @@ export const FarmHeader: React.FC<FarmHeaderProps> = ({ onNewFarm }) => (
           '&:hover': { bgcolor: green[800] },
           px: 3,
           height: 40,
-          mt: 2,
         }}
       >
         Cadastrar Granja
       </Button>
     </Box>
-  </>
+    <Typography variant="body2" color="text.secondary">
+      Gerencie suas granjas cadastradas de forma eficiente
+    </Typography>
+  </Box>
 );
 
 export default FarmHeader;

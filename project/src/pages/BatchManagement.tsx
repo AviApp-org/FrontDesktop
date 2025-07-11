@@ -36,7 +36,7 @@ export function BatchManagement() {
   } = useBatchManagement();
 
   return (
-    <div className="pt-16 pb-8 min-h-screen bg-gray-50 w-full">
+    <div className="pt-16 pb-8 min-h-screen w-full">
       <BatchHeader onNewBatch={() => setIsModalOpen(true)} error={error ?? undefined} />
 
       <div className="flex flex-col gap-6 w-full bg-white rounded-xl shadow px-6 py-4">
