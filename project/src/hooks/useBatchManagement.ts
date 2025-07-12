@@ -80,9 +80,8 @@ export const useBatchManagement = () => {
     });
   };
 
-  // Na função handleAviarySubmit:
 const handleAviarySubmit = (aviaryData: CreateAviaryData) => {
-  // Garantir que batchId seja number
+
   const dataToSend = {
     ...aviaryData,
     batchId: Number(aviaryData.batchId)

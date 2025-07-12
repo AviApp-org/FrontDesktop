@@ -21,28 +21,6 @@ export const formatDateForBackend = (dateString: string): string => {
   }
 };
 
-export const formatDateForFrontend = (dateString: string): string => {
-  if (!dateString) return '';
-  
-  console.log('📅 formatDateForFrontend input:', dateString);
-  
-  try {
-    // Se já está no formato YYYY-MM-DD, retorna como está
-    if (dateString.includes('-') && dateString.length === 10 && dateString.indexOf('-') === 4) {
-      console.log('📅 formatDateForFrontend output (já formatado):', dateString);
-      return dateString;
-    }
-    
-    // Converte de DD-MM-YYYY para YYYY-MM-DD
-    const [day, month, year] = dateString.split('-');
-    const result = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-    console.log('📅 formatDateForFrontend output:', result);
-    return result;
-  } catch (error) {
-    console.error('Erro ao formatar data para frontend:', error);
-    return dateString;
-  }
-};
 
 export const formatDateForDisplay = (dateString: string): string => {
   if (!dateString) return '';

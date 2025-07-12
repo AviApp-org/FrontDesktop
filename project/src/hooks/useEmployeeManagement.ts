@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee } from './useEmployees';
 import { EmployeeData } from '../@types/EmployeeData';
 import { EmployeeRole } from '../@types/enums/enumEmployeeRole';
-import { formatDateForBackend, formatDateForFrontend } from '../utils/formatDate'; // ✅ Importar funções de data
+import { formatDateForBackend } from '../utils/formatDate'; // ✅ Importar funções de data
 import { formatCPF, formatPhone, isValidCPF } from '../utils/validators';
 
 
@@ -75,14 +75,14 @@ export const useEmployeeManagement = (farmId: number) => {
       setFormData({
         name: employee.name,
         cpf: employee.cpf,
-        birthDate: formatDateForFrontend(employee.birthDate), // ✅ Converter DD/MM/YYYY → YYYY-MM-DD
+        birthDate: (employee.birthDate), // ✅ Converter DD/MM/YYYY → YYYY-MM-DD
         phone: employee.phone,
         role: employee.role,
         createdAt: employee.createdAt,
         farmId: employee.farmId
       });
       
-      console.log('🔍 Data formatada para o form:', formatDateForFrontend(employee.birthDate)); // ✅ Debug
+      console.log('🔍 Data formatada para o form:', (employee.birthDate)); // ✅ Debug
       setEditingId(employee.id ?? 0);
     } else {
       setFormData({ ...initialFormData, farmId });

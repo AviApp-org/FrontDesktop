@@ -4,15 +4,18 @@ import { AviaryModalProps } from './types';
 
 
 export const AviaryModal: React.FC<AviaryModalProps> = ({
+
   isOpen,
   aviary,
   selectedBatch, // ✅ Receber selectedBatch
   onClose,
   onSubmit
 }) => {
-  if (!isOpen) return null;
 
+  if (!isOpen) return null;
+  console.log(selectedBatch)
   return (
+
     <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
         <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
@@ -27,13 +30,13 @@ export const AviaryModal: React.FC<AviaryModalProps> = ({
           <form onSubmit={(e) => {
             e.preventDefault();
             const formData = new FormData(e.currentTarget);
-            
+
             // ✅ Criar objeto com tipo correto
             const aviaryData: CreateAviaryData = {
               name: formData.get('name') as string,
               initialAmountOfRoosters: Number(formData.get('initialAmountOfRoosters')),
               initialAmountOfChickens: Number(formData.get('initialAmountOfChickens')),
-              batchId: Number(selectedBatch?.id), // ✅ Converter para number
+              batchId: Number(selectedBatch?.id)
             };
 
             console.log('🔍 Dados do aviário sendo enviados:', aviaryData);

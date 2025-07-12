@@ -1,14 +1,13 @@
 import React from 'react';
-import { Plus, AlertCircle } from 'lucide-react';
 import { useBatchManagement } from '../hooks/useBatchManagement';
 import { BatchTable } from '../components/BatchTable';
 import { AviaryTable } from '../components/AviaryTable';
 import { BatchModal } from '../components/BatchModal';
 import { AviaryModal } from '../components/AviaryModal';
-import Button from '../components/Button';
 import { BatchHeader } from '../components/BatchHeader';
 
 export function BatchManagement() {
+
   const {
     isModalOpen,
     setIsModalOpen,
@@ -34,7 +33,7 @@ export function BatchManagement() {
     handleAviarySubmit,
     handleAviaryDelete,
   } = useBatchManagement();
-
+  console.log(selectedBatch);
   return (
     <div className="pt-16 pb-8 min-h-screen w-full">
       <BatchHeader onNewBatch={() => setIsModalOpen(true)} error={error ?? undefined} />
@@ -71,7 +70,7 @@ export function BatchManagement() {
         </BatchTable>
 
         <BatchModal
-          isOpen={isModalOpen || !!selectedBatch}
+          isOpen={isModalOpen}
           batch={selectedBatch}
           isSubmitting={isSubmitting}
           formErrors={formErrors}

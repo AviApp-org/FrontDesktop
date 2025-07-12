@@ -2,8 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { BatchData } from '@/@types/BatchData'
 import api from '../config/axios';
 import { API_ENDPOINTS } from '../config/api';
-import { AxiosError } from 'axios';
-import { formatDateForBackend } from '../utils/formatDate';
 
 // ✅ Buscar TODOS os lotes de uma granja
 const fetchAllBatches = async (): Promise<BatchData[]> => {
@@ -47,7 +45,7 @@ const postData = async (batch: Omit<BatchData, 'id'>): Promise<BatchData> => {
     
     const formattedBatch = {
       name: batch.name,
-      startDate: formatDateForBackend(batch.startDate),
+      startDate:(batch.startDate),
       status: batch.status || 'ACTIVE',
       farmId: batch.farmId || "1"
     };
@@ -115,7 +113,7 @@ export function usePostBatchData() {
     mutationFn: async (data: Omit<BatchData, 'id'>) => {
       const formattedBatch = {
         ...data,
-        startDate: formatDateForBackend(data.startDate),
+        startDate: (data.startDate),
       };
 
       console.log('Dados formatados para envio:', formattedBatch);
@@ -137,7 +135,7 @@ export function useUpdateBatchData() {
     mutationFn: async ({ id, data }: { id: string; data: Partial<Omit<BatchData, 'id'>> }) => {
       const formattedData = {
         ...data,
-        startDate: data.startDate ? formatDateForBackend(data.startDate) : undefined,
+        startDate: data.startDate ? (data.startDate) : undefined,
       };
 
       console.log('Dados formatados para atualização:', formattedData);
