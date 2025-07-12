@@ -14,12 +14,33 @@ import {
   BulbOutlined         // ✅ Novo ícone para Ovos Eliminados
 } from '@ant-design/icons';
 import { translateEggType } from '../../../@types/reportTypes';
+import { AviaryData } from '@/@types/AviaryData'; // ajuste o caminho conforme sua estrutura
 
 interface AviarioProps {
-  aviary: any;
+  aviary: AviaryData & {
+    aviaryName?: string;
+    aviaryId?: number;
+    totalEggsCollected?: number;
+    totalDeadChickens?: number;
+    totalDeadRoosters?: number;
+    chickenMortality?: number;
+    roosterMortality?: number;
+    mortality?: number;
+    production?: number;
+    incubateEggs?: number;
+    marketEggs?: number;
+    dumpEggs?: number;
+    quantityByEggType?: {
+      type: string;
+      quantity: number;
+    }[];
+    currentChickens?: number;
+    currentRoosters?: number;
+  };
   open: boolean;
   toggle: () => void;
 }
+
 
 export const Aviario: React.FC<AviarioProps> = ({ aviary, open, toggle }) => {
   const aviaryName = aviary.aviaryName || aviary.name || `Aviário ${aviary.aviaryId}`;

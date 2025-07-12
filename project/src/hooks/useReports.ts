@@ -1,17 +1,41 @@
 import { useState, useCallback, useEffect } from 'react';
 import api from '../config/axios';
-import { useBatches } from './useBatch'; // ✅ Importar o hook existente
+import batchHook from './useBatch'; // ✅ Importar o hook existente
+import { BatchData } from '@/@types/BatchData';
 
 export const useReports = () => {
   // ✅ Usar o hook de lotes existente
-  const { data: batches, isLoading: batchesLoading, error: batchesError } = useBatches();
-  
+  const [batches, setBatches] = useState<BatchData[]>([]);
+  const [batchesLoading, setBatchesLoading] = useState<boolean>(false);
+  const [batchesError, setBatchesError] = useState<string | null>(null);
+
+  // Ajuste para seu farmId fixo (ou dinâmico se preferir)
+  const FARM_ID = 1;
+
+  useEffect(() => {
+    const fetchBatches = async () => {
+      setBatchesLoading(true);
+      try {
+        const result = await batchHook.getBatchByFarm(FARM_ID);
+        setBatches(result);
+        setBatchesError(null);
+      } catch (error) {
+        console.error('Erro ao carregar lotes:', error);
+        setBatchesError('Erro ao carregar lotes.');
+        setBatches([]);
+      } finally {
+        setBatchesLoading(false);
+      }
+    };
+
+    fetchBatches();
+  }, []);
   const [reportType, setReportType] = useState<'Diário' | 'Semanal' | 'Mensal'>('Diário');
   const [selectedDate, setSelectedDate] = useState<string>('');
-  
+
   // ✅ Não pré-setar o lote, deixar vazio inicialmente
   const [batchId, setBatchId] = useState<string>('');
-  
+
   const [loading, setLoading] = useState(false);
   const [reportData, setReportData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +57,7 @@ export const useReports = () => {
     setError(null);
     setCurrentDateIndex(0);
     setExpandedAviaries([]);
-    
+
     if (selectedDate) {
       generateDateRange(selectedDate, type);
     }
@@ -41,9 +65,9 @@ export const useReports = () => {
 
   const generateDateRange = (startDate: string, type: 'Diário' | 'Semanal' | 'Mensal') => {
     const dates: string[] = [];
-    
+
     let start: Date;
-    
+
     if (startDate.includes('/')) {
       const [day, month, year] = startDate.split('/');
       start = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
@@ -54,81 +78,85 @@ export const useReports = () => {
       console.error('❌ Formato de data inválido:', startDate);
       return;
     }
-    
+
     let days = 1;
     if (type === 'Semanal') days = 7;
     if (type === 'Mensal') days = 30;
-    
+
     for (let i = 0; i < days; i++) {
       const currentDate = new Date(start);
       currentDate.setDate(start.getDate() + i);
-      
+
       const day = currentDate.getDate().toString().padStart(2, '0');
       const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
       const year = currentDate.getFullYear();
-      
+
       dates.push(`${day}/${month}/${year}`);
     }
-    
+
     setDateRange(dates);
   };
 
-  const fetchReportForDate = useCallback(async (date: string) => {
-    if (!date || !batchId) {
-      setError('Data ou lote inválido.');
-      return;
-    }
-
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      let formattedDate: string;
-      
-      if (date.includes('/')) {
-        const [day, month, year] = date.split('/');
-        formattedDate = `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
-      } else if (date.includes('-')) {
-        const [year, month, day] = date.split('-');
-        formattedDate = `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
-      } else {
-        throw new Error('Formato de data inválido');
+  const fetchReportForDate = useCallback(
+    async (date: string) => {
+      if (!date || !batchId) {
+        setError('Data ou lote inválido.');
+        return;
       }
-      
-      const endpoint = `/api/daily-report/${batchId}/${formattedDate}`;
-      
-      const response = await api.get(endpoint);
-      
-      setReportData(response.data);
 
-    } catch (err: any) {
-      console.error('❌ Erro ao buscar relatório para', date, ':', err);
-      
-      if (err.response?.status === 404) {
-        setError(`Nenhum relatório encontrado para ${date}`);
-      } else if (err.response?.status === 500) {
-        setError(`Erro interno do servidor. Verifique se a data ${date} está no formato correto.`);
-      } else if (err.response) {
-        setError(`Erro ${err.response.status}: ${err.response.data?.message || err.response.statusText}`);
-      } else if (err.request) {
-        setError('Erro de conexão. Verifique se o backend está rodando.');
-      } else {
-        setError(err.message || 'Erro ao carregar relatório');
+      setLoading(true);
+      setError(null);
+
+      try {
+        let formattedDate: string;
+
+        if (date.includes('/')) {
+          const [day, month, year] = date.split('/');
+          formattedDate = `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
+        } else if (date.includes('-')) {
+          const [year, month, day] = date.split('-');
+          formattedDate = `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
+        } else {
+          throw new Error('Formato de data inválido');
+        }
+
+        const endpoint = `/api/daily-report/${batchId}/${formattedDate}`;
+
+        const response = await api.get(endpoint);
+
+        setReportData(response.data);
+      } catch (err: any) {
+        console.error('❌ Erro ao buscar relatório para', date, ':', err);
+
+        if (err.response?.status === 404) {
+          setError(`Nenhum relatório encontrado para ${date}`);
+        } else if (err.response?.status === 500) {
+          setError(
+            `Erro interno do servidor. Verifique se a data ${date} está no formato correto.`
+          );
+        } else if (err.response) {
+          setError(
+            `Erro ${err.response.status}: ${err.response.data?.message || err.response.statusText}`
+          );
+        } else if (err.request) {
+          setError('Erro de conexão. Verifique se o backend está rodando.');
+        } else {
+          setError(err.message || 'Erro ao carregar relatório');
+        }
+
+        setReportData(null);
+      } finally {
+        setLoading(false);
       }
-      
-      setReportData(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [batchId]);
+    },
+    [batchId]
+  );
 
   const fetchReport = useCallback(async () => {
     if (!selectedDate || !batchId) {
       setError('Por favor, selecione uma data e um lote.');
       return;
     }
-
 
     generateDateRange(selectedDate, reportType);
     await fetchReportForDate(selectedDate);
@@ -150,12 +178,15 @@ export const useReports = () => {
     }
   }, [currentDateIndex, dateRange, fetchReportForDate]);
 
-  const goToSpecificDay = useCallback(async (index: number) => {
-    if (index >= 0 && index < dateRange.length) {
-      setCurrentDateIndex(index);
-      await fetchReportForDate(dateRange[index]);
-    }
-  }, [dateRange, fetchReportForDate]);
+  const goToSpecificDay = useCallback(
+    async (index: number) => {
+      if (index >= 0 && index < dateRange.length) {
+        setCurrentDateIndex(index);
+        await fetchReportForDate(dateRange[index]);
+      }
+    },
+    [dateRange, fetchReportForDate]
+  );
 
   const formatDateForDisplay = (dateString: string): string => {
     return dateString || '';
@@ -163,9 +194,7 @@ export const useReports = () => {
 
   const toggleAviario = (index: number) => {
     setExpandedAviaries(prev =>
-      prev.includes(index)
-        ? prev.filter(i => i !== index)
-        : [...prev, index]
+      prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]
     );
   };
 
@@ -190,10 +219,10 @@ export const useReports = () => {
     dateRange,
     canGoPrevious,
     canGoNext,
-    
+
     // ✅ Retornar os lotes do hook existente
     batches: batches || [],
-    
+
     setSelectedDate,
     setBatchId,
     handleReportTypeChange,

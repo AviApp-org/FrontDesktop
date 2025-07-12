@@ -1,16 +1,18 @@
 import React from 'react';
 import { useReports } from '../hooks/useReports';
-import { useBatches } from '../hooks/useBatch'; // ✅ Importar diretamente
 import { ReportFilters } from '../components/Reports/ReportFilters';
 import { DateNavigation } from '../components/Reports/DateNavigation';
 import { ResumoGeral } from '../components/Reports/ResumoGeral';
 import { ResumoSemanal } from '../components/Reports/ResumoSemanal';
 import { Aviario } from '../components/Reports/Aviario';
-import { EmptyStateNoDate, EmptyStateNoAviaries, LoadingState } from '../components/Reports/EmptyStates';
-import { normalizeAviaryData, isValidAviaryData } from '../utils/aviaryUtils';
+import {
+  EmptyStateNoDate,
+  EmptyStateNoAviaries,
+  LoadingState,
+} from '../components/Reports/EmptyStates';
+import { AviaryData } from '@/@types/AviaryData';
 
 const Reports: React.FC = () => {
-  // ✅ Usar os dois hooks separadamente
   const {
     reportType,
     selectedDate,
@@ -33,17 +35,13 @@ const Reports: React.FC = () => {
     goToNextDay,
     goToSpecificDay,
     formatDateForDisplay,
+    batches,
   } = useReports();
 
-  // ✅ Hook separado para os lotes
-  const { data: batches, isLoading: batchesLoading } = useBatches();
-
   return (
-
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* ✅ TÍTULO COM MARGEM TOP */}
       <h1 className="text-3xl font-bold pt-4 mt-4 text-gray-800">
-        Relatório {reportType} 
+        Relatório {reportType}
         {currentDate && ` - ${formatDateForDisplay(currentDate)}`}
       </h1>
 
@@ -51,8 +49,8 @@ const Reports: React.FC = () => {
         reportType={reportType}
         selectedDate={selectedDate}
         batchId={batchId}
-        loading={loading || batchesLoading} // ✅ Incluir loading dos lotes
-        batches={batches || []} // ✅ Passar os lotes
+        loading={loading}
+        batches={batches}
         onReportTypeChange={handleReportTypeChange}
         onDateChange={setSelectedDate}
         onBatchChange={setBatchId}
@@ -77,7 +75,10 @@ const Reports: React.FC = () => {
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
           <p className="text-red-700">❌ {error}</p>
-          <button onClick={fetchReport} className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+          <button
+            onClick={fetchReport}
+            className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          >
             Tentar Novamente
           </button>
         </div>
@@ -96,14 +97,14 @@ const Reports: React.FC = () => {
               totalDays={dateRange.length}
             />
           )}
-          
+
           <ResumoGeral summary={reportData} />
-          
+
           <div className="mb-6">
             <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
               <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 rounded-t-lg">
                 <h2 className="text-xl font-semibold text-gray-800">
-                   Aviários do Lote {batchId}
+                  Aviários do Lote {batchId}
                   {reportType !== 'Diário' && (
                     <span className="text-sm font-normal text-gray-600 ml-2">
                       ({reportType} - Dia {currentDateIndex + 1})
@@ -111,29 +112,27 @@ const Reports: React.FC = () => {
                   )}
                 </h2>
               </div>
-              
+
               <div className="p-6">
                 {(() => {
                   const aviaries = reportData.aviaryReports || [];
-                  const validAviaries = aviaries
-                    .filter(isValidAviaryData)
-                    .map(normalizeAviaryData);
-                  
+                  const validAviaries: AviaryData[] = aviaries.filter((a: any) => !!a.name); // ou ajuste conforme seu critério
+
                   if (validAviaries.length === 0) {
                     return (
-                      <EmptyStateNoAviaries 
+                      <EmptyStateNoAviaries
                         hasReportData={true}
                         totalEggs={reportData.totalEggsCollected || 0}
                         totalDeaths={reportData.totalDeadBirds || 0}
                       />
                     );
                   }
-                  
+
                   return (
                     <div className="space-y-4">
-                      {validAviaries.map((aviary, index) => (
+                      {validAviaries.map((aviary: AviaryData, index) => (
                         <Aviario
-                          key={`${aviary.aviaryId}-${index}`}
+                          key={`${aviary.id ?? aviary.name}-${index}`}
                           aviary={aviary}
                           open={isAviaryExpanded(index)}
                           toggle={() => toggleAviario(index)}
