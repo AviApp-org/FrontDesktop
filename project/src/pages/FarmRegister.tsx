@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Container } from '@mui/material';
-import { useFarmManagement } from '../hooks/useFarmManagement';
 import FarmModal from '../components/FarmModal';
 import FarmHeader from '../components/FarmPageHeader';
 import FarmTableCard from '../components/FarmTableCard';

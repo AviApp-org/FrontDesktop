@@ -3,7 +3,7 @@ export interface AddressData {
   street: string;
   number: string;
   cep: string;
-  neighborhood: string;
+  neighborhood?: string;
   city: string;
   state: string;
 }

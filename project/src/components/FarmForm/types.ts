@@ -1,4 +1,4 @@
-import { FarmFormData  } from '../../hooks/useFarmManagement';
+import { FarmFormData  } from '../../hooks/useFarm';
 
 export interface FarmFormProps {
   formData: FarmFormData;
