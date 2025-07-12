@@ -1,41 +1,55 @@
 import React from 'react';
 import {
+  Card,
+  CardContent,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Card,
-  CardContent,
-  Chip,
-  Avatar,
   IconButton,
-  Tooltip,
-  Box,
   Typography,
-  CircularProgress
+  Box,
+  CircularProgress,
+  Chip
 } from '@mui/material';
-import { blue } from '@mui/material/colors';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { EmployeeData } from '../../@types/EmployeeData';
 import { EmployeeRole } from '../../@types/enums/enumEmployeeRole';
-import { formatCPF, formatPhone } from '../../utils/validators';
-import { formatDateForDisplay } from '../../utils/formatDate';
 
 interface EmployeeTableProps {
   employees: EmployeeData[];
   isLoading: boolean;
   isError: boolean;
   onEdit: (employee: EmployeeData) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: number | null) => void;
 }
 
-const roleLabels: Record<EmployeeRole, string> = {
-  [EmployeeRole.MANAGER]: 'Gerente',
-  [EmployeeRole.WORKER]: 'Colaborador'
+const getRoleLabel = (role: EmployeeRole): string => {
+  const roleLabels = {
+    [EmployeeRole.MANAGER]: 'Gerente',
+    [EmployeeRole.WORKER]: 'Trabalhador',
+  };
+  return roleLabels[role] || role;
+};
+
+const getRoleColor = (role: EmployeeRole) => {
+  const roleColors = {
+    [EmployeeRole.MANAGER]: 'error',
+    [EmployeeRole.WORKER]: 'primary',
+  };
+  return roleColors[role] || 'default';
+};
+
+const formatDate = (dateString: string): string => {
+  if (!dateString) return '-';
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR');
+  } catch {
+    return dateString;
+  }
 };
 
 export const EmployeeTable: React.FC<EmployeeTableProps> = ({
@@ -81,7 +95,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
               <TableRow>
                 <TableCell sx={{ fontWeight: 'bold' }}>Nome</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>CPF</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Data Nascimento</TableCell> {/* ✅ Coluna da data */}
+                <TableCell sx={{ fontWeight: 'bold' }}>Data Nascimento</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Telefone</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Cargo</TableCell>
                 <TableCell align="right" sx={{ fontWeight: 'bold' }}>Ações</TableCell>
@@ -92,54 +106,59 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 employees.map((employee) => (
                   <TableRow key={employee.id} hover>
                     <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Avatar sx={{ mr: 2, bgcolor: blue[100], color: blue[700] }}>
-                          {employee.name.charAt(0)}
-                        </Avatar>
+                      <Typography variant="body2" fontWeight="medium">
                         {employee.name}
-                      </Box>
+                      </Typography>
                     </TableCell>
-                    <TableCell>{formatCPF(employee.cpf)}</TableCell>
-                    <TableCell>{formatDateForDisplay(employee.birthDate)}</TableCell> {/* ✅ Exibir data formatada */}
-                    <TableCell>{formatPhone(employee.phone)}</TableCell>
                     <TableCell>
-                      <Chip 
-                        label={roleLabels[employee.role]} 
-                        color={employee.role === EmployeeRole.MANAGER ? 'primary' : 'default'}
+                      <Typography variant="body2" color="text.secondary">
+                        {employee.cpf}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="text.secondary">
+                        {formatDate(employee.birthDate)}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="text.secondary">
+                        {employee.phone}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={getRoleLabel(employee.role)}
+                        color={getRoleColor(employee.role) as any}
                         size="small"
+                        variant="outlined"
                       />
                     </TableCell>
                     <TableCell align="right">
-                      <Tooltip title="Visualizar detalhes">
-                        <IconButton size="small" sx={{ color: blue[700] }}>
-                          <VisibilityIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Editar">
-                        <IconButton 
-                          size="small" 
-                          sx={{ color: blue[700] }}
+                      <Box display="flex" gap={1} justifyContent="flex-end">
+                        <IconButton
+                          size="small"
                           onClick={() => onEdit(employee)}
+                          sx={{ color: 'primary.main' }}
                         >
                           <EditIcon fontSize="small" />
                         </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Excluir">
-                        <IconButton 
-                          size="small" 
-                          sx={{ color: blue[700] }}
-                          onClick={() => onDelete(employee.id ?? 0)}
+                        <IconButton
+                          size="small"
+                          onClick={() => onDelete(employee.id ?? null)}
+                          sx={{ color: 'error.main' }}
                         >
                           <DeleteIcon fontSize="small" />
                         </IconButton>
-                      </Tooltip>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} align="center"> {/* ✅ Ajustar colSpan para 6 */}
-                    Nenhum funcionário encontrado.
+                  <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                    <Typography color="text.secondary">
+                      Nenhum funcionário encontrado
+                    </Typography>
                   </TableCell>
                 </TableRow>
               )}

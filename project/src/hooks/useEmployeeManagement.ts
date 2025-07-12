@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { EmployeeData } from '../@types/EmployeeData';
 import { EmployeeRole } from '../@types/enums/enumEmployeeRole';
-import { formatDateForBackend } from '../utils/formatDate'; // ✅ Importar funções de data
+import { formatDateForBackend } from '../utils/formatDate';
 import { formatCPF, formatPhone, isValidCPF } from '../utils/validators';
 import employeeHook from './useEmployees';
-
 
 const initialFormData: EmployeeData = {
   name: '',
@@ -26,18 +25,30 @@ export const useEmployeeManagement = (farmId: number) => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Hooks de API
-  const { data: employees, isLoading, isError, refetch } = employeeHook.getEmployee ();
-  const createEmployee = employeeHook.createEmployee;
-  const updateEmployee = useUpdateEmployee();
-  const deleteEmployee = useDeleteEmployee();
+  // Estados para gerenciar os dados dos funcionários
+  const [employees, setEmployees] = useState<EmployeeData[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
-  // Forçar atualização da lista após operações
-  useEffect(() => {
-    if (createEmployee.isSuccess || updateEmployee.isSuccess || deleteEmployee.isSuccess) {
-      refetch();
+  // Carregar funcionários
+  const fetchEmployees = async () => {
+    setIsLoading(true);
+    setIsError(false);
+    try {
+      const employeesData = await employeeHook.getEmployee();
+      setEmployees(employeesData);
+    } catch (error) {
+      console.error('Erro ao carregar funcionários:', error);
+      setIsError(true);
+    } finally {
+      setIsLoading(false);
     }
-  }, [createEmployee.isSuccess, updateEmployee.isSuccess, deleteEmployee.isSuccess, refetch]);
+  };
+
+  // Carregar funcionários na inicialização
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
 
   // Validação do formulário
   const validateForm = (): boolean => {
@@ -70,11 +81,10 @@ export const useEmployeeManagement = (farmId: number) => {
   // Handlers
   const handleOpenDialog = (employee?: EmployeeData) => {
     if (employee) {
-      
       setFormData({
         name: employee.name,
         cpf: employee.cpf,
-        birthDate: (employee.birthDate), 
+        birthDate: employee.birthDate, 
         phone: employee.phone,
         role: employee.role,
         createdAt: employee.createdAt,
@@ -123,45 +133,66 @@ export const useEmployeeManagement = (farmId: number) => {
     setFormErrors({});
 
     try {
-      
       const formattedData = {
         ...formData,
         cpf: formatCPF(formData.cpf),
         phone: formatPhone(formData.phone),
-        birthDate: formatDateForBackend(formData.birthDate), // ✅ Converter YYYY-MM-DD → DD/MM/YYYY
+        birthDate: formatDateForBackend(formData.birthDate),
       };
 
+      console.log('📝 Dados formatados para envio:', formattedData);
+      console.log('🔄 Modo de edição:', !!editingId);
 
       if (editingId) {
-        await updateEmployee.mutateAsync({
-          id: editingId,
-          data: formattedData,
-        });
+        await employeeHook.updateEmployee(editingId, formattedData);
+        console.log('✅ Funcionário atualizado com sucesso');
       } else {
-        await createEmployee.mutateAsync(formattedData);
+        await employeeHook.createEmployee(formattedData);
+        console.log('✅ Funcionário criado com sucesso');
       }
       
+      // Recarregar a lista de funcionários
+      await fetchEmployees();
       handleCloseDialog();
     } catch (error) {
-      console.error('Erro ao salvar funcionário:', error);
+      console.error('❌ Erro ao salvar funcionário:', error);
+      
+      let errorMessage = 'Erro ao salvar funcionário. Tente novamente.';
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
       setFormErrors({ 
-        submit: error instanceof Error ? error.message : 'Erro ao salvar funcionário. Tente novamente.' 
+        submit: errorMessage
       });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleDeleteClick = (id: number | null) => { // ✅ Aceitar null
+  const handleDeleteClick = (id: number | null) => {
     setConfirmDelete(id);
   };
 
   const handleConfirmDelete = async () => {
     if (confirmDelete) {
       try {
-        await deleteEmployee.mutateAsync(confirmDelete);
+        await employeeHook.deleteEmployee(confirmDelete);
+        console.log('✅ Funcionário excluído com sucesso');
+        // Recarregar a lista de funcionários
+        await fetchEmployees();
       } catch (error) {
-        console.error('Erro ao excluir funcionário:', error);
+        console.error('❌ Erro ao excluir funcionário:', error);
+        
+        let errorMessage = 'Erro ao excluir funcionário. Tente novamente.';
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+        
+        setFormErrors({
+          submit: errorMessage
+        });
       }
       setConfirmDelete(null);
     }
@@ -172,11 +203,11 @@ export const useEmployeeManagement = (farmId: number) => {
   };
 
   // Funcionários filtrados
-  const filteredEmployees = employees?.filter(employee => 
+  const filteredEmployees = employees.filter(employee => 
     employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     employee.cpf.includes(searchTerm) ||
     employee.phone.includes(searchTerm)
-  ) || [];
+  );
 
   return {
     // Estados
@@ -201,5 +232,8 @@ export const useEmployeeManagement = (farmId: number) => {
     handleDeleteClick,
     handleConfirmDelete,
     handleSearch,
+    
+    // Função para recarregar dados
+    refetch: fetchEmployees,
   };
 };

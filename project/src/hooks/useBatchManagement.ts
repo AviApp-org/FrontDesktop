@@ -1,11 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  useBatches,
-  usePostBatchData,
-  useUpdateBatchData,
-  useActivateBatchData,
-  useDeactivateBatchData,
-} from './useBatch';
+import batchHook from './useBatch';
 import { BatchData as Batch } from '../@types/BatchData';
 import { AviaryData } from '../@types/AviaryData';
 import { showErrorMessage } from '../utils/errorHandler';
@@ -23,16 +17,30 @@ export const useBatchManagement = () => {
   const [error, setError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Estados para gerenciar os dados dos lotes
+  const [batches, setBatches] = useState<Batch[]>([]);
+  const [isLoadingBatches, setIsLoadingBatches] = useState(false);
+  const [isActivating, setIsActivating] = useState(false);
+  const [isDeactivating, setIsDeactivating] = useState(false);
 
-  const { data: batches = [], isLoading: isLoadingBatches } = useBatches() as {
-    data: Batch[];
-    isLoading: boolean;
-  };
+  // Carregar lotes da fazenda (assumindo farmId = 1)
+  useEffect(() => {
+    const fetchBatches = async () => {
+      setIsLoadingBatches(true);
+      try {
+        const batchesData = await batchHook.getBatchByFarm(1);
+        setBatches(batchesData);
+      } catch (err) {
+        console.error('Erro ao buscar lotes:', err);
+        setError('Erro ao carregar lotes');
+      } finally {
+        setIsLoadingBatches(false);
+      }
+    };
 
-  const { mutate: createBatch } = usePostBatchData();
-  const { mutate: updateBatch } = useUpdateBatchData();
-  const { mutate: activateBatch, isPending: isActivating } = useActivateBatchData();
-  const { mutate: deactivateBatch, isPending: isDeactivating } = useDeactivateBatchData();
+    fetchBatches();
+  }, []);
 
   // Efeito para buscar aviários do lote expandido
   useEffect(() => {
@@ -77,7 +85,7 @@ export const useBatchManagement = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleBatchSubmit = (data: any, isEdit = false) => {
+  const handleBatchSubmit = async (data: any, isEdit = false) => {
     setError(null);
     setFormErrors({});
     setIsSubmitting(true);
@@ -87,29 +95,51 @@ export const useBatchManagement = () => {
       return;
     }
 
-    const mutation = isEdit ? updateBatch : createBatch;
-    const payload = isEdit ? { id: selectedBatch?.id, data } : { ...data, farmId: '1' };
-
-    mutation(payload, {
-      onSuccess: () => {
-        setIsModalOpen(false);
-        setSelectedBatch(null);
-        setIsSubmitting(false);
-      },
-      onError: error => {
-        handleError(error, isEdit ? 'Erro ao atualizar lote' : 'Erro ao criar lote');
-        setIsSubmitting(false);
-      },
-    });
+    try {
+      if (isEdit && selectedBatch?.id) {
+        await batchHook.updateBatch(selectedBatch.id.toString(), data);
+      } else {
+        await batchHook.createBatch({ ...data, farmId: '1' });
+      }
+      
+      // Recarregar a lista de lotes
+      const updatedBatches = await batchHook.getBatchByFarm(1);
+      setBatches(updatedBatches);
+      
+      setIsModalOpen(false);
+      setSelectedBatch(null);
+    } catch (error) {
+      handleError(error, isEdit ? 'Erro ao atualizar lote' : 'Erro ao criar lote');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleBatchAction = (action: 'activate' | 'deactivate', id: string) => {
+  const handleBatchAction = async (action: 'activate' | 'deactivate', id: string) => {
     setError(null);
-    const mutation = action === 'activate' ? activateBatch : deactivateBatch;
-    mutation(id, {
-      onError: error =>
-        handleError(error, `Erro ao ${action === 'activate' ? 'ativar' : 'desativar'} lote`),
-    });
+    
+    if (action === 'activate') {
+      setIsActivating(true);
+    } else {
+      setIsDeactivating(true);
+    }
+
+    try {
+      if (action === 'activate') {
+        await batchHook.activateBatch(id);
+      } else {
+        await batchHook.deactivateBatch(id);
+      }
+      
+      // Recarregar a lista de lotes
+      const updatedBatches = await batchHook.getBatchByFarm(1);
+      setBatches(updatedBatches);
+    } catch (error) {
+      handleError(error, `Erro ao ${action === 'activate' ? 'ativar' : 'desativar'} lote`);
+    } finally {
+      setIsActivating(false);
+      setIsDeactivating(false);
+    }
   };
 
   const handleAviarySubmit = async (aviaryData: CreateAviaryData) => {
@@ -127,6 +157,13 @@ export const useBatchManagement = () => {
         await aviaryHook.createAviary(dataToSend);
       }
 
+      // Recarregar aviários se houver lote expandido
+      const lastExpandedBatch = expandedBatches[expandedBatches.length - 1];
+      if (lastExpandedBatch) {
+        const aviaries = await aviaryHook.getAviariesByBatch(Number(lastExpandedBatch));
+        setAviariesData(aviaries);
+      }
+
       setIsAviaryModalOpen(false);
       setSelectedAviary(null);
     } catch (error) {
@@ -140,6 +177,13 @@ export const useBatchManagement = () => {
   const handleAviaryDelete = async (id: string) => {
     try {
       await aviaryHook.deleteAviary(Number(id));
+      
+      // Recarregar aviários se houver lote expandido
+      const lastExpandedBatch = expandedBatches[expandedBatches.length - 1];
+      if (lastExpandedBatch) {
+        const aviaries = await aviaryHook.getAviariesByBatch(Number(lastExpandedBatch));
+        setAviariesData(aviaries);
+      }
     } catch (error) {
       handleError(error, 'Erro ao deletar aviário');
     }
