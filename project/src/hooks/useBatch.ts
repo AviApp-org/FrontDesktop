@@ -6,10 +6,8 @@ import { API_ENDPOINTS } from '../config/api';
 // ✅ Buscar TODOS os lotes de uma granja
 const fetchAllBatches = async (): Promise<BatchData[]> => {
   try {
-    console.log('Buscando todos os lotes da granja');
     const farmId = "1"; // ID da granja
     const response = await api.get(`${API_ENDPOINTS.batches}/farm/${farmId}`);
-    console.log('Lotes encontrados:', response.data);
     return response.data;
   } catch (error) {
     console.error('Erro ao buscar lotes:', error);
@@ -20,9 +18,7 @@ const fetchAllBatches = async (): Promise<BatchData[]> => {
 // ✅ Buscar UM lote específico por ID
 const fetchBatchById = async (id: string): Promise<BatchData> => {
   try {
-    console.log('Buscando lote por ID:', id);
     const response = await api.get(`${API_ENDPOINTS.batches}/${id}`);
-    console.log('Lote encontrado:', response.data);
     return response.data;
   } catch (error) {
     console.error('Erro ao buscar lote:', error);
@@ -33,7 +29,6 @@ const fetchBatchById = async (id: string): Promise<BatchData> => {
 // ✅ Criar novo lote
 const postData = async (batch: Omit<BatchData, 'id'>): Promise<BatchData> => {
   try {
-    console.log('Criando novo lote:', batch);
     
     if (!batch.name || !batch.startDate || !batch.farmId) {
       throw new Error('Nome, data de início e ID da fazenda são obrigatórios');
@@ -50,10 +45,8 @@ const postData = async (batch: Omit<BatchData, 'id'>): Promise<BatchData> => {
       farmId: batch.farmId || "1"
     };
     
-    console.log('Dados formatados para envio:', formattedBatch);
     
     const response = await api.post(API_ENDPOINTS.batches, formattedBatch);
-    console.log('Lote criado:', response.data);
     return response.data;
   } catch (error) {
     console.error('Erro ao criar lote:', error);
@@ -64,9 +57,7 @@ const postData = async (batch: Omit<BatchData, 'id'>): Promise<BatchData> => {
 // ✅ Ativar lote
 const activateBatch = async (id: string): Promise<void> => {
   try {
-    console.log('Ativando lote:', id);
     await api.patch(`${API_ENDPOINTS.batches}/${id}/activate`);
-    console.log('Lote ativado com sucesso');
   } catch (error) {
     console.error('Erro ao ativar lote:', error);
     throw error;
@@ -76,9 +67,7 @@ const activateBatch = async (id: string): Promise<void> => {
 // ✅ Desativar lote
 const deactivateBatch = async (id: string): Promise<void> => {
   try {
-    console.log('Desativando lote:', id);
     await api.patch(`${API_ENDPOINTS.batches}/${id}/deactivate`);
-    console.log('Lote desativado com sucesso');
   } catch (error) {
     console.error('Erro ao desativar lote:', error);
     throw error;
@@ -116,7 +105,6 @@ export function usePostBatchData() {
         startDate: (data.startDate),
       };
 
-      console.log('Dados formatados para envio:', formattedBatch);
 
       const response = await api.post<BatchData>(API_ENDPOINTS.batches, formattedBatch);
       return response.data;
@@ -138,7 +126,6 @@ export function useUpdateBatchData() {
         startDate: data.startDate ? (data.startDate) : undefined,
       };
 
-      console.log('Dados formatados para atualização:', formattedData);
 
       const response = await api.put<BatchData>(`${API_ENDPOINTS.batches}/${id}`, formattedData);
       return response.data;

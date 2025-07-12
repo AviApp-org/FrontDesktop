@@ -20,7 +20,6 @@ export const BatchModal: React.FC<BatchModalProps> = ({
     const [year, month, day] = dateValue.split('-');
     return `${day}/${month}/${year}`;
   };
-  console.log(batch, "Ai ai ai");
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl shadow-xl max-w-md w-full">

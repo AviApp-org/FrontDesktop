@@ -70,7 +70,6 @@ export const useEmployeeManagement = (farmId: number) => {
   // Handlers
   const handleOpenDialog = (employee?: EmployeeData) => {
     if (employee) {
-      console.log('🔍 Data original do funcionário:', employee.birthDate); // ✅ Debug
       
       setFormData({
         name: employee.name,
@@ -82,7 +81,6 @@ export const useEmployeeManagement = (farmId: number) => {
         farmId: employee.farmId
       });
       
-      console.log('🔍 Data formatada para o form:', (employee.birthDate)); // ✅ Debug
       setEditingId(employee.id ?? 0);
     } else {
       setFormData({ ...initialFormData, farmId });
@@ -125,7 +123,6 @@ export const useEmployeeManagement = (farmId: number) => {
     setFormErrors({});
 
     try {
-      console.log('🔍 Data do form antes da formatação:', formData.birthDate); // ✅ Debug
       
       const formattedData = {
         ...formData,
@@ -134,7 +131,6 @@ export const useEmployeeManagement = (farmId: number) => {
         birthDate: formatDateForBackend(formData.birthDate), // ✅ Converter YYYY-MM-DD → DD/MM/YYYY
       };
 
-      console.log('🔍 Dados sendo enviados:', formattedData); // ✅ Debug
 
       if (editingId) {
         await updateEmployee.mutateAsync({

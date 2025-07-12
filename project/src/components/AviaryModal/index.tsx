@@ -13,7 +13,6 @@ export const AviaryModal: React.FC<AviaryModalProps> = ({
 }) => {
 
   if (!isOpen) return null;
-  console.log(selectedBatch)
   return (
 
     <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
@@ -39,7 +38,6 @@ export const AviaryModal: React.FC<AviaryModalProps> = ({
               batchId: Number(selectedBatch?.id)
             };
 
-            console.log('🔍 Dados do aviário sendo enviados:', aviaryData);
             onSubmit(aviaryData);
           }}>
             <div className="space-y-4">

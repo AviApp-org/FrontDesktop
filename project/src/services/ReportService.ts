@@ -18,13 +18,11 @@ const formatDateToBackend = (dateString: string): string => {
 
 export const reportService = {
   async getDailyReportById(reportId: number): Promise<DailyReportData> {
-    console.log('🔍 Buscando relatório diário por ID:', reportId);
     const response = await api.get(`/daily-report/${reportId}`);
     return response.data;
   },
 
   async getDailyReport(batchId: number, date: string): Promise<DailyReportData> {
-    console.log('🔍 Buscando relatório diário:', { batchId, date });
     
     try {
       // Formatar a data para o formato que o backend aceita (DD-MM-YYYY)
@@ -38,7 +36,6 @@ export const reportService = {
 
       // Usar o formato que funcionou: /daily-report/{batchId}/{date}
       const endpoint = `/daily-report/${batchId}/${formattedDate}`;
-      console.log('🔍 Endpoint:', endpoint);
       
       const response = await api.get(endpoint);
       return response.data;
@@ -50,7 +47,6 @@ export const reportService = {
   },
 
   async getWeeklyReport(batchId: number, date: string): Promise<WeeklyReportData> {
-    console.log('🔍 Buscando relatório semanal:', { batchId, date });
     
     try {
       // Formatar a data para o formato que o backend aceita (DD-MM-YYYY)
@@ -76,7 +72,6 @@ export const reportService = {
   },
 
   async getMonthlyReport(batchId: number, date: string): Promise<WeeklyReportData> {
-    console.log('🔍 Buscando relatório mensal:', { batchId, date });
     
     try {
       // Formatar a data para o formato que o backend aceita (DD-MM-YYYY)
@@ -90,7 +85,6 @@ export const reportService = {
 
       // Usar o mesmo padrão do diário
       const endpoint = `/monthly-report/${batchId}/${formattedDate}`;
-      console.log('🔍 Endpoint mensal:', endpoint);
       
       const response = await api.get(endpoint);
       return response.data;

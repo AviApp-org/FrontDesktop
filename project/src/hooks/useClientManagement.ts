@@ -123,7 +123,6 @@ export const useClientManagement = (farmId: number) => {
 
     try {
       const sanitizedData = sanitizeFormData(formData);
-      console.log('🔍 Dados do cliente sendo enviados:', sanitizedData);
       
       await clientService.create(sanitizedData);
       

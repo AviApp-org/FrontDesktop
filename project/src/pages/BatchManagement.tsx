@@ -33,7 +33,6 @@ export function BatchManagement() {
     handleAviarySubmit,
     handleAviaryDelete,
   } = useBatchManagement();
-  console.log(selectedBatch);
   return (
     <div className="pt-16 pb-8 min-h-screen w-full">
       <BatchHeader onNewBatch={() => setIsModalOpen(true)} error={error ?? undefined} />

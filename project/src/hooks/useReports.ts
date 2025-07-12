@@ -24,12 +24,10 @@ export const useReports = () => {
     if (batches && batches.length > 0 && !batchId) {
       const firstBatch = batches[0];
       setBatchId(firstBatch.id.toString());
-      console.log('🎯 Lote selecionado automaticamente:', firstBatch);
     }
   }, [batches, batchId]);
 
   const handleReportTypeChange = (type: 'Diário' | 'Semanal' | 'Mensal') => {
-    console.log('🔄 Mudando tipo de relatório para:', type);
     setReportType(type);
     setReportData(null);
     setError(null);
@@ -72,7 +70,6 @@ export const useReports = () => {
       dates.push(`${day}/${month}/${year}`);
     }
     
-    console.log('📅 Range de datas gerado:', { type, startDate, days, dates });
     setDateRange(dates);
   };
 
@@ -82,7 +79,6 @@ export const useReports = () => {
       return;
     }
 
-    console.log('🚀 Buscando relatório para data:', date);
 
     setLoading(true);
     setError(null);
@@ -101,10 +97,8 @@ export const useReports = () => {
       }
       
       const endpoint = `/api/daily-report/${batchId}/${formattedDate}`;
-      console.log('🔍 Endpoint final:', endpoint);
       
       const response = await api.get(endpoint);
-      console.log('✅ Dados recebidos para', date, ':', response.data);
       
       setReportData(response.data);
 
@@ -135,7 +129,6 @@ export const useReports = () => {
       return;
     }
 
-    console.log('📊 Iniciando busca do relatório:', { selectedDate, batchId, reportType });
 
     generateDateRange(selectedDate, reportType);
     await fetchReportForDate(selectedDate);
@@ -169,7 +162,6 @@ export const useReports = () => {
   };
 
   const toggleAviario = (index: number) => {
-    console.log('🔄 Toggling aviário:', index);
     setExpandedAviaries(prev =>
       prev.includes(index)
         ? prev.filter(i => i !== index)

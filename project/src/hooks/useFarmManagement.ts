@@ -124,7 +124,6 @@ export const useFarmManagement = () => {
       state: formData.state.trim()
     };
 
-    console.log('🏠 Dados do endereço sendo enviados:', addressData);
 
     const addressResponse = await fetch('http://localhost:8080/api/addresses', {
       method: 'POST',
@@ -136,7 +135,6 @@ export const useFarmManagement = () => {
     });
 
     const addressResult = await addressResponse.json();
-    console.log('🏠 Resposta do cadastro de endereço:', addressResult);
 
     if (!addressResponse.ok) {
       const error = addressResult.message || 'Erro ao cadastrar endereço';
@@ -168,7 +166,6 @@ export const useFarmManagement = () => {
       employeesId: []
     };
     
-    console.log('🚜 Dados da granja sendo enviados:', farmData);
     
     const farmResponse = await fetch('http://localhost:8080/api/farms', {
       method: 'POST',
@@ -180,7 +177,6 @@ export const useFarmManagement = () => {
     });
 
     const farmResult = await farmResponse.json();
-    console.log('🚜 Resposta do cadastro de granja:', farmResult);
 
     if (!farmResponse.ok) {
       // Se houver erro, tentar deletar o endereço criado
@@ -188,7 +184,6 @@ export const useFarmManagement = () => {
         await fetch(`http://localhost:8080/api/addresses/${addressId}`, {
           method: 'DELETE',
         });
-        console.log('🗑️ Endereço deletado após falha no cadastro da granja');
       } catch (deleteError) {
         console.error('Erro ao deletar endereço:', deleteError);
       }
