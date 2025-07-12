@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { EmployeeData } from '../@types/EmployeeData';
 import { EmployeeRole } from '../@types/enums/enumEmployeeRole';
-import { formatDateForBackend } from '../utils/formatDate';
+import { formatDateForBackend, formatDateForInput } from '../utils/formatDate';
 import { formatCPF, formatPhone, isValidCPF } from '../utils/validators';
 import employeeHook from './useEmployees';
 
@@ -31,19 +31,19 @@ export const useEmployeeManagement = (farmId: number) => {
   const [isError, setIsError] = useState(false);
 
   // Carregar funcionários
-  const fetchEmployees = async () => {
-    setIsLoading(true);
-    setIsError(false);
-    try {
-      const employeesData = await employeeHook.getEmployee();
-      setEmployees(employeesData);
-    } catch (error) {
-      console.error('Erro ao carregar funcionários:', error);
-      setIsError(true);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+const fetchEmployees = async () => {
+  setIsLoading(true);
+  setIsError(false);
+  try {
+    const employeesData = await employeeHook.getEmployee();
+    setEmployees(employeesData);
+  } catch (error) {
+    console.error('Erro ao carregar funcionários:', error);
+    setIsError(true);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   // Carregar funcionários na inicialização
   useEffect(() => {
@@ -81,11 +81,12 @@ export const useEmployeeManagement = (farmId: number) => {
   // Handlers
   const handleOpenDialog = (employee?: EmployeeData) => {
     if (employee) {
+      
       setFormData({
         name: employee.name,
-        cpf: employee.cpf,
-        birthDate: employee.birthDate, 
-        phone: employee.phone,
+        cpf: employee.cpf.replace(/\D/g, ''),
+        birthDate: formatDateForInput(employee.birthDate), // ✅ Converte para input
+        phone: employee.phone.replace(/\D/g, ''),
         role: employee.role,
         createdAt: employee.createdAt,
         farmId: employee.farmId
@@ -111,6 +112,7 @@ export const useEmployeeManagement = (farmId: number) => {
   const handleInputChange = (e: any) => {
     const { name, value } = e.target;
     
+    
     if (name === 'cpf') {
       const cleaned = value.replace(/\D/g, '');
       if (cleaned.length <= 11) {
@@ -121,6 +123,8 @@ export const useEmployeeManagement = (farmId: number) => {
       if (cleaned.length <= 11) {
         setFormData({ ...formData, [name]: cleaned });
       }
+    } else if (name === 'birthDate') {
+      setFormData({ ...formData, [name]: value });
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -137,11 +141,8 @@ export const useEmployeeManagement = (farmId: number) => {
         ...formData,
         cpf: formatCPF(formData.cpf),
         phone: formatPhone(formData.phone),
-        birthDate: formatDateForBackend(formData.birthDate),
+        birthDate: formatDateForBackend(formData.birthDate), // ✅ Converte para backend
       };
-
-      console.log('📝 Dados formatados para envio:', formattedData);
-      console.log('🔄 Modo de edição:', !!editingId);
 
       if (editingId) {
         await employeeHook.updateEmployee(editingId, formattedData);

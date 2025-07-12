@@ -14,13 +14,13 @@ import {
   Alert,
   SelectChangeEvent
 } from '@mui/material';
-import { EmployeeFormData } from '../../hooks/useEmployeeManagement';
+import { EmployeeData } from '../../@types/EmployeeData'; // ✅ Importação correta
 import { EmployeeRole } from '../../@types/enums/enumEmployeeRole';
 
 interface EmployeeModalProps {
   open: boolean;
   editingId: number | null;
-  formData: EmployeeFormData;
+  formData: EmployeeData; // ✅ Tipo correto
   formErrors: Record<string, string>;
   isSubmitting: boolean;
   onClose: () => void;
@@ -86,7 +86,6 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             placeholder="Digite apenas números"
           />
           
-          {/* ✅ Campo de Data de Nascimento */}
           <TextField
             label="Data de Nascimento"
             name="birthDate"
