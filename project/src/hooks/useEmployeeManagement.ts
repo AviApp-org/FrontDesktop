@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useEmployees, useCreateEmployee, useUpdateEmployee, useDeleteEmployee } from './useEmployees';
 import { EmployeeData } from '../@types/EmployeeData';
 import { EmployeeRole } from '../@types/enums/enumEmployeeRole';
 import { formatDateForBackend } from '../utils/formatDate'; // ✅ Importar funções de data
 import { formatCPF, formatPhone, isValidCPF } from '../utils/validators';
+import employeeHook from './useEmployees';
 
 
 const initialFormData: EmployeeData = {
@@ -27,8 +27,8 @@ export const useEmployeeManagement = (farmId: number) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Hooks de API
-  const { data: employees, isLoading, isError, refetch } = useEmployees(farmId);
-  const createEmployee = useCreateEmployee();
+  const { data: employees, isLoading, isError, refetch } = employeeHook.getEmployee ();
+  const createEmployee = employeeHook.createEmployee;
   const updateEmployee = useUpdateEmployee();
   const deleteEmployee = useDeleteEmployee();
 
@@ -74,7 +74,7 @@ export const useEmployeeManagement = (farmId: number) => {
       setFormData({
         name: employee.name,
         cpf: employee.cpf,
-        birthDate: (employee.birthDate), // ✅ Converter DD/MM/YYYY → YYYY-MM-DD
+        birthDate: (employee.birthDate), 
         phone: employee.phone,
         role: employee.role,
         createdAt: employee.createdAt,

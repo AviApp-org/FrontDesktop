@@ -1,48 +1,71 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { EmployeeData } from '../@types/EmployeeData';
-import { employeeService } from '../services/EmployeeService';
+import { API_URL } from '../config/api';
+import axios from 'axios';
+import { EmployeeData } from '@/@types/EmployeeData';
 
-export function useEmployees(farmId: number) {
-  return useQuery({
-    queryKey: ['employees', farmId],
-    queryFn: () => employeeService.getAll(farmId),
-    enabled: !!farmId, // ✅ Só executa se farmId existir
-    refetchOnWindowFocus: true,
-    refetchOnMount: true
-  });
-}
 
-export function useCreateEmployee() {
-  const queryClient = useQueryClient();
+const employeeHook = {
 
-  return useMutation({
-    mutationFn: (employee: Omit<EmployeeData, 'id' | 'createdAt'>) => 
-      employeeService.create(employee),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['employees', variables.farmId] });
-    },
-  });
-}
+  getEmployee: async () => {
+    try {
+      const response = await axios.get(`${API_URL}/employees`);
+      return response.data as EmployeeData[];
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        console.error('Axios error message:', e.message);
+        console.error('Axios error response:', e.response);
+      }
+      return [];
+    }
+  },
 
-export function useUpdateEmployee() {
-  const queryClient = useQueryClient();
+getEmployeeByID: async (employeeId: number) => {
+    try {
+      const response = await axios.get(`${API_URL}/employees/${employeeId}`);
+      return response.data as EmployeeData;
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        console.error('Axios error message:', e.message);
+        console.error('Axios error response:', e.response);
+      }
+      return null;
+    }
+  },
+  createEmployee: async (employee: EmployeeData) => {
+    try {
+      const response = await axios.post(`${API_URL}/employees`, employee);
+      return response.data as EmployeeData;
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        console.error('Axios error message:', e.message);
+        console.error('Axios error response:', e.response);
+      }
+      throw new Error('Erro ao criar funcionário');
+    }
+  },
+  updateEmployee: async (employeeId: number, employee: EmployeeData) => {
+    try {
+      const response = await axios.put(`${API_URL}/employees/${employeeId}`, employee);
+      return response.data as EmployeeData;
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        console.error('Axios error message:', e.message);
+        console.error('Axios error response:', e.response);
+      }
+      throw new Error('Erro ao atualizar funcionário');
+    }
+  },
 
-  return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<EmployeeData> }) =>
-      employeeService.update(id, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['employees', variables.data.farmId] });
-    },
-  });
-}
-
-export function useDeleteEmployee() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: number) => employeeService.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['employees'] });
-    },
-  });
-}
+  deleteEmployee: async (employeeId: number) => {
+    try {
+      const response = await axios.delete(`${API_URL}/employees/${employeeId}`);
+      return response.data;
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        console.error('Axios error message:', e.message);
+        console.error('Axios error response:', e.response);
+      }
+      throw new Error('Erro ao excluir funcionário');
+    }
+  }
+};
+export default employeeHook;
