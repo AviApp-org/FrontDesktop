@@ -91,7 +91,7 @@ export const AviaryModal: React.FC<AviaryModalProps> = ({
               {selectedBatch && (
                 <div className="bg-gray-50 p-3 rounded-lg">
                   <p className="text-sm text-gray-600">
-                    <strong>Lote:</strong> {selectedBatch.id}
+                    <strong>Lote:</strong> {selectedBatch.name}
                   </p>
                 </div>
               )}
