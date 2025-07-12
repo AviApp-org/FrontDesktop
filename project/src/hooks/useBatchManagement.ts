@@ -1,10 +1,16 @@
-import { useState } from 'react';
-import { useBatches, usePostBatchData, useUpdateBatchData, useActivateBatchData, useDeactivateBatchData } from './useBatch';
-import { useAviaries, useCreateAviary, useUpdateAviary, useDeleteAviary } from './useAviary';
+import { useState, useEffect } from 'react';
+import {
+  useBatches,
+  usePostBatchData,
+  useUpdateBatchData,
+  useActivateBatchData,
+  useDeactivateBatchData,
+} from './useBatch';
 import { BatchData as Batch } from '../@types/BatchData';
 import { AviaryData } from '../@types/AviaryData';
 import { showErrorMessage } from '../utils/errorHandler';
 import { CreateAviaryData } from '../@types/CreateAviaryData';
+import aviaryHook from './useAviary';
 
 export const useBatchManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -12,22 +18,45 @@ export const useBatchManagement = () => {
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null);
   const [selectedAviary, setSelectedAviary] = useState<AviaryData | null>(null);
   const [expandedBatches, setExpandedBatches] = useState<string[]>([]);
+  const [aviariesData, setAviariesData] = useState<AviaryData[]>([]);
+  const [isLoadingAviaries, setIsLoadingAviaries] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { data: batches = [], isLoading: isLoadingBatches } = useBatches() as { data: Batch[], isLoading: boolean };
+  const { data: batches = [], isLoading: isLoadingBatches } = useBatches() as {
+    data: Batch[];
+    isLoading: boolean;
+  };
+
   const { mutate: createBatch } = usePostBatchData();
   const { mutate: updateBatch } = useUpdateBatchData();
   const { mutate: activateBatch, isPending: isActivating } = useActivateBatchData();
   const { mutate: deactivateBatch, isPending: isDeactivating } = useDeactivateBatchData();
-  const { mutate: createAviary } = useCreateAviary();
-  const { mutate: updateAviary } = useUpdateAviary();
-  const { mutate: deleteAviary } = useDeleteAviary();
 
-  const { data: aviariesData, isLoading: isLoadingAviaries } = useAviaries(
-    expandedBatches.length > 0 ? expandedBatches[expandedBatches.length - 1] : '0'
-  );
+  // Efeito para buscar aviários do lote expandido
+  useEffect(() => {
+    const fetchAviaries = async () => {
+      const lastExpandedBatch = expandedBatches[expandedBatches.length - 1];
+      if (!lastExpandedBatch) {
+        setAviariesData([]);
+        return;
+      }
+
+      setIsLoadingAviaries(true);
+      try {
+        const aviaries = await aviaryHook.getAviariesByBatch(Number(lastExpandedBatch));
+        setAviariesData(aviaries);
+      } catch (err) {
+        console.error('Erro ao buscar aviários:', err);
+        setAviariesData([]);
+      } finally {
+        setIsLoadingAviaries(false);
+      }
+    };
+
+    fetchAviaries();
+  }, [expandedBatches]);
 
   const handleError = (error: unknown, message: string) => {
     setError(`${message}: ${showErrorMessage(error)}`);
@@ -35,7 +64,9 @@ export const useBatchManagement = () => {
 
   const toggleBatchExpansion = (batchId: string) => {
     if (!batchId) return;
-    setExpandedBatches(prev => prev.includes(batchId) ? prev.filter(id => id !== batchId) : [batchId]);
+    setExpandedBatches(prev =>
+      prev.includes(batchId) ? prev.filter(id => id !== batchId) : [batchId]
+    );
   };
 
   const validateBatchData = (data: any) => {
@@ -57,7 +88,7 @@ export const useBatchManagement = () => {
     }
 
     const mutation = isEdit ? updateBatch : createBatch;
-    const payload = isEdit ? { id: selectedBatch?.id, data } : { ...data, farmId: "1" };
+    const payload = isEdit ? { id: selectedBatch?.id, data } : { ...data, farmId: '1' };
 
     mutation(payload, {
       onSuccess: () => {
@@ -65,7 +96,7 @@ export const useBatchManagement = () => {
         setSelectedBatch(null);
         setIsSubmitting(false);
       },
-      onError: (error) => {
+      onError: error => {
         handleError(error, isEdit ? 'Erro ao atualizar lote' : 'Erro ao criar lote');
         setIsSubmitting(false);
       },
@@ -76,57 +107,59 @@ export const useBatchManagement = () => {
     setError(null);
     const mutation = action === 'activate' ? activateBatch : deactivateBatch;
     mutation(id, {
-      onError: (error) => handleError(error, `Erro ao ${action === 'activate' ? 'ativar' : 'desativar'} lote`),
+      onError: error =>
+        handleError(error, `Erro ao ${action === 'activate' ? 'ativar' : 'desativar'} lote`),
     });
   };
 
-const handleAviarySubmit = (aviaryData: CreateAviaryData) => {
+  const handleAviarySubmit = async (aviaryData: CreateAviaryData) => {
+    try {
+      setError(null);
 
-  const dataToSend = {
-    ...aviaryData,
-    batchId: Number(aviaryData.batchId)
+      const dataToSend = {
+        ...aviaryData,
+        batchId: Number(aviaryData.batchId),
+      };
+
+      if (selectedAviary) {
+        await aviaryHook.updateAviary(Number(selectedAviary.id), dataToSend);
+      } else {
+        await aviaryHook.createAviary(dataToSend);
+      }
+
+      setIsAviaryModalOpen(false);
+      setSelectedAviary(null);
+    } catch (error) {
+      setError(
+        `Erro ao ${selectedAviary ? 'atualizar' : 'criar'} aviário: ` +
+          (error instanceof Error ? error.message : 'Erro desconhecido')
+      );
+    }
   };
 
-  if (selectedAviary) {
-    updateAviary({ id: String(selectedAviary.id), data: dataToSend }, {
-      onSuccess: () => {
-        setIsAviaryModalOpen(false);
-        setSelectedAviary(null);
-      },
-      onError: (error) => {
-        setError('Erro ao atualizar aviário: ' + (error instanceof Error ? error.message : 'Erro desconhecido'));
-      },
-    });
-  } else {
-    createAviary(dataToSend, {
-      onSuccess: () => {
-        setIsAviaryModalOpen(false);
-        setSelectedAviary(null);
-      },
-      onError: (error) => {
-        setError('Erro ao criar aviário: ' + (error instanceof Error ? error.message : 'Erro desconhecido'));
-      },
-    });
-  }
-};
-
-  const handleAviaryDelete = (id: string) => {
-    deleteAviary(id, {
-      onError: (error) => handleError(error, 'Erro ao deletar aviário'),
-    });
+  const handleAviaryDelete = async (id: string) => {
+    try {
+      await aviaryHook.deleteAviary(Number(id));
+    } catch (error) {
+      handleError(error, 'Erro ao deletar aviário');
+    }
   };
 
   return {
     // State
-    isModalOpen, setIsModalOpen,
-    isAviaryModalOpen, setIsAviaryModalOpen,
-    selectedBatch, setSelectedBatch,
-    selectedAviary, setSelectedAviary,
+    isModalOpen,
+    setIsModalOpen,
+    isAviaryModalOpen,
+    setIsAviaryModalOpen,
+    selectedBatch,
+    setSelectedBatch,
+    selectedAviary,
+    setSelectedAviary,
     expandedBatches,
     error,
     formErrors,
     isSubmitting,
-    
+
     // Data
     batches,
     aviariesData,
@@ -134,7 +167,7 @@ const handleAviarySubmit = (aviaryData: CreateAviaryData) => {
     isLoadingAviaries,
     isActivating,
     isDeactivating,
-    
+
     // Actions
     toggleBatchExpansion,
     handleBatchSubmit,

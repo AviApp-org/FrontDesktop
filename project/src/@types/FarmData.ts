@@ -1,7 +1,10 @@
+import { AddressData } from "./AddressData";
+import { EmployeeData } from "./EmployeeData";
+
 export interface FarmData {
   id?: number;
   name: string;
-  addressId: number;
+  addressId: AddressData;
   clientId: number;
-  employeesId: number[];
+  employeesId: EmployeeData[];
 }
