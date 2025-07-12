@@ -2,19 +2,7 @@ import axios from 'axios';
 import { API_URL } from '@/config/api';
 import { AviaryData } from '@/@types/AviaryData';
 const aviaryHook = {
-  // getVeiculos: async (userId: string) => {
-  //   try {
-  //     const response = await axios.get(`${SMART_PARK_API_URL}/vehicles/user/${userId}`)
-  //     return response.data as Veiculo[]
-  //   } catch (e) {
-  //     if (axios.isAxiosError(e)) {
-  //       console.error('Axios error message:', e.message)
-  //       console.error('Axios error response:', e.response)
-  //     }
-  //     return []
-  //   }
-  // },
-
+  
   createAviary: async (aviaryData: AviaryData) => {
     try {
       const response = await axios.post(`${API_URL}/aviaries`, aviaryData);
