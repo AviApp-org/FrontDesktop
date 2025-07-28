@@ -1,82 +1,63 @@
-import axios from 'axios';
-import { API_URL } from '@/config/api';
+import api from '../config/axios';
 import { CollectEggData } from '@/@types/CollectEggData';
 const clientHook = {
   
   createEggCollect: async (eggCollectData : CollectEggData) => {
     try {
-      const response = await axios.post(`${API_URL}/collect-egg`, eggCollectData);
+      const response = await api.post('/api/collect-egg', eggCollectData);
       return response.data as CollectEggData;
     } catch (e) {
-      if (axios.isAxiosError(e)) {
-        console.error('Axios error message:', e.message);
-        console.error('Axios error response:', e.response);
-      }
+      console.error('Error creating egg collect:', e);
       return null;
     }
   },
 
   listAllEggCollects: async () => {
     try {
-      const response = await axios.get(`${API_URL}/collect-egg`);
+      const response = await api.get('/api/collect-egg');
       return response.data as CollectEggData[];
     } catch (e) {
-      if (axios.isAxiosError(e)) {
-        console.error('Axios error message:', e.message);
-        console.error('Axios error response:', e.response);
-      }
+      console.error('Error listing egg collects:', e);
       return [];
     }
   },
 
   getByAviary: async (aviaryId : number) => {
     try {
-      const response = await axios.get(`${API_URL}/collect-egg/aviary/${aviaryId}`);
+      const response = await api.get(`/api/collect-egg/aviary/${aviaryId}`);
       return response.data as CollectEggData[];
     } catch (e) {
-      if (axios.isAxiosError(e)) {
-        console.error('Axios error message:', e.message);
-        console.error('Axios error response:', e.response);
-      }
+      console.error('Error getting egg collects by aviary:', e);
       return [];
     }
   },
   
   getByDate: async (date : string) => {
     try {
-      const response = await axios.get(`${API_URL}/collect-egg/date/${date}`);
+      const response = await api.get(`/api/collect-egg/date/${date}`);
       return response.data as CollectEggData[];
     } catch (e) {
-      if (axios.isAxiosError(e)) {
-        console.error('Axios error message:', e.message);
-        console.error('Axios error response:', e.response);
-      }
+      console.error('Error getting egg collects by date:', e);
       return [];
     }
   },
 
   getByDateAndAviary: async (date : string, aviaryId : number) => {
     try {
-      const response = await axios.get(`${API_URL}/collect-egg/date/${date}/aviary/${aviaryId}`);
+      const response = await api.get(`/api/collect-egg/date/${date}/aviary/${aviaryId}`);
       return response.data as CollectEggData[];
     } catch (e) {
-      if (axios.isAxiosError(e)) {
-        console.error('Axios error message:', e.message);
-        console.error('Axios error response:', e.response);
-      }
+      console.error('Error getting egg collects by date and aviary:', e);
       return [];
     }
   },
 
   deleteCollect: async (collectId: number) => {
     try{
-        const response = await axios.delete(`${API_URL}/collect-egg/${collectId}`);
+        const response = await api.delete(`/api/collect-egg/${collectId}`);
         return response.data;
     }catch (e) {
-      if (axios.isAxiosError(e)) {
-        console.error('Axios error message:', e.message);
-        console.error('Axios error response:', e.response);
-      }
+      console.error('Error deleting collect:', e);
       return null;
     }
   }
