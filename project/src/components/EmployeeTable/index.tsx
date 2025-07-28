@@ -17,6 +17,7 @@ import {
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { EmployeeData } from '../../@types/EmployeeData';
 import { EmployeeRole } from '../../@types/enums/enumEmployeeRole';
+import { formatDate } from '../../utils/formatDate'; // ✅ Usar a função correta
 
 interface EmployeeTableProps {
   employees: EmployeeData[];
@@ -42,15 +43,7 @@ const getRoleColor = (role: EmployeeRole) => {
   return roleColors[role] || 'default';
 };
 
-const formatDate = (dateString: string): string => {
-  if (!dateString) return '-';
-  try {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR');
-  } catch {
-    return dateString;
-  }
-};
+// ✅ REMOVIDA a função formatDate local - agora usa a importada
 
 export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   employees,
@@ -117,7 +110,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2" color="text.secondary">
-                        {formatDate(employee.birthDate)}
+                        {formatDate(employee.birthDate) || '-'} {/* ✅ Usa a função importada */}
                       </Typography>
                     </TableCell>
                     <TableCell>
