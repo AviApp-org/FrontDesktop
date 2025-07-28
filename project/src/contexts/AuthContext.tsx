@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import api from '../config/axios';
 import { API_URL } from '@/config/api';
+import axios from 'axios';
 
 
 interface LoginCredentials {
@@ -87,7 +88,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (credentials: LoginCredentials): Promise<void> => {
     try {
-      const response = await api.post(`${API_URL}/auth/login`, credentials);
+      const response = await axios.post(`${API_URL}/auth/login`, credentials);
       
       const { token: newToken, clientId, clientName, userRole, login } = response.data;
 

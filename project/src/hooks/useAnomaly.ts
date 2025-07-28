@@ -1,11 +1,12 @@
 import axios from 'axios';
 import { API_URL } from '@/config/api';
 import { AnomalyData } from '@/@types/AnomalyData';
+import api from '@/config/axios';
 const anomalyHook = {
 
   createAnomaly: async (anomalyData: AnomalyData) => {
     try {
-      const response = await axios.post(`${API_URL}/anomalies`, anomalyData);
+      const response = await api.post(`${API_URL}/anomalies`, anomalyData);
       return response.data as AnomalyData;
     } catch (e) {
       if (axios.isAxiosError(e)) {

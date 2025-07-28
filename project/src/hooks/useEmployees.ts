@@ -1,12 +1,13 @@
 import { API_URL } from '../config/api';
 import axios from 'axios';
 import { EmployeeData } from '@/@types/EmployeeData';
+import api from '@/config/axios';
 
 const employeeHook = {
 
   getEmployee: async () => {
     try {
-      const response = await axios.get(`${API_URL}/employees`);
+      const response = await api.get(`${API_URL}/employees`);
       return response.data as EmployeeData[];
     } catch (e) {
       if (axios.isAxiosError(e)) {
@@ -20,7 +21,7 @@ const employeeHook = {
 
   getEmployeeByID: async (employeeId: number) => {
     try {
-      const response = await axios.get(`${API_URL}/employees/${employeeId}`);
+      const response = await api.get(`${API_URL}/employees/${employeeId}`);
       return response.data as EmployeeData;
     } catch (e) {
       if (axios.isAxiosError(e)) {
@@ -37,7 +38,7 @@ const employeeHook = {
       console.log('🚀 Enviando dados para criar funcionário:', employee);
       console.log('🌐 URL da requisição:', `${API_URL}/employees`);
       
-      const response = await axios.post(`${API_URL}/employees`, employee);
+      const response = await api.post(`${API_URL}/employees`, employee);
       console.log('✅ Funcionário criado com sucesso:', response.data);
       return response.data as EmployeeData;
     } catch (e) {
@@ -66,7 +67,7 @@ const employeeHook = {
     try {
       console.log('🔄 Atualizando funcionário:', { employeeId, employee });
       
-      const response = await axios.put(`${API_URL}/employees/${employeeId}`, employee);
+      const response = await api.put(`${API_URL}/employees/${employeeId}`, employee);
       console.log('✅ Funcionário atualizado com sucesso:', response.data);
       return response.data as EmployeeData;
     } catch (e) {
@@ -91,7 +92,7 @@ const employeeHook = {
     try {
       console.log('🗑️ Deletando funcionário:', employeeId);
       
-      const response = await axios.delete(`${API_URL}/employees/${employeeId}`);
+      const response = await api.delete(`${API_URL}/employees/${employeeId}`);
       console.log('✅ Funcionário deletado com sucesso');
       return response.data;
     } catch (e) {

@@ -1,10 +1,11 @@
 import axios from 'axios';
 import { API_URL } from '@/config/api';
 import { ClientData } from '@/@types/ClientData';
+import api from '@/config/axios';
 const clientHook = {
   createClient: async (clientData: ClientData) => {
     try {
-      const response = await axios.post(`${API_URL}/clients`, clientData);
+      const response = await api.post(`${API_URL}/clients`, clientData);
       return response.data as ClientData;
     } catch (e) {
       if (axios.isAxiosError(e)) {
@@ -16,7 +17,7 @@ const clientHook = {
   },
   listClients: async () => {
     try {
-      const response = await axios.get(`${API_URL}/clients`);
+      const response = await api.get(`${API_URL}/clients`);
       return response.data as ClientData[];
     } catch (e) {
       if (axios.isAxiosError(e)) {
@@ -29,7 +30,7 @@ const clientHook = {
 
   getClientById: async (clientId: number) => {
     try {
-      const response = await axios.get(`${API_URL}/clients/${clientId}`);
+      const response = await api.get(`${API_URL}/clients/${clientId}`);
       return response.data as ClientData;
     } catch (e) {
       if (axios.isAxiosError(e)) {
@@ -42,7 +43,7 @@ const clientHook = {
 
   updateClient: async (clientId: number, clientData: ClientData) => {
     try {
-      const response = await axios.put(`${API_URL}/clients/${clientId}`, clientData);
+      const response = await api.put(`${API_URL}/clients/${clientId}`, clientData);
       return response.data as ClientData;
     } catch (e) {
       if (axios.isAxiosError(e)) {
@@ -55,7 +56,7 @@ const clientHook = {
 
   activateClient: async (clientId: number) => {
     try {
-      const response = await axios.patch(`${API_URL}/clients/${clientId}/activate`);
+      const response = await api.patch(`${API_URL}/clients/${clientId}/activate`);
       return response.data;
     } catch (e) {
       if (axios.isAxiosError(e)) {
@@ -68,7 +69,7 @@ const clientHook = {
 
   deactivateClient: async (clientId: number) => {
     try {
-      const response = await axios.patch(`${API_URL}/clients/${clientId}/deactivate`);
+      const response = await api.patch(`${API_URL}/clients/${clientId}/deactivate`);
       return response.data;
     } catch (e) {
       if (axios.isAxiosError(e)) {
@@ -81,7 +82,7 @@ const clientHook = {
 
   deleteClient: async (clientId:number) => {
     try{
-        const response = await axios.delete(`${API_URL}/clients/${clientId}`)
+        const response = await api.delete(`${API_URL}/clients/${clientId}`)
         return response.data
     }catch (e) {
       if (axios.isAxiosError(e)) {

@@ -1,13 +1,15 @@
 import { API_URL } from '../config/api';
 import axios from 'axios';
 import { AddressData } from '@/@types/AddressData';
+import api from '@/config/axios';
+
 
 
 const addressHook = {
 
   getEmployee: async () => {
     try {
-      const response = await axios.get(`${API_URL}/addresses`);
+      const response = await api.get(`${API_URL}/addresses`);
       return response.data as AddressData[];
     } catch (e) {
       if (axios.isAxiosError(e)) {
@@ -20,7 +22,7 @@ const addressHook = {
 
     getAddressByID: async (addressId: number) => {
         try {
-        const response = await axios.get(`${API_URL}/addresses/${addressId}`);
+        const response = await api.get(`${API_URL}/addresses/${addressId}`);
         return response.data as AddressData;
         } catch (e) {
         if (axios.isAxiosError(e)) {
@@ -33,7 +35,7 @@ const addressHook = {
 
     createAddress: async (address: AddressData) => {
         try {
-            const response = await axios.post(`${API_URL}/addresses`, address);
+            const response = await api.post(`${API_URL}/addresses`, address);
             return response.data as AddressData;
         } catch (e) {
             if (axios.isAxiosError(e)) {
@@ -46,7 +48,7 @@ const addressHook = {
 
     updateAddress: async (addressId: number, address: AddressData) => {
         try {
-            const response = await axios.put(`${API_URL}/addresses/${addressId}`, address);
+            const response = await api.put(`${API_URL}/addresses/${addressId}`, address);
             return response.data as AddressData;
         } catch (e) {
             if (axios.isAxiosError(e)) {
@@ -59,7 +61,7 @@ const addressHook = {
 
     deleteAddress: async (addressId: number) => {
         try {
-            const response = await axios.delete(`${API_URL}/addresses/${addressId}`);
+            const response = await api.delete(`${API_URL}/addresses/${addressId}`);
             return response.data;
         } catch (e) {
             if (axios.isAxiosError(e)) {
@@ -72,7 +74,7 @@ const addressHook = {
 
     getAddressByCep: async (cep: string) => {
         try {
-            const response = await axios.get(`${API_URL}/addresses/cep/${cep}`);
+            const response = await api.get(`${API_URL}/addresses/cep/${cep}`);
             return response.data as AddressData;
         } catch (e) {
             if (axios.isAxiosError(e)) {
