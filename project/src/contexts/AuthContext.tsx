@@ -37,35 +37,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // Configurar interceptor para incluir token em todas as requests
-    useEffect(() => {
-        const requestInterceptor = api.interceptors.request.use(
-            (config) => {
-                if (token) {
-                    config.headers.Authorization = `Bearer ${token}`;
-                }
-                return config;
-            },
-            (error) => {
-                return Promise.reject(error);
-            }
-        );
-
-        const responseInterceptor = api.interceptors.response.use(
-            (response) => response,
-            (error) => {
-                if (error.response?.status === 401) {
-                    logout();
-                }
-                return Promise.reject(error);
-            }
-        );
-
-        return () => {
-            api.interceptors.request.eject(requestInterceptor);
-            api.interceptors.response.eject(responseInterceptor);
-        };
-    }, [token]);
+    
 
     // Verificar token salvo no localStorage ao inicializar
     useEffect(() => {
@@ -88,7 +60,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const login = async (credentials: LoginCredentials): Promise<void> => {
         try {
-            const response = await api.post(`${API_URL}/auth/login`, credentials);
+            const response = await axios.post(`${API_URL}/auth/login`, credentials);
 
             const { token: newToken, clientId, clientName, userRole, login } = response.data;
 
