@@ -1,11 +1,13 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080', // ✅ SEM /api no baseURL
+  baseURL: 'http://localhost:8080', 
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
+    'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}` ,
   },
+  
   timeout: 10000,
 });
 
