@@ -1,6 +1,7 @@
 import api from '../config/axios';
 import { ClientData } from '@/@types/ClientData';
 const clientHook = {
+  
   createClient: async (clientData: ClientData) => {
     try {
       const response = await api.post('/api/clients', clientData);
@@ -10,6 +11,7 @@ const clientHook = {
       return null;
     }
   },
+
   listClients: async () => {
     try {
       const response = await api.get('/api/clients');
