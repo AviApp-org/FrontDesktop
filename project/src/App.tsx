@@ -1,14 +1,22 @@
 import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import { AppRoutes } from './routes';
 import { FarmProvider } from './contexts/FarmContext';
+import { AuthProvider } from './contexts/AuthContext';
+import LoginTemplate from './templates/Login';
 
 const App: React.FC = () => {
-  return(
-  <FarmProvider>
-    <AppRoutes />;
-  </FarmProvider>
-  )
-  };
+  return (
+    <AuthProvider>
+      <FarmProvider>
+        <Routes>
+          <Route path="/login" element={<LoginTemplate />} />
+          <Route path="/*" element={<AppRoutes />} />
+        </Routes>
+      </FarmProvider>
+    </AuthProvider>
+  );
+};
 
 export default App;
 
