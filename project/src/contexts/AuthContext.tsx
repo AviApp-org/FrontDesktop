@@ -134,26 +134,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         localStorage.removeItem('auth_user');
     };
 
-<<<<<<< HEAD
-  const login = async (credentials: LoginCredentials): Promise<void> => {
-    try {
-      const response = await axios.post(`${API_URL}/auth/login`, credentials);
-      
-      const { token: newToken, clientId, clientName, userRole, login } = response.data;
-
-      if (!newToken) {
-        throw new Error('Token não retornado pelo servidor');
-      }
-
-      const userData: User = {
-        clientId,
-        clientName,
-=======
     const value: AuthContextType = {
         isAuthenticated,
         user,
         token,
->>>>>>> 8b11812daf843f29a478dec7bbe9fb66daf367e7
         login,
         logout,
         loading,
