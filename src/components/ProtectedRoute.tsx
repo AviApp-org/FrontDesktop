@@ -27,7 +27,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   const requiredRoles = RoutePermissions[location.pathname as keyof typeof RoutePermissions];
   
-  if (requiredRoles && user?.userRole && !requiredRoles.includes(user.userRole as any)) {
+  if (requiredRoles && user?.role && !requiredRoles.includes(user.role as any)) {
     return <Navigate to="/" replace />;
   }
 

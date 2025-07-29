@@ -12,7 +12,7 @@ interface User {
     clientId: number;
     clientName: string;
     login: string;
-    userRole: string;
+    role: string;
 }
 
 interface AuthContextType {
@@ -56,14 +56,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const login = async (credentials: LoginCredentials): Promise<void> => {
         try {
             const response = await axios.post(`${API_URL}/auth/login`, credentials);
+            console.log('Resposta do servidor:', response.data);
 
-            const { token: newToken, refreshToken, clientId, clientName, userRole, login } = response.data;
+            const { token: newToken, refreshToken, clientId, clientName, role, login } = response.data;
 
             if (!newToken) {
                 throw new Error('Token não retornado pelo servidor');
             }
 
-            const userData: User = { clientId, clientName, login, userRole };
+            const userData: User = { clientId, clientName, login, role };
 
 
             sessionStorage.setItem('access_token', newToken);
