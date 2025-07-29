@@ -87,8 +87,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
             if (error.response?.status === 401) {
                 throw new Error('Credenciais inválidas');
-            } else if (error.response?.status >= 500) {
-                throw new Error('Erro interno do servidor');
+            } else if (error.response?.message === 'Bad credentials') {
+                throw new Error('Credenciais inválidas');
             } else if (error.code === 'NETWORK_ERROR' || !error.response) {
                 throw new Error('Erro de conexão com o servidor');
             } else {
