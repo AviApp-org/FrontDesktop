@@ -11,7 +11,8 @@ import {
   Egg,
   UserPlus,
   Building2,
-  LogOut
+  LogOut,
+  Menu
 } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 
@@ -34,15 +35,32 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const { logout } = useAuthContext();
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   const handleLogout = () => {
     logout();
   };
 
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex min-h-svh bg-gray-100">
+      {/* Mobile Sidebar Toggle */}
+      <button
+        onClick={toggleSidebar}
+        className="md:hidden fixed top-4 left-4 z-20 bg-white p-2 rounded-md shadow-sm"
+      >
+        <Menu className="h-6 w-6" />
+      </button>
+
       {/* Sidebar */}
-      <div className="w-64 bg-white shadow-lg fixed h-full">
+      <div
+        className={`w-64 bg-white shadow-lg fixed h-full transition-all duration-300 z-10 
+          ${sidebarOpen ? 'left-0' : '-left-64'} 
+          md:left-0`}
+      >
         <div className="flex flex-col h-full">
           <div className="p-4 border-b">
             <div className="flex items-center">
@@ -61,8 +79,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center px-6 py-3 text-gray-700 hover:bg-gray-50 ${isActive ? 'bg-green-50 text-green-600 border-r-4 border-green-600' : ''
-                    }`}
+                  onClick={() => setSidebarOpen(false)}
+                  className={`flex items-center px-6 py-3 text-gray-700 hover:bg-gray-50 ${
+                    isActive ? 'bg-green-50 text-green-600 border-r-4 border-green-600' : ''
+                  }`}
                 >
                   <Icon className="h-5 w-5 mr-3" />
                   <span className="text-sm font-medium">{item.text}</span>
@@ -79,10 +99,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 ml-64">
+      <div className="flex-1 md:ml-64">
         {/* Header */}
-        <header className="bg-white shadow-sm fixed w-[calc(100%-16rem)] z-10 flex items-center justify-between px-6 py-4">
-          <h2 className="text-2xl font-bold text-gray-900">
+        <header className="bg-white shadow-sm fixed w-full z-10 flex items-center justify-between px-6 py-4">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900">
             {sidebarItems.find(item => item.path === location.pathname)?.text || 'Dashboard'}
           </h2>
           <button
@@ -90,12 +110,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             className="text-gray-600 hover:text-red-600 transition-colors"
             title="Sair"
           >
-            <LogOut className="h-6 w-6" />
+            <LogOut className="h-5 w-5 md:h-6 md:w-6" />
           </button>
         </header>
 
         {/* Content */}
-        <main className="p-8 max-w-[1920px] mx-auto pt-24">
+        <main className="p-4 md:p-8 max-w-[1920px] mx-auto pt-16 md:pt-24">
           {children}
         </main>
       </div>
