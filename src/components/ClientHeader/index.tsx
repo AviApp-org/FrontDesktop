@@ -24,15 +24,6 @@ export const ClientHeader: React.FC<ClientHeaderProps> = ({
 }) => {
   return (
     <>
-      <Typography
-        variant="h4"
-        component="h1"
-        fontWeight="bold"
-        color="text.primary"
-        mb={3}
-      >
-        Cadastro de Clientes
-      </Typography>
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         

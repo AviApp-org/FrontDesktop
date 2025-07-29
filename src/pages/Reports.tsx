@@ -39,8 +39,8 @@ const Reports: React.FC = () => {
   } = useReports();
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-bold pt-4 mt-4 text-gray-800">
+    <div className="p-6 bg-gray-50 h-auto w-full">
+      <h1 className="text-3xl font-bold pt-4 mt-4 text-gray-800 w-full border-rounded-lg">
         Relatório {reportType}
         {currentDate && ` - ${formatDateForDisplay(currentDate)}`}
       </h1>

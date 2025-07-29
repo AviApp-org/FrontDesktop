@@ -9,7 +9,7 @@ import { DeleteConfirmDialog } from '../components/DeleteButton';
 
 const ClientRegister: React.FC = () => {
   const { farmId } = useFarm();
-  const clientManagement = useClientManagement(farmId);
+  const clientManagement = useClientManagement();
 
   useEffect(() => {
     clientManagement.loadClients();
