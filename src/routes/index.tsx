@@ -11,11 +11,14 @@ import EmployeesPage from '../pages/EmployeesPage';
 import ClientRegister from '../pages/ClientRegister';
 import FarmRegister from '../pages/FarmRegister';
 import ProtectedRoute from '../components/ProtectedRoute';
+import LoginTemplate from '@/templates/Login';
 export function AppRoutes() {
   return (
     <Routes>
+      <Route path="/login" element={<LoginTemplate />} /> {/* <- Adicione isso antes de tudo */}
+
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      
+
       <Route
         path="/dashboard"
         element={
@@ -24,7 +27,7 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/reports"
         element={
@@ -33,7 +36,7 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/financial"
         element={
@@ -42,7 +45,7 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/review"
         element={
@@ -51,7 +54,7 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      
+
       {/* <Route
         path="/data-entry"
         element={
@@ -78,7 +81,7 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/clients/register"
         element={
@@ -96,7 +99,7 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      
+
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );

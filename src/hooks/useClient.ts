@@ -18,7 +18,7 @@ const clientHook = {
       return response.data as ClientData[];
     } catch (e) {
       console.error('Error listing clients:', e);
-      return null;
+      return [];
     }
   },
 

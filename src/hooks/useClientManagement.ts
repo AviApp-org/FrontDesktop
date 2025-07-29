@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import { ClientData } from '../@types/ClientData';
 import { ClientStatus } from '../@types/enums/enumClientStatus';
 import { validateCNPJ } from '../utils/validators';
-import { clientService } from '../services/clientService';
 import { showErrorMessage } from '../utils/errorHandler';
-
+import clientHook from './useClient';
 export interface ClientFormData extends Omit<ClientData, 'id'> {}
 
 const initialFormData: ClientFormData = {
@@ -124,7 +123,7 @@ export const useClientManagement = (farmId: number) => {
     try {
       const sanitizedData = sanitizeFormData(formData);
       
-      await clientService.create(sanitizedData);
+      await clientHook.createClient(sanitizedData);
       
       // Reset form após sucesso
       setFormData(initialFormData);
@@ -148,7 +147,7 @@ export const useClientManagement = (farmId: number) => {
     setIsError(false);
     try {
       // Replace with your actual API/service call
-      const data = await clientService.list(farmId);
+      const data = await clientHook.listClients();
       setClients(data);
     } catch (e) {
       setIsError(true);

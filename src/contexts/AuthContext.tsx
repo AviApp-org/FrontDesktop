@@ -19,7 +19,6 @@ interface User {
 interface AuthContextType {
     isAuthenticated: boolean;
     user: User | null;
-    token: string | null;
     login: (credentials: LoginCredentials) => Promise<void>;
     logout: () => void;
     loading: boolean;
@@ -34,19 +33,16 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
-    
+
 
     // Verificar token salvo no localStorage ao inicializar
     useEffect(() => {
-        const savedToken = localStorage.getItem('auth_token');
         const savedUser = localStorage.getItem('auth_user');
 
-        if (savedToken && savedUser) {
+        if ( savedUser) {
             try {
-                setToken(savedToken);
                 setUser(JSON.parse(savedUser));
                 setIsAuthenticated(true);
             } catch (error) {
@@ -62,25 +58,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
             const response = await axios.post(`${API_URL}/auth/login`, credentials);
 
-            const { token: newToken, clientId, clientName, userRole, login } = response.data;
+            const { token: newToken, refreshToken, clientId, clientName, userRole, login } = response.data;
 
             if (!newToken) {
                 throw new Error('Token não retornado pelo servidor');
             }
 
-            const userData: User = {
-                clientId,
-                clientName,
-                login,
-                userRole
-            };
+            const userData: User = { clientId, clientName, login, userRole };
 
-            setToken(newToken);
+
+            sessionStorage.setItem('access_token', newToken);
+            localStorage.setItem('refresh_token', refreshToken);
+            localStorage.setItem('auth_user', JSON.stringify(userData));
+
             setUser(userData);
             setIsAuthenticated(true);
-
-            localStorage.setItem('auth_token', newToken);
-            localStorage.setItem('auth_user', JSON.stringify(userData));
 
         } catch (error: any) {
             console.error('Erro no login:', error);
@@ -98,18 +90,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     const logout = (): void => {
-        setToken(null);
         setUser(null);
         setIsAuthenticated(false);
 
-        localStorage.removeItem('auth_token');
+        sessionStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
         localStorage.removeItem('auth_user');
+
     };
 
     const value: AuthContextType = {
         isAuthenticated,
         user,
-        token,
         login,
         logout,
         loading,
