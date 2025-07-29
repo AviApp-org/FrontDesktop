@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import api from '../config/axios';
 import { API_URL } from '@/config/api';
 import axios from 'axios';
 

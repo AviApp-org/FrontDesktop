@@ -10,8 +10,10 @@ import {
   FileInput,
   Egg,
   UserPlus,
-  Building2
+  Building2,
+  LogOut
 } from 'lucide-react';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 const sidebarItems = [
   { icon: LayoutDashboard, text: 'Dashboard', path: '/' },
@@ -31,9 +33,15 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
+  const { logout } = useAuthContext();
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
       <div className="w-64 bg-white shadow-lg fixed h-full">
         <div className="flex flex-col h-full">
           <div className="p-4 border-b">
@@ -53,9 +61,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center px-6 py-3 text-gray-700 hover:bg-gray-50 ${
-                    isActive ? 'bg-green-50 text-green-600 border-r-4 border-green-600' : ''
-                  }`}
+                  className={`flex items-center px-6 py-3 text-gray-700 hover:bg-gray-50 ${isActive ? 'bg-green-50 text-green-600 border-r-4 border-green-600' : ''
+                    }`}
                 >
                   <Icon className="h-5 w-5 mr-3" />
                   <span className="text-sm font-medium">{item.text}</span>
@@ -66,24 +73,29 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
           {/* Footer */}
           <div className="p-6 border-t">
-            <p className="text-sm text-gray-600">© 2022 Zuvo</p>
+            <p className="text-sm text-gray-600">© 2022 Freyr</p>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="flex-1 ml-64">
-        {/* Fixed Header */}
-        <header className="bg-white shadow-sm fixed w-[calc(100%-16rem)] z-10">
-          <div className="px-6 py-4">
-            <h2 className="text-2xl font-bold text-gray-900">
-              {sidebarItems.find(item => item.path === location.pathname)?.text || 'Dashboard'}
-            </h2>
-          </div>
+        {/* Header */}
+        <header className="bg-white shadow-sm fixed w-[calc(100%-16rem)] z-10 flex items-center justify-between px-6 py-4">
+          <h2 className="text-2xl font-bold text-gray-900">
+            {sidebarItems.find(item => item.path === location.pathname)?.text || 'Dashboard'}
+          </h2>
+          <button
+            onClick={handleLogout}
+            className="text-gray-600 hover:text-red-600 transition-colors"
+            title="Sair"
+          >
+            <LogOut className="h-6 w-6" />
+          </button>
         </header>
 
         {/* Content */}
-        <main className="p-8 max-w-[1920px] mx-auto">
+        <main className="p-8 max-w-[1920px] mx-auto pt-24">
           {children}
         </main>
       </div>

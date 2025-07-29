@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import {  useState } from 'react';
 import { ClientData } from '../@types/ClientData';
 import { ClientStatus } from '../@types/enums/enumClientStatus';
 import { validateCNPJ } from '../utils/validators';
@@ -14,7 +14,7 @@ const initialFormData: ClientFormData = {
   status: ClientStatus.ACTIVE
 };
 
-export const useClientManagement = (farmId: number) => {
+export const useClientManagement = () => {
   // Estados
   const [formData, setFormData] = useState<ClientFormData>(initialFormData);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});

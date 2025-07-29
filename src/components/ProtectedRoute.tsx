@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { RoutePermissions, UserRole } from '../@types/AuthTypes';
+import { RoutePermissions } from '../@types/AuthTypes';
 import { useAuthContext } from '../contexts/AuthContext';
 import { CircularProgress, Box } from '@mui/material';
 import Layout from './Layout';
