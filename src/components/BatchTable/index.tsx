@@ -4,7 +4,7 @@ import { formatDate } from '../../utils/formatDate';
 import { BatchTableProps } from './types';
 
 const translateStatus = (status: string) => {
-  const translations = { ACTIVE: 'Ativo', COMPLETED: 'Concluído', CANCELLED: 'Cancelado' };
+  const translations = { ACTIVE: 'ATIVO', INACTIVE: 'INATIVO' };
   return translations[status as keyof typeof translations] || status;
 };
 
@@ -30,7 +30,7 @@ export const BatchTable: React.FC<BatchTableProps> = ({
   children
 
 }) => (
-  <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+  <div className="bg-white rounded-xl overflow-hidden">
     <div className="px-6 py-4 border-b border-gray-200">
       <h2 className="text-xl font-semibold text-gray-800">Lista de Lotes e Aviários</h2>
     </div>

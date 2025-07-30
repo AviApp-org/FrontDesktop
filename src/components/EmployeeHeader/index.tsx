@@ -23,15 +23,6 @@ export const EmployeeHeader: React.FC<EmployeeHeaderProps> = ({
 }) => {
   return (
     <>
-      <Typography 
-        variant="h4" 
-        component="h1" 
-        fontWeight="bold" 
-        color="text.primary" 
-        mb={3}
-      >
-        Funcionários
-      </Typography>
       
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         {/* Barra de busca e botão adicionar */}

@@ -15,7 +15,6 @@ import {
   Menu
 } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { console } from 'inspector';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -66,7 +65,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="p-4 border-b">
             <div className="flex items-center">
               <Egg className="h-8 w-8 text-green-600 mr-2" />
-              <h1 className="text-2xl font-bold text-green-900">Zuvo</h1>
+              <h1 className="text-3xl font-bold text-green-900">FREYR</h1>
             </div>
           </div>
 
@@ -102,9 +101,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="flex-1 md:ml-64">
         {/* Header */}
         <header className="bg-white shadow-sm fixed top-0 left-0 w-full md:w-[calc(100%-16rem)] md:left-64 z-20 flex items-center justify-between px-6 py-4">
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
             {sidebarItems.find(item => item.path === location.pathname)?.text || 'Dashboard'}
-          </h2>
+          </h1>
           <button
             onClick={handleLogout}
             className="text-gray-600 hover:text-red-600 transition-colors"

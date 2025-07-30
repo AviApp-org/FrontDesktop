@@ -1,4 +1,3 @@
-import React from 'react';
 import { useBatchManagement } from '../hooks/useBatchManagement';
 import { BatchTable } from '../components/BatchTable';
 import { AviaryTable } from '../components/AviaryTable';
@@ -23,7 +22,6 @@ export function BatchManagement() {
     isSubmitting,
     batches,
     aviariesData,
-    isLoadingBatches,
     isLoadingAviaries,
     isActivating,
     isDeactivating,
@@ -34,7 +32,7 @@ export function BatchManagement() {
     handleAviaryDelete,
   } = useBatchManagement();
   return (
-    <div className="pt-16 pb-8 min-h-screen w-full">
+    <div className=" pb-8 min-h-screen w-full">
       <BatchHeader onNewBatch={() => setIsModalOpen(true)} error={error ?? undefined} />
 
       <div className="flex flex-col gap-6 w-full bg-white rounded-xl shadow px-6 py-4">

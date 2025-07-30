@@ -12,7 +12,6 @@ export const BatchHeader: React.FC<BatchHeaderProps> = ({ onNewBatch, error }) =
       mb: 3,
       bgcolor: 'background.paper',
       borderRadius: 3,
-      boxShadow: 1,
       px: { xs: 2, sm: 4 },
       py: 3,
     }}
