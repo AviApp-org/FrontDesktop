@@ -14,10 +14,10 @@ const farmHook = {
 getFarmByClientID: async (clientId: number) => {
     try {
       const response = await api.get(`/api/farms/client/${clientId}`);
-      return response.data as FarmData[];
+      return response.data as FarmData;
     } catch (e) {
       console.error('Error getting farm by ID:', e);
-      return [];
+      return null;
     }
   },
   getFarms: async () => {

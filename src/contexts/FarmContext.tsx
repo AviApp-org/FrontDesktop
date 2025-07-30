@@ -21,15 +21,14 @@ export const FarmProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   
   const { user, isAuthenticated } = useAuthContext();
 
-  // Carregar farm quando o usuário estiver autenticado
   useEffect(() => {
     const loadUserFarm = async () => {
       if (isAuthenticated && user?.clientId) {
         setLoadingFarm(true);
         try {
           const farms = await farmHook.getFarmByClientID(user.clientId);
-          if (farms && farms.length > 0) {
-            const userFarm = farms[0]; // Pega a primeira farm do cliente
+          if (farms) {
+            const userFarm = farms; // Pega a primeira farm do cliente
             setFarmData(userFarm);
             if (userFarm.id) {
               setFarmId(userFarm.id);
