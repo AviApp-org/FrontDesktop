@@ -12,22 +12,26 @@ export const AviaryTable: React.FC<AviaryTableProps> = ({
   onEditAviary,
   onDeleteAviary
 }) => {
-  // Filtrar aviários do lote atual
   const batchAviaries = aviariesData?.filter(aviary => {
-    // Converter ambos para string para comparação segura
     return String(aviary.batchId) === String(batch.id);
   }) || [];
 
+  const isBatchInactive = batch.status === 'INACTIVE';
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
       <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
         <h3 className="text-lg font-semibold text-gray-800">Aviários do Lote</h3>
-        <Button variant='primary' onClick={onCreateAviary}>
+        <Button
+          variant='primary'
+          onClick={onCreateAviary}
+          disabled={isBatchInactive}
+          title={isBatchInactive ? 'Não é possível criar aviários em lotes inativos' : ''}
+        >
           <Plus className="w-4 h-4 mr-2" />
           Novo Aviário
         </Button>
       </div>
-      
+
       {isLoadingAviaries ? (
         <div className="p-4 text-center text-gray-500">Carregando aviários...</div>
       ) : batchAviaries.length === 0 ? (
