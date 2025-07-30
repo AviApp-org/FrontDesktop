@@ -1,4 +1,4 @@
-# 🐣 AviApp Frontend
+# 🐣 Freyr Frontend
 
 Frontend do **AviApp**, um sistema moderno de gestão para granjas poedeiras, desenvolvido com **React + Vite**, estilizado com **Tailwind CSS** e gerenciado com **Yarn**. Este projeto visa facilitar e automatizar o processo de coleta e análise de dados de produção para produtores agrícolas, promovendo eficiência, precisão e tomada de decisão baseada em dados.
 
