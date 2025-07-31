@@ -10,11 +10,11 @@ import EmployeesPage from '../pages/EmployeesPage';
 import ClientRegister from '../pages/ClientRegister';
 import FarmRegister from '../pages/FarmRegister';
 import ProtectedRoute from '../components/ProtectedRoute';
-import LoginTemplate from '@/templates/Login';
+import LoginPage from '@/pages/Login';
 export function AppRoutes() {
   return (
     <Routes>
-      <Route path="/login" element={<LoginTemplate />} /> {/* <- Adicione isso antes de tudo */}
+      <Route path="/login" element={<LoginPage />} /> {/* <- Adicione isso antes de tudo */}
 
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
 

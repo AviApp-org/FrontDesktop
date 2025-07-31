@@ -3,8 +3,8 @@ import { Routes, Route } from 'react-router-dom';
 import { AppRoutes } from './routes';
 import { FarmProvider } from './contexts/FarmContext';
 import { AuthProvider } from './contexts/AuthContext';
-import LoginTemplate from './templates/Login';
 import { Bounce, ToastContainer } from 'react-toastify';
+import LoginPage from './pages/Login';
 
 const App: React.FC = () => {
   return (
@@ -24,7 +24,7 @@ const App: React.FC = () => {
           transition={Bounce}
         />
         <Routes>
-          <Route path="/login" element={<LoginTemplate />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/*" element={<AppRoutes />} />
         </Routes>
       </FarmProvider>
