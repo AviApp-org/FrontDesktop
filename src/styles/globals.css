@@ -53,10 +53,12 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
   }
 }
+
 @layer components {
   /* Layout Padrão */
   .page-container {
