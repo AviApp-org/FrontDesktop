@@ -2,7 +2,7 @@ import React from 'react';
 import { Plus } from 'lucide-react';
 import { AviaryTableProps } from './types';
 import Button from '../Button';
-
+import { toast } from 'react-toastify';
 
 export const AviaryTable: React.FC<AviaryTableProps> = ({
   batch,
@@ -17,15 +17,31 @@ export const AviaryTable: React.FC<AviaryTableProps> = ({
   }) || [];
 
   const isBatchInactive = batch.status === 'INACTIVE';
+
+  const handleCreateAviary = () => {
+    if (isBatchInactive) {
+      toast.error('Ative o lote antes de criar um aviário', {
+        position: "top-center",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+      });
+      return;
+    }
+    onCreateAviary();
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
       <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
         <h3 className="text-lg font-semibold text-gray-800">Aviários do Lote</h3>
         <Button
-          variant='primary'
-          onClick={onCreateAviary}
-          disabled={isBatchInactive}
-          title={isBatchInactive ? 'Não é possível criar aviários em lotes inativos' : ''}
+          variant="primary"
+          onClick={handleCreateAviary}
+          title={isBatchInactive ? 'Ative o lote para criar aviários' : ''}
         >
           <Plus className="w-4 h-4 mr-2" />
           Novo Aviário

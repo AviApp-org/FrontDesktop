@@ -2,6 +2,7 @@ import React from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { formatDate } from '../../utils/formatDate';
 import { BatchTableProps } from './types';
+import { toast } from 'react-toastify';
 
 const translateStatus = (status: string) => {
   const translations = { ACTIVE: 'ATIVO', INACTIVE: 'INATIVO' };
@@ -16,7 +17,6 @@ const getStatusClasses = (status: string) => {
   };
   return classes[status as keyof typeof classes] || classes.default;
 };
-
 
 export const BatchTable: React.FC<BatchTableProps> = ({
   batches,
@@ -76,14 +76,29 @@ export const BatchTable: React.FC<BatchTableProps> = ({
                   <td className="px-6 py-4 whitespace-nowrap align-middle text-right text-sm font-medium">
                     <div className="flex justify-end space-x-2">
                       <button
-                        onClick={() => !isEditDisabled && onEdit(batch)}
+                        onClick={() => {
+                          if (isBatchInactive) {
+                            toast.error('Ative o lote para habilitar a edição', {
+                              position: "top-center",
+                              autoClose: 4000,
+                              hideProgressBar: false,
+                              closeOnClick: true,
+                              pauseOnHover: true,
+                              draggable: true,
+                              progress: undefined,
+                              theme: "colored",
+                            });
+                            return;
+                          }
+                          onEdit(batch);
+                        }}
                         className={`transition-colors duration-200 ${
                           isBatchInactive 
                             ? 'text-gray-400 cursor-not-allowed' 
                             : 'text-blue-600 hover:text-blue-900'
                         }`}
                         disabled={isEditDisabled}
-                        title={isBatchInactive ? 'Não é possível editar lotes inativos' : ''}
+                        title={isBatchInactive ? 'Ative o lote para habilitar a edição' : ''}
                       >
                         Editar
                       </button>

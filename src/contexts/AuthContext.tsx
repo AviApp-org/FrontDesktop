@@ -36,22 +36,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 
 
-    // Verificar token salvo no localStorage ao inicializar
     useEffect(() => {
         const savedUser = localStorage.getItem('auth_user');
+        const accessToken = sessionStorage.getItem('access_token');
 
-        if ( savedUser) {
+        if (savedUser && accessToken) {
             try {
                 setUser(JSON.parse(savedUser));
                 setIsAuthenticated(true);
             } catch (error) {
                 console.error('Erro ao recuperar dados de autenticação:', error);
-                localStorage.removeItem('auth_token');
+                sessionStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
                 localStorage.removeItem('auth_user');
             }
         }
+
         setLoading(false);
     }, []);
+
 
     const login = async (credentials: LoginCredentials): Promise<void> => {
         try {

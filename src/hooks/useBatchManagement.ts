@@ -5,6 +5,7 @@ import { AviaryData } from '../@types/AviaryData';
 import { showErrorMessage } from '../utils/errorHandler';
 import { CreateAviaryData } from '../@types/CreateAviaryData';
 import aviaryHook from './useAviary';
+import { toast } from 'react-toastify';
 
 export const useBatchManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -86,35 +87,35 @@ export const useBatchManagement = () => {
   };
 
   const handleBatchSubmit = async (data: any, isEdit = false) => {
-    setError(null);
-    setFormErrors({});
-    setIsSubmitting(true);
+  setError(null);
+  setFormErrors({});
+  setIsSubmitting(true);
 
-    if (!validateBatchData(data)) {
-      setIsSubmitting(false);
-      return;
+  if (!validateBatchData(data)) {
+    setIsSubmitting(false);
+    return;
+  }
+
+  try {
+    if (isEdit && selectedBatch?.id) {
+      await batchHook.updateBatch(selectedBatch.id.toString(), data);
+      toast.success('Lote atualizado com sucesso!');
+    } else {
+      await batchHook.createBatch({ ...data, farmId: '1' });
+      toast.success('Lote criado com sucesso!');
     }
 
-    try {
-      if (isEdit && selectedBatch?.id) {
-        await batchHook.updateBatch(selectedBatch.id.toString(), data);
-      } else {
-        await batchHook.createBatch({ ...data, farmId: '1' });
-      }
-      
-      // Recarregar a lista de lotes
-      const updatedBatches = await batchHook.getBatchByFarm(1);
-      setBatches(updatedBatches);
-      
-      setIsModalOpen(false);
-      setSelectedBatch(null);
-    } catch (error) {
-      handleError(error, isEdit ? 'Erro ao atualizar lote' : 'Erro ao criar lote');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    const updatedBatches = await batchHook.getBatchByFarm(1);
+    setBatches(updatedBatches);
 
+    setIsModalOpen(false);
+    setSelectedBatch(null);
+  } catch (error) {
+    handleError(error, isEdit ? 'Erro ao atualizar lote' : 'Erro ao criar lote');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
   const handleBatchAction = async (action: 'activate' | 'deactivate', id: string) => {
     setError(null);
     
