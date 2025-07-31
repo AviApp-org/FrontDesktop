@@ -24,7 +24,7 @@ interface EmployeeTableProps {
   isLoading: boolean;
   isError: boolean;
   onEdit: (employee: EmployeeData) => void;
-  onDelete: (id: number | null) => void;
+  onDelete: (id: number) => void;
 }
 
 const getRoleLabel = (role: EmployeeRole): string => {
@@ -43,7 +43,6 @@ const getRoleColor = (role: EmployeeRole) => {
   return roleColors[role] || 'default';
 };
 
-// ✅ REMOVIDA a função formatDate local - agora usa a importada
 
 export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   employees,
@@ -137,11 +136,16 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                         </IconButton>
                         <IconButton
                           size="small"
-                          onClick={() => onDelete(employee.id ?? null)}
+                          onClick={() => {
+                            if (employee.id !== undefined) {
+                              onDelete(employee.id);
+                            }
+                          }}
                           sx={{ color: 'error.main' }}
                         >
                           <DeleteIcon fontSize="small" />
                         </IconButton>
+
                       </Box>
                     </TableCell>
                   </TableRow>
