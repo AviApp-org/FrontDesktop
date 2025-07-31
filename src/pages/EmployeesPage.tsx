@@ -14,6 +14,7 @@ import {
 } from '@/utils/formatDate';
 import employeeHook from '@/hooks/useEmployees';
 import { SelectChangeEvent } from '@mui/material';
+import { toast } from 'react-toastify';
 
 const initialFormData: EmployeeData = {
   name: '',
@@ -106,17 +107,21 @@ const EmployeesPage: React.FC = () => {
   const validateForm = () => {
     const errors: Record<string, string> = {};
 
-    if (!formData.name.trim()) errors.name = 'Nome é obrigatório';
+    if (!formData.name.trim())
+      toast.error('Nome é obrigatório');
     if (!formData.cpf.trim()) {
-      errors.cpf = 'CPF é obrigatório';
+      toast.error('CPF é obrigatório');
     } else if (!isValidCPF(formData.cpf)) {
-      errors.cpf = 'CPF inválido';
+      toast.error('CPF inválido');
+
     }
-    if (!formData.birthDate.trim()) errors.birthDate = 'Data de nascimento é obrigatória';
+    if (!formData.birthDate.trim())
+      toast.error('Data de nascimento é obrigatória');
     if (!formData.phone.trim()) {
-      errors.phone = 'Telefone é obrigatório';
+      toast.error('Telefone é obrigatório');
+
     } else if (formData.phone.replace(/\D/g, '').length < 10) {
-      errors.phone = 'Telefone inválido';
+      toast.error('Telefone inválido');
     }
 
     setFormErrors(errors);
@@ -139,14 +144,16 @@ const EmployeesPage: React.FC = () => {
     try {
       if (editingId) {
         await employeeHook.updateEmployee(editingId, formattedData);
+        toast.success('Funcionário atualizado com sucesso!');
       } else {
         await employeeHook.createEmployee(formattedData);
+        toast.success('Funcionário criado com sucesso!');
       }
       await fetchEmployees();
       handleCloseDialog();
     } catch (e) {
-      const message = e instanceof Error ? e.message : 'Erro ao salvar funcionário';
-      setFormErrors({ submit: message });
+      toast.error('Erro ao salvar funcionário');
+      setFormErrors({ submit: 'Erro ao salvar funcionário' });
     } finally {
       setIsSubmitting(false);
     }
@@ -160,8 +167,10 @@ const EmployeesPage: React.FC = () => {
     if (!confirmDelete) return;
     try {
       await employeeHook.deleteEmployee(confirmDelete);
+      toast.success('Funcionário excluído com sucesso!');
       await fetchEmployees();
     } catch (e) {
+      toast.error('Erro ao excluir funcionário');
       setFormErrors({
         submit: e instanceof Error ? e.message : 'Erro ao excluir funcionário'
       });
