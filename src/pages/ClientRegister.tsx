@@ -1,56 +1,169 @@
-import React, { useEffect } from 'react';
-import { Box } from '@mui/material';
-import { useFarm } from '../contexts/FarmContext';
-import { useClientManagement } from '../hooks/useClientManagement';
-import { ClientHeader } from '../components/ClientHeader';
-import { ClientTable } from '../components/ClientTable';
-import { ClientModal } from '../components/ClientModal';
-import { DeleteConfirmDialog } from '../components/DeleteButton';
+import React, { useEffect, useState } from 'react';
+import { ClientRegisterTemplate } from '@/templates/ClientRegister';
+import { ClientData } from '@/@types/ClientData';
+import { ClientFormData } from '@/hooks/useClient';
+import clientHook from '@/hooks/useClient';
 
 const ClientRegister: React.FC = () => {
-  const { farmId } = useFarm();
-  const clientManagement = useClientManagement();
+  // Estados
+  const [clients, setClients] = useState<ClientData[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [openDialog, setOpenDialog] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
+  const [formData, setFormData] = useState<ClientFormData>(clientHook.getInitialFormData());
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Carregar clientes
+  const loadClients = async () => {
+    setIsLoading(true);
+    setIsError(false);
+    try {
+      const data = await clientHook.listClients();
+      setClients(data);
+    } catch (e) {
+      console.error('Erro ao buscar clientes:', e);
+      setIsError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    clientManagement.loadClients();
-  }, [farmId]);
+    loadClients();
+  }, []);
+
+  // Handlers
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleAddClient = () => {
+    setFormData(clientHook.getInitialFormData());
+    setFormErrors({});
+    setEditingId(null);
+    setOpenDialog(true);
+  };
+
+  const handleEditClient = (client: ClientData) => {
+    setFormData({
+      name: client.name,
+      email: client.email,
+      cnpj: client.cnpj,
+      phone: client.phone,
+      status: client.status
+    });
+    setFormErrors({});
+    setEditingId(client.id ?? null);
+    setOpenDialog(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenDialog(false);
+    setFormData(clientHook.getInitialFormData());
+    setEditingId(null);
+    setFormErrors({});
+    setIsSubmitting(false);
+  };
+
+  const handleInputChange = (e: any) => {
+    const { name, value } = e.target;
+    
+    if (name === 'cnpj') {
+      const cleaned = value.replace(/\D/g, '');
+      if (cleaned.length <= 14) {
+        setFormData({ ...formData, [name]: cleaned });
+      }
+    } else if (name === 'phone') {
+      const cleaned = value.replace(/\D/g, '');
+      setFormData({ ...formData, [name]: cleaned });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+
+    // Limpar erro do campo quando usuário começar a digitar
+    if (formErrors[name]) {
+      setFormErrors({ ...formErrors, [name]: '' });
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!clientHook.validateClientForm(formData)) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setFormErrors({});
+
+    try {
+      const sanitizedData = clientHook.sanitizeClientData(formData);
+      
+      if (editingId) {
+        await clientHook.updateClientWithToast(editingId, sanitizedData);
+      } else {
+        await clientHook.createClientWithToast(sanitizedData);
+      }
+      
+      await loadClients();
+      handleCloseModal();
+    } catch (error) {
+      setFormErrors({ submit: 'Erro ao salvar cliente' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteClick = (id: number | null) => {
+    setConfirmDelete(id);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!confirmDelete) return;
+    
+    try {
+      await clientHook.deleteClientWithToast(confirmDelete);
+      await loadClients();
+    } catch (error) {
+      setFormErrors({ submit: 'Erro ao excluir cliente' });
+    } finally {
+      setConfirmDelete(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setConfirmDelete(null);
+  };
 
   return (
-    <Box>
-      <ClientHeader
-        searchTerm={clientManagement.searchTerm}
-        totalClients={clientManagement.clients.length}
-        onSearch={(e) => clientManagement.handleSearch(e.target.value)}
-        onAddClient={() => clientManagement.handleOpenDialog()}
-      />
+    <ClientRegisterTemplate
+      // Estados
+      isLoading={isLoading}
+      isError={isError}
+      openDialog={openDialog}
+      editingId={editingId}
+      confirmDelete={confirmDelete}
+      searchTerm={searchTerm}
+      formData={formData}
+      formErrors={formErrors}
+      isSubmitting={isSubmitting}
 
-      <Box sx={{ mt: 3 }}>
-        <ClientTable
-          clients={clientManagement.clients.filter((c) => typeof c.id === 'number') as any}
-          isLoading={clientManagement.isLoading}
-          isError={clientManagement.isError}
-          onEdit={(client) => clientManagement.handleOpenDialog(client.id)}
-          onDelete={clientManagement.handleDeleteClick}
-        />
-      </Box>
+      // Dados
+      clients={clients}
 
-      <ClientModal
-        open={clientManagement.openDialog}
-        editingId={clientManagement.editingId}
-        formData={clientManagement.formData}
-        formErrors={clientManagement.formErrors}
-        isSubmitting={clientManagement.isSubmitting}
-        onClose={clientManagement.handleCloseDialog}
-        onSubmit={clientManagement.handleSubmit}
-        onInputChange={clientManagement.handleInputChange}
-      />
-
-      <DeleteConfirmDialog
-        open={!!clientManagement.confirmDelete}
-        onClose={() => clientManagement.handleDeleteClick(null)}
-        onConfirm={clientManagement.handleConfirmDelete}
-      />
-    </Box>
+      // Callbacks
+      onSearch={handleSearch}
+      onAddClient={handleAddClient}
+      onEditClient={handleEditClient}
+      onDeleteClient={handleDeleteClick}
+      onCloseModal={handleCloseModal}
+      onSubmit={handleSubmit}
+      onInputChange={handleInputChange}
+      onCancelDelete={handleCancelDelete}
+      onConfirmDelete={handleConfirmDelete}
+    />
   );
 };
 

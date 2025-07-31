@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BatchManagementTemplate } from '@/templates/BatchManagement';
+import { BatchManagementTemplate } from '@/templates/Batch';
 import { BatchData } from '@/@types/BatchData';
 import { AviaryData } from '@/@types/AviaryData';
 import { CreateAviaryData } from '@/@types/CreateAviaryData';
