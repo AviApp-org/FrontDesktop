@@ -5,7 +5,7 @@ import Reports from '../pages/Reports';
 import Financial from '../pages/Financial';
 import CollectionReview from '../pages/CollectionReview';
 //import DataEntry from '../pages/DataEntry';
-import { BatchManagement } from '../pages/BatchManagement';
+import BatchManagement from '../pages/BatchManagement';
 import EmployeesPage from '../pages/EmployeesPage';
 import ClientRegister from '../pages/ClientRegister';
 import FarmRegister from '../pages/FarmRegister';
