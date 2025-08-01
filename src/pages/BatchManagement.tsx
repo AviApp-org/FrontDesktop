@@ -5,6 +5,7 @@ import { AviaryData } from '@/@types/AviaryData';
 import { CreateAviaryData } from '@/@types/CreateAviaryData';
 import batchHook from '@/hooks/useBatch';
 import { toast } from 'react-toastify';
+import { useFarm } from '@/contexts/FarmContext';
 
 const BatchManagement: React.FC = () => {
   // Estados
@@ -24,12 +25,14 @@ const BatchManagement: React.FC = () => {
   // Dados
   const [batches, setBatches] = useState<BatchData[]>([]);
   const [aviariesData, setAviariesData] = useState<AviaryData[]>([]);
+  const { farmId, loadingFarm } = useFarm();
+
 
   const fetchBatches = async () => {
     setIsLoadingBatches(true);
     setError(null);
     try {
-      const batchesData = await batchHook.getBatchesByFarm(parseInt(localStorage.getItem('farmId') || ''));
+      const batchesData = await batchHook.getBatchesByFarm(farmId);
       setBatches(batchesData);
     } catch (err) {
       toast.error('Erro ao carregar lotes');
@@ -52,9 +55,12 @@ const BatchManagement: React.FC = () => {
     }
   };
 
+
+  // ✅ Carrega os lotes ao montar o componente
   useEffect(() => {
+
     fetchBatches();
-  }, []);
+  }, [farmId]);
 
   // Efeito para buscar aviários quando um lote é expandido
   useEffect(() => {

@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { CollectEggData } from '@/@types/CollectEggData';
 import eggCollectHook from '@/hooks/useEggCollect';
 import { useEffect, useState } from 'react';
+import { useFarm } from '@/contexts/FarmContext';
 
 function CollectionReview() {
 
@@ -17,15 +18,9 @@ function CollectionReview() {
 
   const [selectedBatch, setSelectedBatch] = useState<BatchData | null>(null);
   const [selectedAviary, setSelectedAviary] = useState<AviaryData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { farmId, loadingFarm } = useFarm();
 
-  const fetchBatches = async () => {
-    try {
-      const batchesData = await batchHook.getBatchesByFarm(parseInt(localStorage.getItem('farmId') || ''));
-      setBatches(batchesData);
-    } catch (err) {
-      toast.error('Erro ao carregar lotes');
-    }
-  };
 
   const fetchAviaries = async (batchId: number) => {
     try {
@@ -69,20 +64,25 @@ function CollectionReview() {
 
   const currentDate = '12/08/2024';
 
-   // ✅ Carrega os lotes ao montar o componente
+  // ✅ Carrega os lotes ao montar o componente
   useEffect(() => {
     const fetchBatches = async () => {
+      if (!farmId) return; // Aguarda farmId válido
+
       try {
-        const farmId = parseInt(localStorage.getItem('farmId') || '');
+        setIsLoading(true);
         const batchesData = await batchHook.getBatchesByFarm(farmId);
         setBatches(batchesData);
       } catch (err) {
         toast.error('Erro ao carregar lotes');
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchBatches();
-  }, []);
+  }, [farmId]);
+
 
 
   const handleCategoryChange = (
@@ -113,6 +113,13 @@ function CollectionReview() {
   const handleFinish = () => {
     console.log('Finishing collection review:', { categories, deadBirds });
   };
+  if (loadingFarm) {
+    return (
+      <div className="text-center text-gray-500 py-20 text-lg">
+        Carregando fazenda...
+      </div>
+    );
+  }
 
   return (
 
@@ -127,7 +134,7 @@ function CollectionReview() {
             <h3 className="text-xl font-semibold">Seleção de Aviário</h3>
           </div>
 
-           <div className="max-w-md space-y-4 mb-6">
+          <div className="max-w-md space-y-4 mb-6">
             {/* 🔹 Select de Lote */}
             <select
               value={selectedBatch?.id?.toString() || ''}
