@@ -25,12 +25,11 @@ const BatchManagement: React.FC = () => {
   const [batches, setBatches] = useState<BatchData[]>([]);
   const [aviariesData, setAviariesData] = useState<AviaryData[]>([]);
 
-  // Carregar lotes da fazenda (assumindo farmId = 1)
   const fetchBatches = async () => {
     setIsLoadingBatches(true);
     setError(null);
     try {
-      const batchesData = await batchHook.getBatchesByFarm(1);
+      const batchesData = await batchHook.getBatchesByFarm(parseInt(localStorage.getItem('farmId') || ''));
       setBatches(batchesData);
     } catch (err) {
       toast.error('Erro ao carregar lotes');
@@ -40,7 +39,6 @@ const BatchManagement: React.FC = () => {
     }
   };
 
-  // Carregar aviários do lote expandido
   const fetchAviaries = async (batchId: number) => {
     setIsLoadingAviaries(true);
     try {

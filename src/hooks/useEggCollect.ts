@@ -1,6 +1,6 @@
 import api from '../config/axios';
 import { CollectEggData } from '@/@types/CollectEggData';
-const clientHook = {
+const eggCollectHook = {
   
   createEggCollect: async (eggCollectData : CollectEggData) => {
     try {
@@ -64,4 +64,4 @@ const clientHook = {
   
 };
 
-export default clientHook;
+export default eggCollectHook;
