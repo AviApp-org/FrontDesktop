@@ -2,7 +2,6 @@ import api from '../config/axios';
 import { EmployeeData } from '@/@types/EmployeeData';
 
 const employeeHook = {
-
   getEmployee: async () => {
     try {
       const response = await api.get('/api/employees');
@@ -23,10 +22,20 @@ const employeeHook = {
     }
   },
 
+  getEmployeeByFarmID: async (farmId: number) => {
+    try {
+      const response = await api.get(`/api/employees/farm/${farmId}`);
+      return response.data as EmployeeData[];
+    } catch (e) {
+      console.error('Error getting employee by ID:', e);
+      return [];
+    }
+  },
+
   createEmployee: async (employee: EmployeeData) => {
     try {
       console.log('🚀 Enviando dados para criar funcionário:', employee);
-      
+
       const response = await api.post('/api/employees', employee);
       console.log('✅ Funcionário criado com sucesso:', response.data);
       return response.data as EmployeeData;
@@ -39,7 +48,7 @@ const employeeHook = {
   updateEmployee: async (employeeId: number, employee: EmployeeData) => {
     try {
       console.log('🔄 Atualizando funcionário:', { employeeId, employee });
-      
+
       const response = await api.put(`/api/employees/${employeeId}`, employee);
       console.log('✅ Funcionário atualizado com sucesso:', response.data);
       return response.data as EmployeeData;
@@ -52,7 +61,7 @@ const employeeHook = {
   deleteEmployee: async (employeeId: number) => {
     try {
       console.log('🗑️ Deletando funcionário:', employeeId);
-      
+
       const response = await api.delete(`/api/employees/${employeeId}`);
       console.log('✅ Funcionário deletado com sucesso');
       return response.data;
@@ -60,7 +69,7 @@ const employeeHook = {
       console.error('Error deleting employee:', e);
       throw new Error('Erro ao excluir funcionário');
     }
-  }
+  },
 };
 
 export default employeeHook;

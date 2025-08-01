@@ -28,7 +28,6 @@ const initialFormData: EmployeeData = {
 
 const EmployeesPage: React.FC = () => {
   const { farmId } = useFarm();
-
   const [employees, setEmployees] = useState<EmployeeData[]>([]);
   const [formData, setFormData] = useState<EmployeeData>({ ...initialFormData, farmId });
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -44,7 +43,7 @@ const EmployeesPage: React.FC = () => {
     setIsLoading(true);
     setIsError(false);
     try {
-      const data = await employeeHook.getEmployee();
+      const data = await employeeHook.getEmployeeByFarmID(farmId);
       setEmployees(data);
     } catch (e) {
       console.error('Erro ao buscar funcionários:', e);
@@ -55,8 +54,9 @@ const EmployeesPage: React.FC = () => {
   };
 
   useEffect(() => {
+
     fetchEmployees();
-  }, []);
+  }, [farmId]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);

@@ -25,7 +25,7 @@ const BatchManagement: React.FC = () => {
   // Dados
   const [batches, setBatches] = useState<BatchData[]>([]);
   const [aviariesData, setAviariesData] = useState<AviaryData[]>([]);
-  const { farmId, loadingFarm } = useFarm();
+  const { farmId } = useFarm();
 
 
   const fetchBatches = async () => {
