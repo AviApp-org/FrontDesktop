@@ -151,7 +151,7 @@ export default function CollectsTemplate({
                               <span className="text-gray-700 font-medium">
                                 {eggTypeLabels[detail.type] || detail.type}
                               </span>
-                              <span className="bg-amber-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                              <span className=" text-orange-500 font-bold flex items-center justify-center">
                                 {detail.quantity}
                               </span>
                             </div>
