@@ -2,8 +2,6 @@ import api from '../config/axios';
 import { ClientData } from '@/@types/ClientData';
 import { ClientStatus } from '@/@types/enums/enumClientStatus';
 import { validateCNPJ } from '../utils/validators';
-import { showErrorMessage } from '../utils/errorHandler';
-import { toast } from 'react-toastify';
 
 export interface ClientFormData extends Omit<ClientData, 'id'> {}
 
@@ -23,7 +21,7 @@ const clientHook = {
       return response.data as ClientData;
     } catch (e) {
       console.error('Error creating client:', e);
-      return null;
+      throw new Error('Erro ao criar cliente');
     }
   },
 
@@ -33,7 +31,7 @@ const clientHook = {
       return response.data as ClientData[];
     } catch (e) {
       console.error('Error listing clients:', e);
-      return [];
+      throw new Error('Erro ao listar clientes');
     }
   },
 
@@ -43,7 +41,7 @@ const clientHook = {
       return response.data as ClientData;
     } catch (e) {
       console.error('Error getting client by ID:', e);
-      return null;
+      throw new Error('Erro ao buscar cliente');
     }
   },
 
@@ -53,7 +51,7 @@ const clientHook = {
       return response.data as ClientData;
     } catch (e) {
       console.error('Error updating client:', e);
-      return null;
+      throw new Error('Erro ao atualizar cliente');
     }
   },
 
@@ -63,7 +61,7 @@ const clientHook = {
       return response.data;
     } catch (e) {
       console.error('Error activating client:', e);
-      return null;
+      throw new Error('Erro ao ativar cliente');
     }
   },
 
@@ -73,78 +71,17 @@ const clientHook = {
       return response.data;
     } catch (e) {
       console.error('Error deactivating client:', e);
-      return null;
+      throw new Error('Erro ao desativar cliente');
     }
   },
 
-  deleteClient: async (clientId:number) => {
-    try{
-        const response = await api.delete(`/api/clients/${clientId}`)
-        return response.data
-    }catch (e) {
-      console.error('Error deleting client:', e);
-      return null;
-    }
-  },
-
-  // Operações com toast (do useClientManagement)
-  createClientWithToast: async (clientData: ClientData) => {
-    try {
-      const response = await api.post('/api/clients', clientData);
-      toast.success('Cliente criado com sucesso!');
-      return response.data as ClientData;
-    } catch (error) {
-      const message = `Erro ao criar cliente: ${showErrorMessage(error)}`;
-      toast.error(message);
-      throw new Error(message);
-    }
-  },
-
-  updateClientWithToast: async (clientId: number, clientData: ClientData) => {
-    try {
-      const response = await api.put(`/api/clients/${clientId}`, clientData);
-      toast.success('Cliente atualizado com sucesso!');
-      return response.data as ClientData;
-    } catch (error) {
-      const message = `Erro ao atualizar cliente: ${showErrorMessage(error)}`;
-      toast.error(message);
-      throw new Error(message);
-    }
-  },
-
-  deleteClientWithToast: async (clientId: number) => {
+  deleteClient: async (clientId: number) => {
     try {
       const response = await api.delete(`/api/clients/${clientId}`);
-      toast.success('Cliente excluído com sucesso!');
       return response.data;
-    } catch (error) {
-      const message = `Erro ao excluir cliente: ${showErrorMessage(error)}`;
-      toast.error(message);
-      throw new Error(message);
-    }
-  },
-
-  activateClientWithToast: async (clientId: number) => {
-    try {
-      const response = await api.patch(`/api/clients/${clientId}/activate`);
-      toast.success('Cliente ativado com sucesso!');
-      return response.data;
-    } catch (error) {
-      const message = `Erro ao ativar cliente: ${showErrorMessage(error)}`;
-      toast.error(message);
-      throw new Error(message);
-    }
-  },
-
-  deactivateClientWithToast: async (clientId: number) => {
-    try {
-      const response = await api.patch(`/api/clients/${clientId}/deactivate`);
-      toast.success('Cliente desativado com sucesso!');
-      return response.data;
-    } catch (error) {
-      const message = `Erro ao desativar cliente: ${showErrorMessage(error)}`;
-      toast.error(message);
-      throw new Error(message);
+    } catch (e) {
+      console.error('Error deleting client:', e);
+      throw new Error('Erro ao excluir cliente');
     }
   },
 

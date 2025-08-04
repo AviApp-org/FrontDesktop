@@ -3,6 +3,7 @@ import { ClientRegisterTemplate } from '@/templates/ClientRegister';
 import { ClientData } from '@/@types/ClientData';
 import { ClientFormData } from '@/hooks/useClient';
 import clientHook from '@/hooks/useClient';
+import { toast } from 'react-toastify';
 
 const ClientRegister: React.FC = () => {
   // Estados
@@ -27,6 +28,7 @@ const ClientRegister: React.FC = () => {
     } catch (e) {
       console.error('Erro ao buscar clientes:', e);
       setIsError(true);
+      toast.error('Erro ao carregar clientes');
     } finally {
       setIsLoading(false);
     }
@@ -102,14 +104,17 @@ const ClientRegister: React.FC = () => {
       const sanitizedData = clientHook.sanitizeClientData(formData);
       
       if (editingId) {
-        await clientHook.updateClientWithToast(editingId, sanitizedData);
+        await clientHook.updateClient(editingId, sanitizedData);
+        toast.success('Cliente atualizado com sucesso!');
       } else {
-        await clientHook.createClientWithToast(sanitizedData);
+        await clientHook.createClient(sanitizedData);
+        toast.success('Cliente criado com sucesso!');
       }
       
       await loadClients();
       handleCloseModal();
     } catch (error) {
+      toast.error('Erro ao salvar cliente');
       setFormErrors({ submit: 'Erro ao salvar cliente' });
     } finally {
       setIsSubmitting(false);
@@ -124,9 +129,11 @@ const ClientRegister: React.FC = () => {
     if (!confirmDelete) return;
     
     try {
-      await clientHook.deleteClientWithToast(confirmDelete);
+      await clientHook.deleteClient(confirmDelete);
+      toast.success('Cliente excluído com sucesso!');
       await loadClients();
     } catch (error) {
+      toast.error('Erro ao excluir cliente');
       setFormErrors({ submit: 'Erro ao excluir cliente' });
     } finally {
       setConfirmDelete(null);
