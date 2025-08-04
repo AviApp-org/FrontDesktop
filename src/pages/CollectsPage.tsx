@@ -23,7 +23,7 @@ function CollectsPage() {
     TOTAL: 'Total',
     CLEAN: 'Limpo',
     CRACKED: 'Quebrado',
-    DIRTY_NEST: 'Ninho Sujo',
+    NEST_DIRTY: 'Ninho Sujo',
     BED_DIRTY: 'Sujo de Cama',
     SMALL: 'Pequeno',
     INCUBATABLE: 'Incubável',
