@@ -8,6 +8,8 @@ import { AviaryData } from '@/@types/AviaryData';
 import { CollectEggData } from '@/@types/CollectEggData';
 import CollectsTemplate from '@/templates/Collects';
 import { EggType } from '@/@types/enums/enumEggtype';
+import { formatDateForInput, formatDateForBackend } from '@/utils/formatDate';
+
 
 function CollectsPage() {
   const [batches, setBatches] = useState<BatchData[]>([]);
@@ -18,8 +20,13 @@ function CollectsPage() {
   const [selectedAviary, setSelectedAviary] = useState<AviaryData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { farmId } = useFarm();
-  const currentDate = '04-08-2025';
 
+
+  const [currentDate, setCurrentDate] = useState(() => {
+    const hoje = new Date();
+    const isoDate = hoje.toISOString().split('T')[0];
+    return isoDate; 
+  });
 
   // Carrega lotes
   useEffect(() => {
@@ -51,14 +58,16 @@ function CollectsPage() {
 
   // Carrega coletas quando aviário é selecionado
   const fetchEggCollects = async (aviaryId: number) => {
-    try {
-      const collects = await eggCollectHook.getByDateAndAviary(currentDate, aviaryId);
-      setEggCollects(collects);
-    } catch (err) {
-      toast.error('Erro ao carregar coletas de ovos');
-      setEggCollects([]);
-    }
-  };
+  try {
+    const formattedDate = formatDateForInput(currentDate); // usa seu util aqui
+    const collects = await eggCollectHook.getByDateAndAviary(formattedDate, aviaryId);
+    setEggCollects(collects);
+  } catch (err) {
+    toast.error('Erro ao carregar coletas de ovos');
+    setEggCollects([]);
+  }
+};
+
 
   const handleBatchChange = (batchId: string) => {
     const batch = batches.find(b => b.id === parseInt(batchId)) || null;
@@ -76,6 +85,11 @@ function CollectsPage() {
     if (aviary?.id) fetchEggCollects(aviary.id);
   };
 
+  const handleDateChange = (newDate: string) => {
+    setCurrentDate(newDate);
+    if (selectedAviary?.id) fetchEggCollects(selectedAviary.id);
+  };
+
   return (
     <CollectsTemplate
       batches={batches}
@@ -87,6 +101,7 @@ function CollectsPage() {
       isLoading={isLoading}
       eggTypeLabels={EggType}
       currentDate={currentDate}
+      onDateChange={handleDateChange}
       onBatchChange={handleBatchChange}
       onAviaryChange={handleAviaryChange}
       onSelectCollect={setSelectedCollect}

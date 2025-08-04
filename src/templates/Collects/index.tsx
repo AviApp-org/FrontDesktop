@@ -12,10 +12,11 @@ interface CollectionReviewTemplateProps {
   selectedCollect: CollectEggData | null;
   isLoading: boolean;
   eggTypeLabels: Record<string, string>;
-  currentDate: string;
   onBatchChange: (batchId: string) => void;
   onAviaryChange: (aviaryId: string) => void;
   onSelectCollect: (collect: CollectEggData) => void;
+  currentDate: string;
+  onDateChange: (date: string) => void;
 }
 
 export default function CollectsTemplate({
@@ -31,15 +32,22 @@ export default function CollectsTemplate({
   onBatchChange,
   onAviaryChange,
   onSelectCollect,
+  onDateChange
 }: CollectionReviewTemplateProps) {
   return (
     <div className=" mx-auto p-4">
       <div className="bg-white rounded-2xl p-6 mb-8">
         <div className="flex justify-between items-center mb-8">
-          <div className="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
-            Data: {currentDate}
+          <div className="flex items-center p-5">
+            <input
+              type="date"
+              value={currentDate}
+              onChange={(e) => onDateChange(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
           </div>
         </div>
+
 
         {/* Seletor de Lote/Aviário */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
@@ -102,8 +110,8 @@ export default function CollectsTemplate({
                         key={index}
                         onClick={() => onSelectCollect(entry)}
                         className={`p-4 rounded-xl border cursor-pointer transition-all hover:shadow-md ${selectedCollect?.id === entry.id
-                            ? 'border-green-500 bg-green-50'
-                            : 'border-gray-200 hover:border-green-300'
+                          ? 'border-green-500 bg-green-50'
+                          : 'border-gray-200 hover:border-green-300'
                           }`}
                       >
                         <div className="flex justify-between items-center">
@@ -116,7 +124,7 @@ export default function CollectsTemplate({
                               })}
                             </span>                          </div>
                           <div className="text-lg font-bold text-green-600">
-                            {entry.totalEggs} unidades
+                            {entry.totalEggs} ovos
                           </div>
                         </div>
                       </div>

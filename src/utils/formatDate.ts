@@ -34,7 +34,7 @@ export const formatDateForInput = (dateString: string): string => {
     if (parts.length === 3) {
       const [day, month, year] = parts;
       if (day && month && year && year.length === 4) {
-        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        return `${day.padStart(2, '0')}-${month.padStart(2, '0')}-${year}`;
       }
     }
   }
