@@ -28,7 +28,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const sidebarItems = [
     { icon: LayoutDashboard, text: 'Dashboard', path: '/', requiredRole: null },
-    { icon: ClipboardCheck, text: 'Revisão de coletas', path: '/review', requiredRole: null },
+    { icon: ClipboardCheck, text: 'Histórico de coletas', path: '/collects', requiredRole: null },
     { icon: FileBarChart, text: 'Relatórios', path: '/reports', requiredRole: null },
     { icon: Home, text: 'Lotes e aviários', path: '/batches', requiredRole: null },
     { icon: Users, text: 'Funcionários', path: '/employees', requiredRole: null },

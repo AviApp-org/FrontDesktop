@@ -1,5 +1,5 @@
 export interface AviaryData {
-  id?: number;                        
+  id: number;                        
   name: string;
   initialAmountOfRoosters: number;
   initialAmountOfChickens: number;

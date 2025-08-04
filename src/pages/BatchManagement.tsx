@@ -195,7 +195,6 @@ const BatchManagement: React.FC = () => {
   const handleAviaryDelete = async (id: string) => {
     try {
       await batchHook.deleteAviary(id);
-      toast.success('Aviário deletado com sucesso!');
       // Recarregar aviários se houver lote expandido
       const lastExpandedBatch = expandedBatches[expandedBatches.length - 1];
       if (lastExpandedBatch) {
@@ -204,6 +203,9 @@ const BatchManagement: React.FC = () => {
     } catch (error) {
       toast.error('Erro ao deletar aviário');
       setError('Erro ao deletar aviário');
+    } finally {
+      toast.success('Aviário deletado com sucesso!');
+
     }
   };
 

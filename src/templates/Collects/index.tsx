@@ -1,212 +1,203 @@
-import React, { useState } from 'react';
-
+import { AviaryData } from '@/@types/AviaryData';
+import { BatchData } from '@/@types/BatchData';
+import { CollectEggData } from '@/@types/CollectEggData';
 import { Info } from 'lucide-react';
-import { Aviary, Category, CollectionEntry, DeadBirds, } from '@/@types/collection';
 
-function CollectionTemplate() {
-  
-  const [aviaries, setAviaries] = useState<Aviary[]>([
-    {
-      id: '1',
-      name: 'Aviário A',
-      initialBrids: { male: 100, female: 1000 },
-      currentBirds: { male: 95, female: 980 },
-      isActive: true,
-    },
-    {
-      id: '2',
-      name: 'Aviário B',
-      initialBrids: { male: 150, female: 1500 },
-      currentBirds: { male: 148, female: 1490 },
-      isActive: true,
-    },
-  ]);
+interface CollectionReviewTemplateProps {
+  batches: BatchData[];
+  aviaries: AviaryData[];
+  eggCollects: CollectEggData[];
+  selectedBatch: BatchData | null;
+  selectedAviary: AviaryData | null;
+  selectedCollect: CollectEggData | null;
+  isLoading: boolean;
+  eggTypeLabels: Record<string, string>;
+  currentDate: string;
+  onBatchChange: (batchId: string) => void;
+  onAviaryChange: (aviaryId: string) => void;
+  onSelectCollect: (collect: CollectEggData) => void;
+}
 
-  const [selectedAviary, setSelectedAviary] = useState<string>('');
-
-  const [collectionHistory] = useState<CollectionEntry[]>([
-    { time: '06:50', collector: 'Pedro Paulo', status: 'Incubáveis', units: 1153 },
-    { time: '06:30', collector: 'Pedro Paulo', status: 'Ovos incubáveis: 0' },
-    { time: '06:30', collector: 'Pedro Paulo', status: 'Ovos sujos: 0' },
-    { time: '06:30', collector: 'Pedro Paulo', status: 'Ovos deformados: 0' },
-    { time: '06:30', collector: 'Pedro Paulo', status: 'Ovos rejeitados: 0' },
-  ]);
-
-  const [deadBirds, setDeadBirds] = useState<DeadBirds>({
-    male: 16,
-    female: 53,
-  });
-
-  const [categories, setCategories] = useState<Category[]>([
-    { name: 'Incubáveis', total: 1153, cages: '', quantity: 0 },
-    { name: 'Deformados', total: 1153, cages: '', quantity: 0 },
-    { name: 'Eliminados', total: 1153, cages: '', quantity: 0 },
-    { name: 'Incubáveis', total: 1153, cages: '', quantity: 0 },
-  ]);
-
-  const currentDate = '12/08/2024';
-
-  const handleCategoryChange = (
-    index: number,
-    field: 'cages' | 'quantity',
-    value: string | number
-  ) => {
-    const newCategories = [...categories];
-    newCategories[index] = {
-      ...newCategories[index],
-      [field]: value,
-    };
-    setCategories(newCategories);
-  };
-
-  const handleDeadBirdsChange = (type: 'male' | 'female', value: string) => {
-    const numValue = parseInt(value) || 0;
-    setDeadBirds(prev => ({
-      ...prev,
-      [type]: numValue,
-    }));
-  };
-
-  const handleSave = () => {
-    console.log('Saving categories:', categories);
-  };
-
-  const handleFinish = () => {
-    console.log('Finishing collection review:', { categories, deadBirds });
-  };
-
+export default function CollectsTemplate({
+  batches,
+  aviaries,
+  eggCollects,
+  selectedBatch,
+  selectedAviary,
+  selectedCollect,
+  isLoading,
+  eggTypeLabels,
+  currentDate,
+  onBatchChange,
+  onAviaryChange,
+  onSelectCollect,
+}: CollectionReviewTemplateProps) {
   return (
-    
-    <div>
-    <div className="flex justify-between items-center mb-8">
-      <h2 className="text-2xl font-bold text-gray-900">Revisão de Coleta</h2>
-    </div>
-  
-    <div className="grid grid-cols-1 gap-8">
-      <div className="bg-white p-6 rounded-lg shadow">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-semibold">Seleção de Aviário</h3>
+    <div className=" mx-auto p-4">
+      <div className="bg-white rounded-2xl p-6 mb-8">
+        <div className="flex justify-between items-center mb-8">
+          <div className="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
+            Data: {currentDate}
+          </div>
         </div>
-  
-        <div className="max-w-md mb-6">
-          <select
-            id="aviary-select"
-            value={selectedAviary}
-            onChange={e => setSelectedAviary(e.target.value)}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
-          >
-            <option value="">Selecione um aviário</option>
-            {aviaries.map(aviary => (
-              <option key={aviary.id} value={aviary.id?.toString()}>
-                {aviary.name} - Aves: {aviary.currentBirds.male + aviary.currentBirds.female}
-              </option>
-            ))}
-          </select>
-        </div>
-  
-        {selectedAviary ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-lg border p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">Histórico de coleta</h3>
-                <div className="flex items-center text-sm text-gray-500">
-                  <Info className="h-4 w-4 mr-1" />
-                  <span>Clique para mais informações</span>
-                </div>
-              </div>
-  
-              <div className="space-y-3">
-                {collectionHistory.map((entry, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
-                  >
-                    <div className="flex items-center space-x-4">
-                      <span className="text-gray-600">{currentDate}</span>
-                      <span className="text-gray-600">{entry.time}</span>
-                      <span className="font-medium">{entry.collector}</span>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      <span>{entry.status}</span>
-                      {entry.units && (
-                        <span className="text-gray-600">Unidades: {entry.units}</span>
-                      )}
-                    </div>
-                  </div>
+
+        {/* Seletor de Lote/Aviário */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+          <div className="bg-white p-5 rounded-xl ">
+            <label className="block text-gray-700 font-medium mb-2">Selecione um Lote</label>
+            <select
+              value={selectedBatch?.id?.toString() || ''}
+              onChange={(e) => onBatchChange(e.target.value)}
+              disabled={isLoading}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+            >
+              <option value="">{isLoading ? 'Carregando...' : 'Selecione um lote'}</option>
+              {batches.map((batch) => (
+                <option key={batch.id} value={batch.id}>
+                  {batch.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {selectedBatch && (
+            <div className="bg-white p-5 rounded-xl ">
+              <label className="block text-gray-700 font-medium mb-2">Selecione um Aviário</label>
+              <select
+                value={selectedAviary?.id?.toString() || ''}
+                onChange={(e) => onAviaryChange(e.target.value)}
+                disabled={isLoading}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+              >
+                <option value="">Selecione um aviário</option>
+                {aviaries.map((aviary) => (
+                  <option key={aviary.id} value={aviary.id}>
+                    {aviary.name} - Aves: {(
+                      (aviary.currentAmountOfRooster ?? aviary.initialAmountOfRoosters) +
+                      (aviary.currentAmountOfChickens ?? aviary.initialAmountOfChickens)
+                    )}
+                  </option>
                 ))}
+              </select>
+            </div>
+          )}
+        </div>
+
+        {/* Área de Resultados */}
+        {selectedAviary ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Histórico de Coletas */}
+            <div className="bg-white rounded-2xl border overflow-hidden">
+              <div className="bg-gradient-to-r from-green-500 to-teal-500 p-4">
+                <h3 className="text-lg font-semibold text-white flex items-center">
+                  <Info className="mr-2 h-5 w-5" />
+                  Histórico de Coleta
+                </h3>
+              </div>
+              <div className="p-5">
+                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                  {eggCollects.length > 0 ? (
+                    eggCollects.map((entry, index) => (
+                      <div
+                        key={index}
+                        onClick={() => onSelectCollect(entry)}
+                        className={`p-4 rounded-xl border cursor-pointer transition-all hover:shadow-md ${selectedCollect?.id === entry.id
+                            ? 'border-green-500 bg-green-50'
+                            : 'border-gray-200 hover:border-green-300'
+                          }`}
+                      >
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <span className="text-gray-600">
+                              {new Date(entry.collectionDate).toLocaleTimeString('pt-BR', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false
+                              })}
+                            </span>                          </div>
+                          <div className="text-lg font-bold text-green-600">
+                            {entry.totalEggs} unidades
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-10 text-gray-500">
+                      Nenhuma coleta encontrada para esta data
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-  
-            <div className="space-y-6">
-              <div className="bg-white rounded-lg border p-6">
-                {categories.map((category, index) => (
-                  <div key={index} className="mb-6 last:mb-0">
-                    <div className="flex items-center space-x-2 mb-3">
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      <h4 className="font-medium">{category.name}</h4>
-                      <span className="text-gray-500">Total: {category.total}</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <input
-                        type="text"
-                        placeholder="Carrinhos"
-                        value={category.cages}
-                        onChange={e => handleCategoryChange(index, 'cages', e.target.value)}
-                        className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
-                      />
-                      <input
-                        type="number"
-                        placeholder="Unidade"
-                        value={category.quantity}
-                        onChange={e => handleCategoryChange(index, 'quantity', parseInt(e.target.value) || 0)}
-                        className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
-                      />
-                    </div>
+
+            {/* Detalhes da Coleta */}
+            <div>
+              {selectedCollect ? (
+                <div className="bg-white rounded-2xl  border overflow-hidden">
+                  <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-4">
+                    <h3 className="text-lg font-semibold text-white">Detalhes da Coleta</h3>
                   </div>
-                ))}
-                <button onClick={handleSave} className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors mt-6">
-                  Salvar
-                </button>
-              </div>
-  
-              <div className="bg-white rounded-lg border p-6">
-                <h3 className="text-lg font-semibold mb-4">Contagem de aves mortas</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Galos</label>
-                    <input
-                      type="number"
-                      value={deadBirds.male}
-                      onChange={e => handleDeadBirdsChange('male', e.target.value)}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Galinhas</label>
-                    <input
-                      type="number"
-                      value={deadBirds.female}
-                      onChange={e => handleDeadBirdsChange('female', e.target.value)}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
-                    />
+                  <div className="p-6">
+                    {/* Tipos de Ovos */}
+                    <div className="mb-8">
+                      <h4 className="text-md font-semibold text-gray-700 mb-4">Distribuição de Ovos</h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        {selectedCollect.eggDetails?.map((detail, idx) => (
+                          <div
+                            key={idx}
+                            className="bg-gradient-to-br from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-100"
+                          >
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-700 font-medium">
+                                {eggTypeLabels[detail.type] || detail.type}
+                              </span>
+                              <span className="bg-amber-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                                {detail.quantity}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Resumo */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="bg-gradient-to-br from-green-50 to-teal-50 p-4 rounded-xl border border-green-200">
+                        <div className="text-green-800 font-medium text-sm mb-1">Ovos de Mercado</div>
+                        <div className="text-2xl font-bold text-gray-800">{selectedCollect.marketEggs}</div>
+                      </div>
+                      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-200">
+                        <div className="text-blue-800 font-medium text-sm mb-1">Ovos Incubáveis</div>
+                        <div className="text-2xl font-bold text-gray-800">{selectedCollect.hatchableEggs}</div>
+                      </div>
+                      <div className="bg-gradient-to-br from-rose-50 to-pink-50 p-4 rounded-xl border border-rose-200">
+                        <div className="text-rose-800 font-medium text-sm mb-1">Ovos Descartáveis</div>
+                        <div className="text-2xl font-bold text-gray-800">{selectedCollect.dumpEggs}</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <button onClick={handleFinish} className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors mt-6">
-                  Finalizar
-                </button>
-              </div>
+              ) : (
+                <div className="bg-gradient-to-br from-gray-50 to-blue-50 h-full rounded-2xl shadow-lg flex flex-col items-center justify-center p-8 text-center">
+                  <Info className="h-12 w-12 text-gray-400 mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-600 mb-2">Selecione uma coleta</h3>
+                  <p className="text-gray-500">
+                    Escolha uma entrada no histórico à esquerda para visualizar os detalhes
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         ) : (
-          <div className="text-center py-12 text-gray-500">
-            Selecione um aviário para visualizar os dados de coleta
+          <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl shadow-lg flex flex-col items-center justify-center py-16 text-center">
+            <Info className="h-16 w-16 text-gray-400 mb-4" />
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">Selecione um aviário</h3>
+            <p className="text-gray-500 max-w-md">
+              Escolha um lote e depois um aviário para visualizar o histórico de coletas
+            </p>
           </div>
         )}
       </div>
     </div>
-  </div>
-  
   );
 }
-
-export default CollectionTemplate;

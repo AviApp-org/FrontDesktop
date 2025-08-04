@@ -1,5 +1,6 @@
 import api from '../config/axios';
 import { CollectEggData } from '@/@types/CollectEggData';
+
 const eggCollectHook = {
   
   createEggCollect: async (eggCollectData : CollectEggData) => {
