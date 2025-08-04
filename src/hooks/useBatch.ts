@@ -2,6 +2,8 @@ import { BatchData } from '@/@types/BatchData'
 import { AviaryData } from '@/@types/AviaryData';
 import { CreateAviaryData } from '@/@types/CreateAviaryData';
 import aviaryHook from './useAviary';
+import { showErrorMessage } from '../utils/errorHandler';
+import { toast } from 'react-toastify';
 import api from '../config/axios';
 
 const batchHook = {
@@ -12,7 +14,7 @@ const batchHook = {
       return response.data as BatchData[];
     } catch (e) {
       console.error('Error fetching batch:', e);
-      throw new Error('Erro ao buscar lote');
+      return [];
     }
   },
 
@@ -22,7 +24,7 @@ const batchHook = {
       return response.data as BatchData[];
     } catch (e) {
       console.error('Error fetching batches by farm:', e);
-      throw new Error('Erro ao buscar lotes da fazenda');
+      return [];
     }
   },
  
@@ -76,6 +78,61 @@ const batchHook = {
     }
   },
 
+  // Operações de Lote com toast (do useBatchManagement)
+  getBatchesByFarm: async (farmId: number) => {
+    try {
+      const batchesData = await batchHook.getBatchByFarm(farmId);
+      return batchesData;
+    } catch (err) {
+      console.error('Erro ao buscar lotes:', err);
+      throw new Error('Erro ao carregar lotes');
+    }
+  },
+
+  createBatchWithToast: async (data: any) => {
+    try {
+      await batchHook.createBatch({ ...data, farmId: '1' });
+      toast.success('Lote criado com sucesso!');
+    } catch (error) {
+      const message = `Erro ao criar lote: ${showErrorMessage(error)}`;
+      toast.error(message);
+      throw new Error(message);
+    }
+  },
+
+  updateBatchWithToast: async (batchId: string, data: any) => {
+    try {
+      await batchHook.updateBatch(batchId, data);
+      toast.success('Lote atualizado com sucesso!');
+    } catch (error) {
+      const message = `Erro ao atualizar lote: ${showErrorMessage(error)}`;
+      toast.error(message);
+      throw new Error(message);
+    }
+  },
+
+  activateBatchWithToast: async (id: string) => {
+    try {
+      await batchHook.activateBatch(id);
+      toast.success('Lote ativado com sucesso!');
+    } catch (error) {
+      const message = `Erro ao ativar lote: ${showErrorMessage(error)}`;
+      toast.error(message);
+      throw new Error(message);
+    }
+  },
+
+  deactivateBatchWithToast: async (id: string) => {
+    try {
+      await batchHook.deactivateBatch(id);
+      toast.success('Lote desativado com sucesso!');
+    } catch (error) {
+      const message = `Erro ao desativar lote: ${showErrorMessage(error)}`;
+      toast.error(message);
+      throw new Error(message);
+    }
+  },
+
   // Operações de Aviário
   getAviariesByBatch: async (batchId: number) => {
     try {
@@ -83,7 +140,7 @@ const batchHook = {
       return aviaries;
     } catch (err) {
       console.error('Erro ao buscar aviários:', err);
-      throw new Error('Erro ao buscar aviários');
+      return [];
     }
   },
 
@@ -94,8 +151,11 @@ const batchHook = {
         batchId: Number(aviaryData.batchId),
       };
       await aviaryHook.createAviary(dataToSend);
+      toast.success('Aviário criado com sucesso!');
     } catch (error) {
-      throw new Error('Erro ao criar aviário');
+      const message = `Erro ao criar aviário: ${showErrorMessage(error)}`;
+      toast.error(message);
+      throw new Error(message);
     }
   },
 
@@ -106,16 +166,22 @@ const batchHook = {
         batchId: Number(aviaryData.batchId),
       };
       await aviaryHook.updateAviary(aviaryId, dataToSend);
+      toast.success('Aviário atualizado com sucesso!');
     } catch (error) {
-      throw new Error('Erro ao atualizar aviário');
+      const message = `Erro ao atualizar aviário: ${showErrorMessage(error)}`;
+      toast.error(message);
+      throw new Error(message);
     }
   },
 
   deleteAviary: async (id: string) => {
     try {
       await aviaryHook.deleteAviary(Number(id));
+      toast.success('Aviário deletado com sucesso!');
     } catch (error) {
-      throw new Error('Erro ao deletar aviário');
+      const message = `Erro ao deletar aviário: ${showErrorMessage(error)}`;
+      toast.error(message);
+      throw new Error(message);
     }
   },
 
