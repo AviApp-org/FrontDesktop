@@ -8,7 +8,9 @@ import { AviaryData } from '@/@types/AviaryData';
 import { CollectEggData } from '@/@types/CollectEggData';
 import CollectsTemplate from '@/templates/Collects';
 import { EggType } from '@/@types/enums/enumEggtype';
-import { formatDateForInput, formatDateForBackend } from '@/utils/formatDate';
+import { formatDateForInput } from '@/utils/formatDate';
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 
 
 function CollectsPage() {
@@ -25,10 +27,9 @@ function CollectsPage() {
   const [currentDate, setCurrentDate] = useState(() => {
     const hoje = new Date();
     const isoDate = hoje.toISOString().split('T')[0];
-    return isoDate; 
+    return isoDate;
   });
 
-  // Carrega lotes
   useEffect(() => {
     const fetchBatches = async () => {
       if (!farmId) return;
@@ -45,6 +46,40 @@ function CollectsPage() {
     fetchBatches();
   }, [farmId]);
 
+  useEffect(() => {
+    const socket = new SockJS(`http://localhost:8080/ws-collect`);
+    const stompClient = new Client({
+      webSocketFactory: () => socket,
+      debug: (str) => console.log('[STOMP]', str),
+      reconnectDelay: 5000,
+      onConnect: () => {
+        stompClient.subscribe('/topic/collects', (message) => {
+          if (message.body) {
+            const newCollect = JSON.parse(message.body);
+
+            const collectDate = newCollect.collectionDate?.substring(0, 10);
+            const currentDateShort = currentDate;
+
+            if (
+              selectedAviary &&
+              newCollect.aviaryId === selectedAviary.id &&
+              collectDate === currentDateShort
+            ) {
+              setEggCollects(prev => [newCollect, ...prev]);
+              toast.success('Nova coleta recebida!');
+            }
+          }
+        });
+      },
+    });
+
+    stompClient.activate();
+
+    return () => {
+      stompClient.deactivate();
+    };
+  }, [selectedAviary, currentDate]); // re-cria a conexão quando mudar aviário ou data
+
   // Carrega aviários quando lote é selecionado
   const fetchAviaries = async (batchId: number) => {
     try {
@@ -58,15 +93,15 @@ function CollectsPage() {
 
   // Carrega coletas quando aviário é selecionado
   const fetchEggCollects = async (aviaryId: number) => {
-  try {
-    const formattedDate = formatDateForInput(currentDate); // usa seu util aqui
-    const collects = await eggCollectHook.getByDateAndAviary(formattedDate, aviaryId);
-    setEggCollects(collects);
-  } catch (err) {
-    toast.error('Erro ao carregar coletas de ovos');
-    setEggCollects([]);
-  }
-};
+    try {
+      const formattedDate = formatDateForInput(currentDate); // usa seu util aqui
+      const collects = await eggCollectHook.getByDateAndAviary(formattedDate, aviaryId);
+      setEggCollects(collects);
+    } catch (err) {
+      toast.error('Erro ao carregar coletas de ovos');
+      setEggCollects([]);
+    }
+  };
 
 
   const handleBatchChange = (batchId: string) => {
