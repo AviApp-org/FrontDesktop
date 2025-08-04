@@ -195,7 +195,6 @@ const BatchManagement: React.FC = () => {
   const handleAviaryDelete = async (id: string) => {
     try {
       await batchHook.deleteAviary(id);
-      // Recarregar aviários se houver lote expandido
       const lastExpandedBatch = expandedBatches[expandedBatches.length - 1];
       if (lastExpandedBatch) {
         await fetchAviaries(Number(lastExpandedBatch));

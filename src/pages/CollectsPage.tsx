@@ -7,6 +7,7 @@ import { BatchData } from '@/@types/BatchData';
 import { AviaryData } from '@/@types/AviaryData';
 import { CollectEggData } from '@/@types/CollectEggData';
 import CollectsTemplate from '@/templates/Collects';
+import { EggType } from '@/@types/enums/enumEggtype';
 
 function CollectsPage() {
   const [batches, setBatches] = useState<BatchData[]>([]);
@@ -19,21 +20,6 @@ function CollectsPage() {
   const { farmId } = useFarm();
   const currentDate = '04-08-2025';
 
-  const eggTypeLabels: Record<string, string> = {
-    TOTAL: 'Total',
-    CLEAN: 'Limpo',
-    CRACKED: 'Quebrado',
-    NEST_DIRTY: 'Ninho Sujo',
-    BED_DIRTY: 'Sujo de Cama',
-    SMALL: 'Pequeno',
-    INCUBATABLE: 'Incubável',
-    DOUBLE_YOLK: 'Gema Dupla',
-    BROKEN: 'Quebrado',
-    DEFORMED: 'Deformado',
-    THIN_SHELL: 'Casca Fina',
-    ELIMINATED: 'Descartado',
-    MARKET: 'Comercial',
-  };
 
   // Carrega lotes
   useEffect(() => {
@@ -99,7 +85,7 @@ function CollectsPage() {
       selectedAviary={selectedAviary}
       selectedCollect={selectedCollect}
       isLoading={isLoading}
-      eggTypeLabels={eggTypeLabels}
+      eggTypeLabels={EggType}
       currentDate={currentDate}
       onBatchChange={handleBatchChange}
       onAviaryChange={handleAviaryChange}
