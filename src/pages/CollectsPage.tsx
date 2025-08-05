@@ -16,7 +16,7 @@ import chickenCollectHook from '@/hooks/useChickenCollect';
 
 
 function CollectsPage() {
-  
+
   const [batches, setBatches] = useState<BatchData[]>([]);
   const [aviaries, setAviaries] = useState<AviaryData[]>([]);
   const [eggCollects, setEggCollects] = useState<CollectEggData[]>([]);
@@ -25,7 +25,7 @@ function CollectsPage() {
   const [selectedBatch, setSelectedBatch] = useState<BatchData | null>(null);
   const [selectedAviary, setSelectedAviary] = useState<AviaryData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const {farmId} = useFarm();
+  const { farmId } = useFarm();
 
 
   const [currentDate, setCurrentDate] = useState(() => {
@@ -70,7 +70,15 @@ function CollectsPage() {
               collectDate === currentDateShort
             ) {
               console.log('Nova coleta recebida:', newCollect);
-              setEggCollects(prev => [newCollect, ...prev]);
+              setEggCollects(prev => {
+                // Adiciona a nova coleta no início do array
+                const newCollects = [newCollect, ...prev];
+
+                // Mantém a ordenação por data/hora (opcional)
+                return newCollects.sort((a, b) =>
+                  new Date(b.collectionDate).getTime() - new Date(a.collectionDate).getTime()
+                );
+              }); 
               toast.success('Nova coleta recebida!');
             }
           }
@@ -83,7 +91,7 @@ function CollectsPage() {
     return () => {
       stompClient.deactivate();
     };
-  }, [selectedAviary, currentDate]); 
+  }, [selectedAviary, currentDate]);
 
   const fetchAviaries = async (batchId: number) => {
     try {
@@ -97,9 +105,14 @@ function CollectsPage() {
 
   const fetchEggCollects = async (aviaryId: number) => {
     try {
-      const formattedDate = formatDateForInput(currentDate); 
+      const formattedDate = formatDateForInput(currentDate);
       const collects = await eggCollectHook.getByDateAndAviary(formattedDate, aviaryId);
-      setEggCollects(collects);
+
+      const sortedCollects = collects.sort((a, b) =>
+        new Date(b.collectionDate).getTime() - new Date(a.collectionDate).getTime()
+      );
+
+      setEggCollects(sortedCollects);
     } catch (err) {
       toast.error('Erro ao carregar coletas de ovos');
       setEggCollects([]);
@@ -108,7 +121,7 @@ function CollectsPage() {
 
   const fetchChickenCollects = async (aviaryId: number) => {
     try {
-      const formattedDate = formatDateForInput(currentDate); 
+      const formattedDate = formatDateForInput(currentDate);
       const collects = await chickenCollectHook.getByDateAndAviary(formattedDate, aviaryId);
       setChickenCollect(collects);
     } catch (err) {

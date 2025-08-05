@@ -105,7 +105,7 @@ export default function CollectsTemplate({
               <div className="p-5">
                 <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
                   {eggCollects.length > 0 ? (
-                    eggCollects.slice().reverse().map((entry, index) => (
+                    eggCollects.map((entry, index) => (
                       <div
                         key={index}
                         onClick={() => onSelectCollect(entry)}

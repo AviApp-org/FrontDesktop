@@ -13,7 +13,6 @@ import {
   formatDateForInput
 } from '@/utils/formatDate';
 import employeeHook from '@/hooks/useEmployees';
-import { SelectChangeEvent } from '@mui/material';
 import { toast } from 'react-toastify';
 
 const initialFormData: EmployeeData = {
