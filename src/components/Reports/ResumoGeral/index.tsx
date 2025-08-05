@@ -1,9 +1,9 @@
 import React from 'react';
 import { Card } from 'antd';
-import { ReportData } from '../../../@types/reportTypes'; 
+import { DailyReportData } from '../../../@types/DailyReportData'; 
 
 interface ResumoGeralProps {
-  summary: ReportData;
+  summary: DailyReportData;
 }
 
 export const ResumoGeral: React.FC<ResumoGeralProps> = ({ summary }) => {

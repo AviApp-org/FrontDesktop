@@ -1,22 +1,21 @@
 import { useState, useCallback, useEffect } from 'react';
 import api from '../config/axios';
-import batchHook from './useBatch'; // ✅ Importar o hook existente
+import batchHook from './useBatch'; 
 import { BatchData } from '@/@types/BatchData';
+import { useFarm } from '@/contexts/FarmContext';
 
 export const useReports = () => {
   // ✅ Usar o hook de lotes existente
   const [batches, setBatches] = useState<BatchData[]>([]);
   const [batchesLoading, setBatchesLoading] = useState<boolean>(false);
   const [batchesError, setBatchesError] = useState<string | null>(null);
-
-  // Ajuste para seu farmId fixo (ou dinâmico se preferir)
-  const FARM_ID = 1;
+  const { farmId } = useFarm();
 
   useEffect(() => {
     const fetchBatches = async () => {
       setBatchesLoading(true);
       try {
-        const result = await batchHook.getBatchByFarm(FARM_ID);
+        const result = await batchHook.getBatchByFarm(farmId);
         setBatches(result);
         setBatchesError(null);
       } catch (error) {
@@ -33,7 +32,6 @@ export const useReports = () => {
   const [reportType, setReportType] = useState<'Diário' | 'Semanal' | 'Mensal'>('Diário');
   const [selectedDate, setSelectedDate] = useState<string>('');
 
-  // ✅ Não pré-setar o lote, deixar vazio inicialmente
   const [batchId, setBatchId] = useState<string>('');
 
   const [loading, setLoading] = useState(false);

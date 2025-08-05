@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ClientRegisterTemplate } from '@/templates/ClientRegister';
+import { ClientRegisterTemplate } from '@/templates/Clients';
 import { ClientData } from '@/@types/ClientData';
 import { ClientFormData } from '@/hooks/useClient';
 import clientHook from '@/hooks/useClient';

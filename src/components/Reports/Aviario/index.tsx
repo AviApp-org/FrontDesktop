@@ -27,7 +27,7 @@ interface AviarioProps {
     roosterMortality?: number;
     mortality?: number;
     production?: number;
-    incubateEggs?: number;
+    hatchableEggs?: number;
     marketEggs?: number;
     dumpEggs?: number;
     quantityByEggType?: {
@@ -60,7 +60,7 @@ export const Aviario: React.FC<AviarioProps> = ({ aviary, open, toggle }) => {
   const productionData = {
     totalProduced: aviary.totalEggsCollected || 0,
     productionPercentage: aviary.production || 0,
-    incubatableEggs: aviary.incubateEggs || 0,
+    hatchableEggs: aviary.hatchableEggs || 0,
     marketEggs: aviary.marketEggs || 0,
     eliminatedEggs: aviary.dumpEggs || 0,
   };
@@ -180,7 +180,7 @@ export const Aviario: React.FC<AviarioProps> = ({ aviary, open, toggle }) => {
                     <span className="text-sm font-medium">Ovos Incubáveis</span>
                   </div>
                   <div className="text-xl font-bold text-gray-800">
-                    {productionData.incubatableEggs}
+                    {productionData.hatchableEggs}
                   </div>
                 </Card>
               </Col>

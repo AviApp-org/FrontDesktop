@@ -21,5 +21,5 @@ export interface DailyReportData {
   percentageByEggType: EggDetailPercentageData[];
   marketEggs: number;
   dumpEggs: number;
-  incubateEggs: number;
+  hatchableEggs: number;
 }
