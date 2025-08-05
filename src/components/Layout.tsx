@@ -33,7 +33,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { icon: Home, text: 'Lotes e aviários', path: '/batches', requiredRole: null },
     { icon: Users, text: 'Funcionários', path: '/employees', requiredRole: null },
     { icon: DollarSign, text: 'Financeiro', path: '/financial', requiredRole: null },
-    { icon: FileInput, text: 'Entrada de dados', path: '/data-entry', requiredRole: null },
     { icon: UserPlus, text: 'Cadastro de Clientes', path: '/clients/register', requiredRole: 'ADMIN' },
     { icon: Building2, text: 'Cadastro de Granjas', path: '/farms/register', requiredRole: 'ADMIN' },
   ].filter(item => !item.requiredRole || user?.role === item.requiredRole);
@@ -47,7 +46,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div className="flex min-h-svh bg-gray-100">
-      {/* Mobile Sidebar Toggle */}
       <button
         onClick={toggleSidebar}
         className="md:hidden fixed top-4 left-4 z-20 bg-white p-2 rounded-md shadow-sm"
@@ -55,7 +53,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <Menu className="h-6 w-6" />
       </button>
 
-      {/* Sidebar */}
       <div
         className={`w-64 bg-white shadow-lg fixed h-full transition-all duration-300 z-10 
           ${sidebarOpen ? 'left-0' : '-left-64'} 
@@ -101,7 +98,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="flex-1 md:ml-64">
         {/* Header */}
         <header className="bg-white shadow-sm fixed top-0 left-0 w-full md:w-[calc(100%-16rem)] md:left-64 z-20 flex items-center justify-between px-6 py-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+          <h1 className="text-2xl md:text-3xl font-bold text-green-600">
             {sidebarItems.find(item => item.path === location.pathname)?.text || 'Dashboard'}
           </h1>
           <button
