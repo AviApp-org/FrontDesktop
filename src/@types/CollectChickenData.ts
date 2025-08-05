@@ -1,9 +1,9 @@
 export interface CollectChickenData {
-    id?: number;
+    id: number;
     aviaryId : number;
     deadRoosters : number;
     deadChickens : number;
-    observation : string;
-    collectionDate : string;
+    observation?: string;
+    collectionDate: string;
 }
  

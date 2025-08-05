@@ -11,17 +11,21 @@ import { EggType } from '@/@types/enums/enumEggtype';
 import { formatDateForInput } from '@/utils/formatDate';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { CollectChickenData } from '@/@types/CollectChickenData';
+import chickenCollectHook from '@/hooks/useChickenCollect';
 
 
 function CollectsPage() {
+  
   const [batches, setBatches] = useState<BatchData[]>([]);
   const [aviaries, setAviaries] = useState<AviaryData[]>([]);
   const [eggCollects, setEggCollects] = useState<CollectEggData[]>([]);
+  const [chickenCollects, setChickenCollect] = useState<CollectChickenData[]>([]);
   const [selectedCollect, setSelectedCollect] = useState<CollectEggData | null>(null);
   const [selectedBatch, setSelectedBatch] = useState<BatchData | null>(null);
   const [selectedAviary, setSelectedAviary] = useState<AviaryData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { farmId } = useFarm();
+  const {farmId} = useFarm();
 
 
   const [currentDate, setCurrentDate] = useState(() => {
@@ -79,9 +83,8 @@ function CollectsPage() {
     return () => {
       stompClient.deactivate();
     };
-  }, [selectedAviary, currentDate]); // re-cria a conexão quando mudar aviário ou data
+  }, [selectedAviary, currentDate]); 
 
-  // Carrega aviários quando lote é selecionado
   const fetchAviaries = async (batchId: number) => {
     try {
       const aviariesData = await batchHook.getAviariesByBatch(batchId);
@@ -92,15 +95,25 @@ function CollectsPage() {
     }
   };
 
-  // Carrega coletas quando aviário é selecionado
   const fetchEggCollects = async (aviaryId: number) => {
     try {
-      const formattedDate = formatDateForInput(currentDate); // usa seu util aqui
+      const formattedDate = formatDateForInput(currentDate); 
       const collects = await eggCollectHook.getByDateAndAviary(formattedDate, aviaryId);
       setEggCollects(collects);
     } catch (err) {
       toast.error('Erro ao carregar coletas de ovos');
       setEggCollects([]);
+    }
+  };
+
+  const fetchChickenCollects = async (aviaryId: number) => {
+    try {
+      const formattedDate = formatDateForInput(currentDate); 
+      const collects = await chickenCollectHook.getByDateAndAviary(formattedDate, aviaryId);
+      setChickenCollect(collects);
+    } catch (err) {
+      toast.error('Erro ao carregar coletas de ovos');
+      setChickenCollect([]);
     }
   };
 
