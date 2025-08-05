@@ -65,6 +65,7 @@ function CollectsPage() {
               newCollect.aviaryId === selectedAviary.id &&
               collectDate === currentDateShort
             ) {
+              console.log('Nova coleta recebida:', newCollect);
               setEggCollects(prev => [newCollect, ...prev]);
               toast.success('Nova coleta recebida!');
             }
