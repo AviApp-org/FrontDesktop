@@ -1,5 +1,4 @@
 import React from 'react';
-import { Box, SelectChangeEvent } from '@mui/material';
 import { EmployeeHeader } from '@/components/EmployeeHeader';
 import { EmployeeTable } from '@/components/EmployeeTable';
 import { EmployeeModal } from '@/components/EmployeeModal';
@@ -23,9 +22,7 @@ interface Props {
     onDeleteEmployee: (id: number) => void;
     onCloseModal: () => void;
     onSubmit: () => void;
-    onInputChange: (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent
-    ) => void;
+    onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | React.ChangeEvent<HTMLSelectElement>) => void;
     onCancelDelete: () => void;
     onConfirmDelete: () => void;
 }
@@ -52,7 +49,7 @@ export const EmployeeTemplate: React.FC<Props> = ({
     onConfirmDelete
 }) => {
     return (
-        <Box>
+        <div className=" px-4 sm:px-6 lg:px-8 py-6">
             <EmployeeHeader
                 searchTerm={searchTerm}
                 totalEmployees={employees.length}
@@ -60,7 +57,7 @@ export const EmployeeTemplate: React.FC<Props> = ({
                 onAddEmployee={onAddEmployee}
             />
 
-            <Box sx={{ mt: 3 }}>
+            <div className="mt-6 rounded-2xl bg-white shadow-md overflow-hidden">
                 <EmployeeTable
                     employees={employees}
                     isLoading={isLoading}
@@ -68,7 +65,7 @@ export const EmployeeTemplate: React.FC<Props> = ({
                     onEdit={onEditEmployee}
                     onDelete={onDeleteEmployee}
                 />
-            </Box>
+            </div>
 
             <EmployeeModal
                 open={openDialog}
@@ -86,6 +83,6 @@ export const EmployeeTemplate: React.FC<Props> = ({
                 onClose={onCancelDelete}
                 onConfirm={onConfirmDelete}
             />
-        </Box>
+        </div>
     );
 };

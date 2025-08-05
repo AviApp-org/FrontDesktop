@@ -1,23 +1,7 @@
 import React from 'react';
-import {
-  Card,
-  CardContent,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  IconButton,
-  Typography,
-  Box,
-  CircularProgress,
-  Chip
-} from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { EmployeeData } from '../../@types/EmployeeData';
 import { EmployeeRole } from '../../@types/enums/enumEmployeeRole';
-import { formatDate } from '../../utils/formatDate'; // ✅ Usar a função correta
+import { formatDate } from '../../utils/formatDate';
 
 interface EmployeeTableProps {
   employees: EmployeeData[];
@@ -30,19 +14,18 @@ interface EmployeeTableProps {
 const getRoleLabel = (role: EmployeeRole): string => {
   const roleLabels = {
     [EmployeeRole.MANAGER]: 'Gerente',
-    [EmployeeRole.WORKER]: 'Trabalhador',
+    [EmployeeRole.WORKER]: 'Colaborador',
   };
   return roleLabels[role] || role;
 };
 
-const getRoleColor = (role: EmployeeRole) => {
+const getRoleColor = (role: EmployeeRole): string => {
   const roleColors = {
-    [EmployeeRole.MANAGER]: 'error',
-    [EmployeeRole.WORKER]: 'primary',
+    [EmployeeRole.MANAGER]: 'text-red-600 border-red-600',
+    [EmployeeRole.WORKER]: 'text-green-600 border-green-600',
   };
-  return roleColors[role] || 'default';
+  return roleColors[role] || 'text-gray-600 border-gray-300';
 };
-
 
 export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   employees,
@@ -53,116 +36,78 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
-        <CardContent>
-          <Box display="flex" justifyContent="center" my={4}>
-            <CircularProgress sx={{ color: 'primary.main' }} />
-            <Typography sx={{ ml: 2 }}>Carregando funcionários...</Typography>
-          </Box>
-        </CardContent>
-      </Card>
+      <div className="border border-gray-200 rounded p-6 text-center">
+        <div className="flex items-center justify-center gap-2">
+          <div className="w-5 h-5 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
+          <span className="text-sm text-gray-700">Carregando funcionários...</span>
+        </div>
+      </div>
     );
   }
 
   if (isError) {
     return (
-      <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
-        <CardContent>
-          <Box display="flex" justifyContent="center" my={4}>
-            <Typography color="error">
-              Erro ao carregar funcionários. Por favor, tente novamente mais tarde.
-            </Typography>
-          </Box>
-        </CardContent>
-      </Card>
+      <div className="border border-gray-200 rounded p-6 text-center text-red-600 font-medium">
+        Erro ao carregar funcionários. Por favor, tente novamente mais tarde.
+      </div>
     );
   }
 
   return (
-    <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
-      <CardContent sx={{ p: 0 }}>
-        <TableContainer>
-          <Table>
-            <TableHead sx={{ bgcolor: 'background.default' }}>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 'bold' }}>Nome</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>CPF</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Data Nascimento</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Telefone</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Cargo</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 'bold' }}>Ações</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {employees.length > 0 ? (
-                employees.map((employee) => (
-                  <TableRow key={employee.id} hover>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight="medium">
-                        {employee.name}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="text.secondary">
-                        {employee.cpf}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="text.secondary">
-                        {formatDate(employee.birthDate) || '-'} {/* ✅ Usa a função importada */}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="text.secondary">
-                        {employee.phone}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={getRoleLabel(employee.role)}
-                        color={getRoleColor(employee.role) as any}
-                        size="small"
-                        variant="outlined"
-                      />
-                    </TableCell>
-                    <TableCell align="right">
-                      <Box display="flex" gap={1} justifyContent="flex-end">
-                        <IconButton
-                          size="small"
-                          onClick={() => onEdit(employee)}
-                          sx={{ color: 'primary.main' }}
-                        >
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => {
-                            if (employee.id !== undefined) {
-                              onDelete(employee.id);
-                            }
-                          }}
-                          sx={{ color: 'error.main' }}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
-                    <Typography color="text.secondary">
-                      Nenhum funcionário encontrado
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </CardContent>
-    </Card>
+    <div className="border border-gray-200 rounded overflow-x-auto">
+      <table className="min-w-full text-sm">
+        <thead className="bg-gray-100 text-left">
+          <tr>
+            <th className="font-semibold px-4 py-2">Nome</th>
+            <th className="font-semibold px-4 py-2">CPF</th>
+            <th className="font-semibold px-4 py-2">Data Nascimento</th>
+            <th className="font-semibold px-4 py-2">Telefone</th>
+            <th className="font-semibold px-4 py-2">Cargo</th>
+            <th className="font-semibold px-4 py-2 text-right">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {employees.length > 0 ? (
+            employees.map((employee) => (
+              <tr key={employee.id} className="hover:bg-gray-50 border-t">
+                <td className="px-4 py-3 font-medium">{employee.name}</td>
+                <td className="px-4 py-3 text-gray-600">{employee.cpf}</td>
+                <td className="px-4 py-3 text-gray-600">{formatDate(employee.birthDate)}</td>
+                <td className="px-4 py-3 text-gray-600">{employee.phone}</td>
+                <td className="px-4 py-3">
+                  <span className={`text-xs px-2 py-1 border rounded-full ${getRoleColor(employee.role)}`}>
+                    {getRoleLabel(employee.role)}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-right">
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => onEdit(employee)}
+                      className="text-green-600 hover:text-green-800 transition"
+                      title="Editar"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      onClick={() => employee.id && onDelete(employee.id)}
+                      className="text-red-600 hover:text-red-800 transition"
+                      title="Excluir"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={6} className="text-center text-gray-500 py-6">
+                Nenhum funcionário encontrado
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
   );
 };
