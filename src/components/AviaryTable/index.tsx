@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { AviaryTableProps } from './types';
 import Button from '../Button';
 import { toast } from 'react-toastify';
@@ -12,10 +12,7 @@ export const AviaryTable: React.FC<AviaryTableProps> = ({
   onEditAviary,
   onDeleteAviary
 }) => {
-  const batchAviaries = aviariesData?.filter(aviary => {
-    return String(aviary.batchId) === String(batch.id);
-  }) || [];
-
+  const batchAviaries = aviariesData?.filter(aviary => String(aviary.batchId) === String(batch.id)) || [];
   const isBatchInactive = batch.status === 'INACTIVE';
 
   const handleCreateAviary = () => {
@@ -35,9 +32,9 @@ export const AviaryTable: React.FC<AviaryTableProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-800">Aviários do Lote</h3>
+        <h3 className="text-xl font-semibold text-gray-800">Aviários do Lote</h3>
         <Button
           variant="primary"
           onClick={handleCreateAviary}
@@ -49,64 +46,44 @@ export const AviaryTable: React.FC<AviaryTableProps> = ({
       </div>
 
       {isLoadingAviaries ? (
-        <div className="p-4 text-center text-gray-500">Carregando aviários...</div>
+        <div className="p-6 text-center text-gray-500">Carregando aviários...</div>
       ) : batchAviaries.length === 0 ? (
-        <div className="p-4 text-center text-gray-500">Nenhum aviário encontrado para este lote.</div>
+        <div className="p-6 text-center text-gray-500">Nenhum aviário encontrado para este lote.</div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full text-sm">
+            <thead className="bg-gray-100 text-gray-700 uppercase text-xs tracking-wider">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Nome
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Galos Iniciais
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Galinhas Iniciais
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Galos Atuais
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Galinhas Atuais
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Ações
-                </th>
+                <th className="px-6 py-3 text-left">Nome</th>
+                <th className="px-6 py-3 text-center">Galos Iniciais</th>
+                <th className="px-6 py-3 text-center">Galinhas Iniciais</th>
+                <th className="px-6 py-3 text-center">Galos Atuais</th>
+                <th className="px-6 py-3 text-center">Galinhas Atuais</th>
+                <th className="px-6 py-3 text-right">Ações</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {batchAviaries.map((aviary) => (
-                <tr key={aviary.id} className="hover:bg-gray-50 transition-colors duration-150">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {aviary.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {aviary.initialAmountOfRoosters}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {aviary.initialAmountOfChickens}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {aviary.currentAmountOfRooster ?? aviary.initialAmountOfRoosters}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {aviary.currentAmountOfChickens ?? aviary.initialAmountOfChickens}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex justify-end space-x-2">
+                <tr key={aviary.id} className="hover:bg-gray-50 transition">
+                  <td className="px-6 py-4 font-medium text-gray-900">{aviary.name}</td>
+                  <td className="px-6 py-4 text-center text-gray-600">{aviary.initialAmountOfRoosters}</td>
+                  <td className="px-6 py-4 text-center text-gray-600">{aviary.initialAmountOfChickens}</td>
+                  <td className="px-6 py-4 text-center text-gray-600">{aviary.currentAmountOfRooster ?? aviary.initialAmountOfRoosters}</td>
+                  <td className="px-6 py-4 text-center text-gray-600">{aviary.currentAmountOfChickens ?? aviary.initialAmountOfChickens}</td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex justify-end gap-2">
                       <button
                         onClick={() => onEditAviary(aviary)}
-                        className="text-blue-600 hover:text-blue-900 transition-colors duration-200"
+                        className="flex items-center gap-1 px-2 py-1 text-green-700 hover:text-white hover:bg-green-600 border border-green-600 rounded-md transition"
                       >
+                        <Pencil className="w-4 h-4" />
                         Editar
                       </button>
                       <button
                         onClick={() => onDeleteAviary(String(aviary.id))}
-                        className="text-red-600 hover:text-red-900 transition-colors duration-200"
+                        className="flex items-center gap-1 px-2 py-1 text-red-600 hover:text-white hover:bg-red-500 border border-red-500 rounded-md transition"
                       >
+                        <Trash2 className="w-4 h-4" />
                         Excluir
                       </button>
                     </div>

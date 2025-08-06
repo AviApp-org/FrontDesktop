@@ -1,5 +1,4 @@
 import React from 'react';
-import { Box } from '@mui/material';
 import { BatchHeader } from '@/components/BatchHeader';
 import { BatchTable } from '@/components/BatchTable';
 import { AviaryTable } from '@/components/AviaryTable';
@@ -10,7 +9,6 @@ import { AviaryData } from '@/@types/AviaryData';
 import { CreateAviaryData } from '@/@types/CreateAviaryData';
 
 interface Props {
-  // Estados
   isModalOpen: boolean;
   isAviaryModalOpen: boolean;
   selectedBatch: BatchData | null;
@@ -24,11 +22,9 @@ interface Props {
   isActivating: boolean;
   isDeactivating: boolean;
 
-  // Dados
   batches: BatchData[];
   aviariesData: AviaryData[];
 
-  // Callbacks
   onNewBatch: () => void;
   onToggleExpansion: (batchId: string) => void;
   onEditBatch: (batch: BatchData) => void;
@@ -43,7 +39,6 @@ interface Props {
 }
 
 export const BatchManagementTemplate: React.FC<Props> = ({
-  // Estados
   isModalOpen,
   isAviaryModalOpen,
   selectedBatch,
@@ -56,12 +51,8 @@ export const BatchManagementTemplate: React.FC<Props> = ({
   isLoadingAviaries,
   isActivating,
   isDeactivating,
-
-  // Dados
   batches,
   aviariesData,
-
-  // Callbacks
   onNewBatch,
   onToggleExpansion,
   onEditBatch,
@@ -75,13 +66,13 @@ export const BatchManagementTemplate: React.FC<Props> = ({
   onCloseAviaryModal
 }) => {
   return (
-    <Box>
-      <BatchHeader 
-        onNewBatch={onNewBatch} 
-        error={error ?? undefined} 
+    <div className="w-full">
+      <BatchHeader
+        onNewBatch={onNewBatch}
+        error={error ?? undefined}
       />
 
-      <Box sx={{ mt: 3 }}>
+      <div className="mt-6">
         <div className="flex flex-col gap-6 w-full bg-white rounded-xl shadow px-6 py-4">
           <BatchTable
             batches={batches}
@@ -93,7 +84,7 @@ export const BatchManagementTemplate: React.FC<Props> = ({
             onEdit={onEditBatch}
             onAction={onBatchAction}
           >
-            {batch => (
+            {(batch) => (
               <AviaryTable
                 batch={batch}
                 aviariesData={aviariesData}
@@ -122,7 +113,7 @@ export const BatchManagementTemplate: React.FC<Props> = ({
             onSubmit={onAviarySubmit}
           />
         </div>
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
-}; 
+};

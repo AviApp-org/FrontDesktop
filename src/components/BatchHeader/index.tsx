@@ -1,74 +1,43 @@
 import React from "react";
 import { BatchHeaderProps } from "./types";
 import { AlertCircle } from "lucide-react";
-import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
-import { green } from "@mui/material/colors";
-import { Box, Typography } from "@mui/material";
 
 export const BatchHeader: React.FC<BatchHeaderProps> = ({ onNewBatch, error }) => (
-  <Box
-    sx={{
-      mb: 3,
-      bgcolor: 'background.paper',
-      borderRadius: 3,
-      px: { xs: 2, sm: 4 },
-      py: 3,
-    }}
-  >
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: { xs: 'column', sm: 'row' },
-        alignItems: { xs: 'stretch', sm: 'center' },
-        justifyContent: 'space-between',
-        gap: 3,
-        mb: 1,
-      }}
-    >
-      <Typography
-        variant="h4"
-        component="h1"
-        fontWeight="bold"
-        color="text.primary"
-        mb={0}
-      >
+  <div className="mb-6 bg-white rounded-xl px-4 sm:px-6 py-6 shadow">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
+      <h1 className="text-2xl font-bold text-gray-900">
         Gerenciamento de Lotes e Aviários
-      </Typography>
-      <Button
-        variant="contained"
-        startIcon={<AddIcon />}
+      </h1>
+
+      <button
         onClick={onNewBatch}
-        sx={{
-          bgcolor: green[600],
-          '&:hover': { bgcolor: green[800] },
-          px: 3,
-        }}
+        className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white px-4 py-2 rounded-md transition-colors"
       >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M12 5v14M5 12h14" />
+        </svg>
         Cadastrar Lote
-      </Button>
-    </Box>
-    <Typography variant="body2" color="text.secondary" mb={error ? 2 : 0}>
+      </button>
+    </div>
+
+    <p className={`text-sm text-gray-600 ${error ? 'mb-4' : 'mb-0'}`}>
       Gerencie seus lotes e aviários de forma eficiente
-    </Typography>
+    </p>
+
     {error && (
-      <Box
-        sx={{
-          bgcolor: 'red.50',
-          borderLeft: '4px solid',
-          borderColor: 'error.main',
-          p: 2,
-          borderRadius: 2,
-          display: 'flex',
-          alignItems: 'center',
-          width: '100%',
-          mt: 2,
-          gap: 1,
-        }}
-      >
-        <AlertCircle style={{ color: '#f44336', marginRight: 8 }} size={20} />
-        <Typography color="error.main">{error}</Typography>
-      </Box>
+      <div className="flex items-center gap-2 p-3 mt-4 bg-red-50 border-l-4 border-red-600 rounded-md">
+        <AlertCircle className="text-red-600 w-5 h-5" />
+        <span className="text-red-600 text-sm">{error}</span>
+      </div>
     )}
-  </Box>
+  </div>
 );
