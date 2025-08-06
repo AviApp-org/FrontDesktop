@@ -35,7 +35,7 @@ export const BatchTable: React.FC<BatchTableProps> = ({
         <thead className="bg-gray-50">
           <tr>
             <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Nome
+              Nome do Lote
             </th>
             <th scope="col" className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Data de Início
@@ -71,7 +71,17 @@ export const BatchTable: React.FC<BatchTableProps> = ({
                             <ChevronUp className="w-5 h-5" />
                           )}
                         </button>
-                        <span className="text-sm font-medium text-gray-900">{batch.name}</span>
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">{batch.name}</div>
+                            <div className="text-xs text-gray-500">Lote</div>
+                          </div>
+                        </div>
                       </div>
                     </td>
 
@@ -137,7 +147,7 @@ export const BatchTable: React.FC<BatchTableProps> = ({
 
                   {expandedBatches.includes(String(batch.id)) && children && (
                     <tr>
-                      <td colSpan={4} className="px-6 py-4 bg-gray-50">
+                      <td colSpan={4} className="px-0 py-0 bg-gray-50">
                         {children(batch)}
                       </td>
                     </tr>
