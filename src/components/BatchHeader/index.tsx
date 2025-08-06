@@ -3,15 +3,20 @@ import { BatchHeaderProps } from "./types";
 import { AlertCircle } from "lucide-react";
 
 export const BatchHeader: React.FC<BatchHeaderProps> = ({ onNewBatch, error }) => (
-  <div className="mb-6 bg-white rounded-xl px-4 sm:px-6 py-6 shadow">
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
-      <h1 className="text-2xl font-bold text-gray-900">
-        Gerenciamento de Lotes e Aviários
-      </h1>
+  <div className="flex flex-col gap-4">
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">
+          Gerenciamento de Lotes e Aviários
+        </h1>
+        <p className="text-gray-600 mt-1">
+          Gerencie seus lotes e aviários de forma eficiente
+        </p>
+      </div>
 
       <button
         onClick={onNewBatch}
-        className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white px-4 py-2 rounded-md transition-colors"
+        className="bg-gradient-to-r from-green-600 to-teal-600 text-white px-6 py-3 rounded-xl text-sm font-medium hover:from-green-700 hover:to-teal-700 transition-all shadow-md flex items-center justify-center gap-2"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -29,13 +34,9 @@ export const BatchHeader: React.FC<BatchHeaderProps> = ({ onNewBatch, error }) =
       </button>
     </div>
 
-    <p className={`text-sm text-gray-600 ${error ? 'mb-4' : 'mb-0'}`}>
-      Gerencie seus lotes e aviários de forma eficiente
-    </p>
-
     {error && (
-      <div className="flex items-center gap-2 p-3 mt-4 bg-red-50 border-l-4 border-red-600 rounded-md">
-        <AlertCircle className="text-red-600 w-5 h-5" />
+      <div className="flex items-center gap-3 p-4 bg-red-50 border-l-4 border-red-600 rounded-lg">
+        <AlertCircle className="text-red-600 w-5 h-5 flex-shrink-0" />
         <span className="text-red-600 text-sm">{error}</span>
       </div>
     )}

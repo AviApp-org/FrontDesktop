@@ -2,68 +2,56 @@ import React from 'react';
 import { CreateAviaryData } from '../../@types/CreateAviaryData';
 import { AviaryModalProps } from './types';
 
-
 export const AviaryModal: React.FC<AviaryModalProps> = ({
-
   isOpen,
   aviary,
-  selectedBatch, // ✅ Receber selectedBatch
+  selectedBatch,
   onClose,
   onSubmit
 }) => {
-
   if (!isOpen) return null;
-  return (
 
-    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-          <h3 className="text-lg font-semibold text-gray-900">
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+      <div className="bg-white rounded-xl w-full max-w-md shadow-xl">
+        <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-4">
+          <h3 className="text-lg font-semibold text-white">
             {aviary ? 'Editar Aviário' : 'Novo Aviário'}
           </h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-500 transition-colors duration-200">
-            ×
-          </button>
         </div>
+
         <div className="p-6">
           <form onSubmit={(e) => {
             e.preventDefault();
             const formData = new FormData(e.currentTarget);
-
-            // ✅ Criar objeto com tipo correto
             const aviaryData: CreateAviaryData = {
               name: formData.get('name') as string,
               initialAmountOfRoosters: Number(formData.get('initialAmountOfRoosters')),
               initialAmountOfChickens: Number(formData.get('initialAmountOfChickens')),
               batchId: Number(selectedBatch?.id)
             };
-
             onSubmit(aviaryData);
           }}>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nome do Aviário
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Nome do Aviário *</label>
                 <input
                   type="text"
                   name="name"
                   defaultValue={aviary?.name}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
                   placeholder="Ex: AVIÁRIO A1"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Quantidade Inicial de Galos
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Quantidade de Galos *</label>
                 <input
                   type="number"
                   name="initialAmountOfRoosters"
                   defaultValue={aviary?.initialAmountOfRoosters}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
                   placeholder="0"
                   required
                   min="0"
@@ -71,42 +59,39 @@ export const AviaryModal: React.FC<AviaryModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Quantidade Inicial de Galinhas
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Quantidade de Galinhas *</label>
                 <input
                   type="number"
                   name="initialAmountOfChickens"
                   defaultValue={aviary?.initialAmountOfChickens}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition"
                   placeholder="0"
                   required
                   min="0"
                 />
               </div>
 
-              {/* ✅ Mostrar qual lote está sendo usado */}
               {selectedBatch && (
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <p className="text-sm text-gray-600">
-                    <strong>Lote:</strong> {selectedBatch.name}
+                <div className="bg-amber-50 p-3 rounded-lg border border-amber-100">
+                  <p className="text-sm text-amber-800">
+                    <span className="font-medium">Lote associado:</span> {selectedBatch.name}
                   </p>
                 </div>
               )}
 
-              <div className="flex justify-end space-x-3 mt-6">
+              <div className="flex justify-end gap-3 mt-6">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                  className="px-6 py-3 border border-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 transition"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"
+                  className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-sm font-medium hover:from-amber-600 hover:to-orange-600 transition"
                 >
-                  {aviary ? 'Salvar' : 'Criar'}
+                  {aviary ? 'Salvar Alterações' : 'Criar Aviário'}
                 </button>
               </div>
             </div>

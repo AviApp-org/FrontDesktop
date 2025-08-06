@@ -20,21 +20,16 @@ export const BatchModal: React.FC<BatchModalProps> = ({
     const [year, month, day] = dateValue.split('-');
     return `${day}/${month}/${year}`;
   };
+
   return (
-    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-          <h3 className="text-lg font-semibold text-gray-900">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+      <div className="bg-white rounded-xl w-full max-w-md shadow-xl">
+        <div className="bg-gradient-to-r from-green-600 to-teal-600 p-4">
+          <h3 className="text-lg font-semibold text-white">
             {batch ? 'Editar Lote' : 'Novo Lote'}
           </h3>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-500 transition-colors duration-200"
-            disabled={isSubmitting}
-          >
-            ×
-          </button>
         </div>
+
         <div className="p-6">
           <form onSubmit={(e) => {
             e.preventDefault();
@@ -49,12 +44,12 @@ export const BatchModal: React.FC<BatchModalProps> = ({
           }}>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nome do Lote</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Nome do Lote *</label>
                 <input
                   type="text"
                   name="name"
                   defaultValue={batch?.name}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition ${
                     formErrors.name ? 'border-red-500' : 'border-gray-300'
                   }`}
                   placeholder="Ex: LOTE001"
@@ -65,12 +60,12 @@ export const BatchModal: React.FC<BatchModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Data de Início</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Data de Início *</label>
                 <input
                   type="date"
                   name="startDate"
                   defaultValue={batch?.startDate ? formatDateForInput(batch.startDate) : ''}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition ${
                     formErrors.startDate ? 'border-red-500' : 'border-gray-300'
                   }`}
                   required
@@ -80,11 +75,11 @@ export const BatchModal: React.FC<BatchModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Status *</label>
                 <select
                   name="status"
                   defaultValue={batch?.status || 'ACTIVE'}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
                   required
                   disabled={isSubmitting}
                 >
@@ -94,21 +89,31 @@ export const BatchModal: React.FC<BatchModalProps> = ({
                 </select>
               </div>
 
-              <div className="flex justify-end space-x-3 mt-6">
+              <div className="flex justify-end gap-3 mt-6">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                   disabled={isSubmitting}
+                  className="px-6 py-3 border border-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 transition"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"
                   disabled={isSubmitting}
+                  className={`px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-xl text-sm font-medium hover:from-green-700 hover:to-teal-700 transition ${
+                    isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 >
-                  {isSubmitting ? 'Processando...' : (batch ? 'Salvar' : 'Criar')}
+                  {isSubmitting ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Processando...
+                    </span>
+                  ) : batch ? 'Salvar Alterações' : 'Criar Lote'}
                 </button>
               </div>
             </div>

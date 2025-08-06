@@ -21,10 +21,8 @@ interface Props {
   isLoadingAviaries: boolean;
   isActivating: boolean;
   isDeactivating: boolean;
-
   batches: BatchData[];
   aviariesData: AviaryData[];
-
   onNewBatch: () => void;
   onToggleExpansion: (batchId: string) => void;
   onEditBatch: (batch: BatchData) => void;
@@ -66,14 +64,14 @@ export const BatchManagementTemplate: React.FC<Props> = ({
   onCloseAviaryModal
 }) => {
   return (
-    <div className="w-full">
-      <BatchHeader
-        onNewBatch={onNewBatch}
-        error={error ?? undefined}
-      />
+    <div className="mx-auto p-4">
+      <div className="bg-white rounded-2xl p-6 mb-8 shadow-lg">
+        <BatchHeader
+          onNewBatch={onNewBatch}
+          error={error ?? undefined}
+        />
 
-      <div className="mt-6">
-        <div className="flex flex-col gap-6 w-full bg-white rounded-xl shadow px-6 py-4">
+        <div className="mt-6">
           <BatchTable
             batches={batches}
             expandedBatches={expandedBatches}
