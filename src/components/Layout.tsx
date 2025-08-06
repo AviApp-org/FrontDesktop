@@ -7,7 +7,6 @@ import {
   Home,
   Users,
   DollarSign,
-  FileInput,
   Egg,
   UserPlus,
   Building2,

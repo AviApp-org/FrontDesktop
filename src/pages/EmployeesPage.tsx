@@ -100,47 +100,84 @@ const EmployeesPage: React.FC = () => {
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
-  };
 
+    if (['name', 'cpf', 'birthDate', 'phone'].includes(name)) {
+      const newErrors = { ...formErrors };
+
+      if (!value.trim()) {
+        newErrors[name] = 'Campo obrigatório';
+      } else {
+        delete newErrors[name];
+
+        if (name === 'cpf' && value.trim() && !isValidCPF(value)) {
+          newErrors.cpf = 'CPF inválido';
+        }
+
+        if (name === 'phone' && value.replace(/\D/g, '').length < 10) {
+          newErrors.phone = 'Telefone inválido';
+        }
+      }
+
+      setFormErrors(newErrors);
+    }
+  };
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
+    let isValid = true;
 
-    if (!formData.name.trim())
-      toast.error('Nome é obrigatório');
-    if (!formData.cpf.trim()) {
-      toast.error('CPF é obrigatório');
-    } else if (!isValidCPF(formData.cpf)) {
-      toast.error('CPF inválido');
-
+    if (!formData.name.trim()) {
+      errors.name = 'Nome é obrigatório';
+      isValid = false;
     }
-    if (!formData.birthDate.trim())
-      toast.error('Data de nascimento é obrigatória');
-    if (!formData.phone.trim()) {
-      toast.error('Telefone é obrigatório');
 
+    if (!formData.cpf.trim()) {
+      errors.cpf = 'CPF é obrigatório';
+      isValid = false;
+    } else if (!isValidCPF(formData.cpf)) {
+      errors.cpf = 'CPF inválido';
+      isValid = false;
+    }
+
+    if (!formData.birthDate.trim()) {
+      errors.birthDate = 'Data de nascimento é obrigatória';
+      isValid = false;
+    } else {
+      const birthDate = new Date(formData.birthDate);
+      const today = new Date();
+      if (birthDate >= today) {
+        errors.birthDate = 'Data de nascimento deve ser anterior a hoje';
+        isValid = false;
+      }
+    }
+
+    if (!formData.phone.trim()) {
+      errors.phone = 'Telefone é obrigatório';
+      isValid = false;
     } else if (formData.phone.replace(/\D/g, '').length < 10) {
-      toast.error('Telefone inválido');
+      errors.phone = 'Telefone inválido (mínimo 10 dígitos)';
+      isValid = false;
     }
 
     setFormErrors(errors);
-    return Object.keys(errors).length === 0;
+    return isValid;
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      return;
+    }
 
     setIsSubmitting(true);
-    setFormErrors({});
-
-    const formattedData = {
-      ...formData,
-      cpf: formatCPF(formData.cpf),
-      phone: formatPhone(formData.phone),
-      birthDate: formatDateForBackend(formData.birthDate)
-    };
 
     try {
+      const formattedData = {
+        ...formData,
+        cpf: formatCPF(formData.cpf),
+        phone: formatPhone(formData.phone),
+        birthDate: formatDateForBackend(formData.birthDate)
+      };
+
       if (editingId) {
         await employeeHook.updateEmployee(editingId, formattedData);
         toast.success('Funcionário atualizado com sucesso!');
@@ -148,11 +185,11 @@ const EmployeesPage: React.FC = () => {
         await employeeHook.createEmployee(formattedData);
         toast.success('Funcionário criado com sucesso!');
       }
+
       await fetchEmployees();
       handleCloseDialog();
     } catch (e) {
       toast.error('Erro ao salvar funcionário');
-      setFormErrors({ submit: 'Erro ao salvar funcionário' });
     } finally {
       setIsSubmitting(false);
     }

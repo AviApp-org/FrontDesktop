@@ -8,37 +8,33 @@ export const EmployeeHeader: React.FC<EmployeeHeaderProps> = ({
   onAddEmployee
 }) => {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+      {/* Total de funcionários */}
+      <div className="bg-gradient-to-r from-green-500 to-teal-500 rounded-xl p-4 shadow-md w-full md:w-auto">
+        <p className="text-2xl font-bold text-white">{totalEmployees}</p>
+        <p className="text-sm text-white/90">Total de Funcionários</p>
+      </div>
+
       {/* Barra de busca e botão */}
-      <div className="border border-gray-200 rounded p-4 bg-white shadow-sm flex justify-between items-center flex-wrap gap-4">
-        <div className="flex items-center w-full md:w-2/3">
+      <div className="flex flex-col sm:flex-row gap-4 w-full">
+        <div className="relative flex-1">
           <input
             type="text"
-            placeholder="Buscar funcionários..."
+            placeholder="Buscar funcionários por nome, CPF ou telefone..."
             value={searchTerm}
             onChange={onSearch}
-            className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
           />
-          <button
-            className="ml-2 text-gray-500 hover:text-gray-700 transition"
-            title="Filtros avançados"
-          >
-            🔍
-          </button>
+          <span className="absolute right-3 top-3 text-gray-400">🔍</span>
         </div>
 
         <button
           onClick={onAddEmployee}
-          className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700 transition"
+          className="bg-gradient-to-r from-green-600 to-teal-600 text-white px-6 py-3 rounded-xl text-sm font-medium hover:from-green-700 hover:to-teal-700 transition-all shadow-md flex items-center justify-center gap-2"
         >
-          ➕ Adicionar Funcionário
+          <span>+</span>
+          <span>Adicionar Funcionário</span>
         </button>
-      </div>
-
-      {/* Total de funcionários */}
-      <div className="border border-blue-200 bg-blue-50 rounded p-4 shadow-sm">
-        <p className="text-xl font-semibold text-blue-700">{totalEmployees}</p>
-        <p className="text-sm text-blue-900">Total de Funcionários</p>
       </div>
     </div>
   );

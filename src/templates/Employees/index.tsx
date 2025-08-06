@@ -49,40 +49,42 @@ export const EmployeeTemplate: React.FC<Props> = ({
     onConfirmDelete
 }) => {
     return (
-        <div className=" px-4 sm:px-6 lg:px-8 py-6">
-            <EmployeeHeader
-                searchTerm={searchTerm}
-                totalEmployees={employees.length}
-                onSearch={onSearch}
-                onAddEmployee={onAddEmployee}
-            />
+        <div className="mx-auto p-4">
+            <div className="bg-white rounded-2xl p-6 mb-8 shadow-lg">
+                <EmployeeHeader
+                    searchTerm={searchTerm}
+                    totalEmployees={employees.length}
+                    onSearch={onSearch}
+                    onAddEmployee={onAddEmployee}
+                />
 
-            <div className="mt-6 rounded-2xl bg-white shadow-md overflow-hidden">
-                <EmployeeTable
-                    employees={employees}
-                    isLoading={isLoading}
-                    isError={isError}
-                    onEdit={onEditEmployee}
-                    onDelete={onDeleteEmployee}
+                <div className="mt-6">
+                    <EmployeeTable
+                        employees={employees}
+                        isLoading={isLoading}
+                        isError={isError}
+                        onEdit={onEditEmployee}
+                        onDelete={onDeleteEmployee}
+                    />
+                </div>
+
+                <EmployeeModal
+                    open={openDialog}
+                    editingId={editingId}
+                    formData={formData}
+                    formErrors={formErrors}
+                    isSubmitting={isSubmitting}
+                    onClose={onCloseModal}
+                    onSubmit={onSubmit}
+                    onInputChange={onInputChange}
+                />
+
+                <DeleteConfirmDialog
+                    open={!!confirmDelete}
+                    onClose={onCancelDelete}
+                    onConfirm={onConfirmDelete}
                 />
             </div>
-
-            <EmployeeModal
-                open={openDialog}
-                editingId={editingId}
-                formData={formData}
-                formErrors={formErrors}
-                isSubmitting={isSubmitting}
-                onClose={onCloseModal}
-                onSubmit={onSubmit}
-                onInputChange={onInputChange}
-            />
-
-            <DeleteConfirmDialog
-                open={!!confirmDelete}
-                onClose={onCancelDelete}
-                onConfirm={onConfirmDelete}
-            />
         </div>
     );
 };
