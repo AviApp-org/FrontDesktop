@@ -6,7 +6,6 @@ import { BatchModal } from '@/components/BatchModal';
 import { AviaryModal } from '@/components/AviaryModal';
 import { BatchData } from '@/@types/BatchData';
 import { AviaryData } from '@/@types/AviaryData';
-import { CreateAviaryData } from '@/@types/CreateAviaryData';
 
 interface Props {
   isModalOpen: boolean;

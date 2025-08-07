@@ -13,6 +13,7 @@ import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { CollectChickenData } from '@/@types/CollectChickenData';
 import chickenCollectHook from '@/hooks/useChickenCollect';
+import aviaryHook from '@/hooks/useAviary';
 
 
 function CollectsPage() {
@@ -39,7 +40,7 @@ function CollectsPage() {
       if (!farmId) return;
       try {
         setIsLoading(true);
-        const batchesData = await batchHook.getBatchesByFarm(farmId);
+        const batchesData = await batchHook.getBatchByFarm(farmId);
         setBatches(batchesData);
       } catch (err) {
         toast.error('Erro ao carregar lotes');
@@ -95,7 +96,7 @@ function CollectsPage() {
 
   const fetchAviaries = async (batchId: number) => {
     try {
-      const aviariesData = await batchHook.getAviariesByBatch(batchId);
+      const aviariesData = await aviaryHook.getAviariesByBatch(batchId);
       setAviaries(aviariesData);
     } catch (err) {
       toast.error('Erro ao carregar aviários');

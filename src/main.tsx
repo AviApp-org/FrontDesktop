@@ -6,7 +6,6 @@ import App from './App';
 import './styles/globals.css';
 import 'react-toastify/dist/ReactToastify.css'
 
-// Criar uma instância do QueryClient
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

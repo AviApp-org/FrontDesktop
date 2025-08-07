@@ -8,14 +8,12 @@ interface ApiError {
 }
 
 export function handleApiError(error: AxiosError): ApiError {
-  // Erro padrão
   const defaultError: ApiError = {
     message: 'Ocorreu um erro inesperado. Tente novamente.',
     status: 500,
     type: 'error',
   };
 
-  // Se não houver resposta da API
   if (!error.response) {
     return {
       message: 'Erro de conexão. Verifique sua internet.',
@@ -24,17 +22,15 @@ export function handleApiError(error: AxiosError): ApiError {
     };
   }
 
-  // Tratamento baseado no status code
   switch (error.response.status) {
     case 400:
       return {
-        message: error.response.data?.message || 'Dados inválidos. Verifique os campos.',
+        message: error.message || 'Dados inválidos. Verifique os campos.',
         status: 400,
         type: 'warning',
       };
 
     case 401:
-      // Limpar token e redirecionar para login
       localStorage.removeItem(TOKEN_KEY);
       window.location.href = '/login';
       return {
@@ -59,7 +55,7 @@ export function handleApiError(error: AxiosError): ApiError {
 
     case 422:
       return {
-        message: error.response.data?.message || 'Dados inválidos para processamento.',
+        message: error.message || 'Dados inválidos para processamento.',
         status: 422,
         type: 'warning',
       };
@@ -76,7 +72,6 @@ export function handleApiError(error: AxiosError): ApiError {
   }
 }
 
-// Função auxiliar para exibir mensagens de erro
 export function showErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     return error.message;
@@ -89,13 +84,3 @@ export function showErrorMessage(error: unknown): string {
   return 'Ocorreu um erro inesperado';
 }
 
-// Exemplo de uso em componentes:
-/*
-try {
-  await api.post('/endpoint', data);
-} catch (error) {
-  const { message, type } = handleApiError(error as AxiosError);
-  // Usar com um componente de toast/notification
-  toast[type](message);
-}
-*/

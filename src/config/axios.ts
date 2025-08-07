@@ -9,14 +9,12 @@ const api = axios.create({
   timeout: 10000,
 });
 
-// Adiciona o token antes de cada requisição
 api.interceptors.request.use(config => {
   const token = sessionStorage.getItem('access_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// Gerencia fila de requisições enquanto o token é renovado
 let isRefreshing = false;
 let failedQueue: any[] = [];
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import { CreateAviaryData } from '../../@types/CreateAviaryData';
 import { AviaryModalProps } from './types';
 import { AviaryData } from '@/@types/AviaryData';
 
