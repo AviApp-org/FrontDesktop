@@ -1,5 +1,3 @@
-import { SelectChangeEvent } from '@mui/material/Select';
-
 export interface ClientFormData {
   name: string;
   email: string;
@@ -16,5 +14,5 @@ export interface ClientModalProps {
   isSubmitting: boolean;
   onClose: () => void;
   onSubmit: () => void;
-  onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => void;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
 }

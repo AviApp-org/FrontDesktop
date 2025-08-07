@@ -2,7 +2,6 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { RoutePermissions } from '../@types/AuthTypes';
 import { useAuthContext } from '../contexts/AuthContext';
-import { CircularProgress, Box } from '@mui/material';
 import Layout from './Layout';
 
 interface ProtectedRouteProps {
@@ -15,9 +14,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-        <CircularProgress />
-      </Box>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin" />
+      </div>
     );
   }
 
@@ -26,7 +25,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   const requiredRoles = RoutePermissions[location.pathname as keyof typeof RoutePermissions];
-  
+
   if (requiredRoles && user?.role && !requiredRoles.includes(user.role as any)) {
     return <Navigate to="/" replace />;
   }
@@ -34,4 +33,4 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   return <Layout>{children}</Layout>;
 };
 
-export default ProtectedRoute; 
+export default ProtectedRoute;

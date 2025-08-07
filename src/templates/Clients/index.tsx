@@ -1,5 +1,4 @@
 import React from 'react';
-import { Box } from '@mui/material';
 import { ClientHeader } from '@/components/ClientHeader';
 import { ClientTable } from '@/components/ClientTable';
 import { ClientModal } from '@/components/ClientModal';
@@ -7,7 +6,6 @@ import { DeleteConfirmDialog } from '@/components/DeleteButton';
 import { ClientData } from '@/@types/ClientData';
 
 interface Props {
-  // Estados
   isLoading: boolean;
   isError: boolean;
   openDialog: boolean;
@@ -18,10 +16,8 @@ interface Props {
   formErrors: Record<string, string>;
   isSubmitting: boolean;
 
-  // Dados
   clients: ClientData[];
 
-  // Callbacks
   onSearch: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onAddClient: () => void;
   onEditClient: (client: ClientData) => void;
@@ -34,7 +30,6 @@ interface Props {
 }
 
 export const ClientRegisterTemplate: React.FC<Props> = ({
-  // Estados
   isLoading,
   isError,
   openDialog,
@@ -45,10 +40,8 @@ export const ClientRegisterTemplate: React.FC<Props> = ({
   formErrors,
   isSubmitting,
 
-  // Dados
   clients,
 
-  // Callbacks
   onSearch,
   onAddClient,
   onEditClient,
@@ -57,10 +50,10 @@ export const ClientRegisterTemplate: React.FC<Props> = ({
   onSubmit,
   onInputChange,
   onCancelDelete,
-  onConfirmDelete
+  onConfirmDelete,
 }) => {
   return (
-    <Box>
+    <div className="w-full">
       <ClientHeader
         searchTerm={searchTerm}
         totalClients={clients.length}
@@ -68,7 +61,7 @@ export const ClientRegisterTemplate: React.FC<Props> = ({
         onAddClient={onAddClient}
       />
 
-      <Box sx={{ mt: 3 }}>
+      <div className="mt-12">
         <ClientTable
           clients={clients.filter((c) => typeof c.id === 'number') as any}
           isLoading={isLoading}
@@ -76,7 +69,7 @@ export const ClientRegisterTemplate: React.FC<Props> = ({
           onEdit={onEditClient}
           onDelete={onDeleteClient}
         />
-      </Box>
+      </div>
 
       <ClientModal
         open={openDialog}
@@ -94,6 +87,6 @@ export const ClientRegisterTemplate: React.FC<Props> = ({
         onClose={onCancelDelete}
         onConfirm={onConfirmDelete}
       />
-    </Box>
+    </div>
   );
-}; 
+};

@@ -1,60 +1,26 @@
 import React from 'react';
-import { Box, Button, Typography } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import { green } from '@mui/material/colors';
+import { Plus } from 'lucide-react';
 
 interface FarmHeaderProps {
   onNewFarm: () => void;
 }
 
 export const FarmHeader: React.FC<FarmHeaderProps> = ({ onNewFarm }) => (
-  <Box
-    sx={{
-      mb: 3,
-      bgcolor: 'background.paper',
-      borderRadius: 3,
-      boxShadow: 1,
-      px: { xs: 2, sm: 4 },
-      py: 3,
-    }}
-  >
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: { xs: 'column', sm: 'row' },
-        alignItems: { xs: 'stretch', sm: 'center' },
-        justifyContent: 'space-between',
-        gap: 3,
-        mb: 1,
-      }}
-    >
-      <Typography
-        variant="h4"
-        component="h1"
-        fontWeight="bold"
-        color="text.primary"
-        mb={0}
-      >
-        Lista de Granjas
-      </Typography>
-      <Button
-        variant="contained"
-        startIcon={<AddIcon />}
+  <div className="mb-6 bg-white rounded-2xl shadow p-4 sm:p-6">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-2">
+      <h1 className="text-2xl font-bold text-gray-900">Lista de Granjas</h1>
+      <button
         onClick={onNewFarm}
-        sx={{
-          bgcolor: green[600],
-          '&:hover': { bgcolor: green[800] },
-          px: 3,
-          height: 40,
-        }}
+        className="flex items-center gap-2 bg-green-600 hover:bg-green-800 text-white font-medium rounded px-4 h-10 transition-colors"
       >
+        <Plus className="w-4 h-4" />
         Cadastrar Granja
-      </Button>
-    </Box>
-    <Typography variant="body2" color="text.secondary">
+      </button>
+    </div>
+    <p className="text-sm text-gray-500">
       Gerencie suas granjas cadastradas de forma eficiente
-    </Typography>
-  </Box>
+    </p>
+  </div>
 );
 
 export default FarmHeader;
