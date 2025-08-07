@@ -16,77 +16,164 @@ import {
   AreaChart,
   Area,
 } from 'recharts';
-
-import { WeeklyReportData } from '@/@types/WeeklyReportData';
+import { toast } from 'react-toastify';
+import { useFarm } from '@/contexts/FarmContext';
+import batchHook from '@/hooks/useBatch';
 import reportHook from '@/hooks/useReport';
+import { WeeklyReportData } from '@/@types/WeeklyReportData';
+import { BatchData } from '@/@types/BatchData';
 import { formatDateForBackend } from '@/utils/formatDate';
-import { getBirdsEvolutionData, getEggDestinationData, getEggDistributionData, getMortalityData, getProductionData } from '@/utils/reportUtils';
+import { 
+  getBirdsEvolutionData, 
+  getEggDestinationData, 
+  getEggDistributionData, 
+  getMortalityData, 
+  getProductionData 
+} from '@/utils/reportUtils';
 
-const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#00C49F'];
+const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#00C49F', '#FF6B6B'];
 
 function Dashboard() {
   const [weeklyData, setWeeklyData] = useState<WeeklyReportData | null>(null);
+  const [batches, setBatches] = useState<BatchData[]>([]);
+  const [selectedBatchId, setSelectedBatchId] = useState<number | null>(null);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [isLoading, setIsLoading] = useState(true);
-  const [batchId] = useState(3); // Pode ser dinâmico
-  const [date] = useState('01-08-2025');
+  const { farmId } = useFarm();
+
+  // Transforma os dados para os gráficos
   const productionData = weeklyData ? getProductionData(weeklyData.dailyReports) : [];
   const mortalityData = weeklyData ? getMortalityData(weeklyData.dailyReports) : [];
   const eggDistributionData = weeklyData ? getEggDistributionData(weeklyData.dailyReports) : [];
   const birdsEvolutionData = weeklyData ? getBirdsEvolutionData(weeklyData.dailyReports) : [];
   const eggDestinationData = weeklyData ? getEggDestinationData(weeklyData.dailyReports) : [];
 
+  // Carrega a lista de lotes
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchBatches = async () => {
+      if (!farmId) return;
       try {
-        const weekReport = await reportHook.getWeek(batchId, formatDateForBackend(date));
-        setWeeklyData(weekReport);
-      } catch (error) {
-        console.error('Erro ao buscar dados:', error);
+        setIsLoading(true);
+        const batchesData = await batchHook.getBatchByFarm(farmId);
+        setBatches(batchesData);
+        // Seleciona o primeiro lote por padrão
+        if (batchesData.length > 0) {
+          setSelectedBatchId(batchesData[0].id);
+        }
+      } catch (err) {
+        toast.error('Erro ao carregar lotes');
       } finally {
         setIsLoading(false);
       }
     };
+    fetchBatches();
+  }, [farmId]);
 
-    fetchData();
-  }, [batchId, date]);
+  // Carrega os dados semanais quando o batchId ou data muda
+  useEffect(() => {
+    const fetchWeeklyData = async () => {
+      if (!selectedBatchId) return;
+      try {
+        setIsLoading(true);
+        const weekReport = await reportHook.getWeek(selectedBatchId, formatDateForBackend(selectedDate));
+        setWeeklyData(weekReport);
+      } catch (error) {
+        console.error('Erro ao buscar dados:', error);
+        toast.error('Erro ao carregar dados semanais');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchWeeklyData();
+  }, [selectedBatchId, selectedDate]);
 
-  if (isLoading) return <div>Carregando dados...</div>;
-  if (!weeklyData) return <div>Nenhum dado disponível</div>;
+  const handleBatchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedBatchId(parseInt(e.target.value));
+  };
 
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedDate(e.target.value);
+  };
 
+  if (isLoading) return <div className="flex justify-center items-center h-screen">Carregando dados...</div>;
+  if (!weeklyData) return <div className="flex justify-center items-center h-screen">Nenhum dado disponível</div>;
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900">Lote: {weeklyData?.batch}</h2>
-        <div className="text-green-600 font-semibold">
-          Período: {new Date(weeklyData?.startDate).toLocaleDateString()} a {new Date(weeklyData?.endDate).toLocaleDateString()}
+    <div className="p-4">
+      {/* Cabeçalho com seletores */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full">
+          <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
+          
+          {/* Select de Lotes */}
+          <div className="w-full md:w-64">
+            <label htmlFor="batch-select" className="block text-sm font-medium text-gray-700 mb-1">
+              Selecione o Lote
+            </label>
+            <select
+              id="batch-select"
+              value={selectedBatchId || ''}
+              onChange={handleBatchChange}
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              disabled={isLoading}
+            >
+              {isLoading && <option value="">Carregando lotes...</option>}
+              {!isLoading && batches.length === 0 && <option value="">Nenhum lote disponível</option>}
+              {batches.map((batch) => (
+                <option key={batch.id} value={batch.id}>
+                  {batch.name} ({batch.id})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Seletor de Data */}
+          <div className="w-full md:w-48">
+            <label htmlFor="date-select" className="block text-sm font-medium text-gray-700 mb-1">
+              Data de Referência
+            </label>
+            <input
+              type="date"
+              id="date-select"
+              value={selectedDate}
+              onChange={handleDateChange}
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              disabled={isLoading}
+            />
+          </div>
+        </div>
+
+        {/* Período do relatório */}
+        <div className="text-green-600 font-semibold bg-green-50 px-4 py-2 rounded-lg whitespace-nowrap">
+          Período: {new Date(weeklyData.startDate).toLocaleDateString()} a {new Date(weeklyData.endDate).toLocaleDateString()}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Produção */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-4">% de Produção (Última semana)</h3>
-          <div className="h-[300px]">
+      {/* Primeira Linha - Gráficos Principais */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        {/* Produção Diária */}
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-lg font-semibold mb-3">Produção Diária</h3>
+          <div className="h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={productionData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis yAxisId="left" orientation="left" domain={[0, 15]} />
-                <YAxis yAxisId="right" orientation="right" domain={[0, 'dataMax + 100']} />
+                <YAxis yAxisId="right" orientation="right" domain={[0, 'dataMax + 100']} hide />
                 <Tooltip />
                 <Legend />
-                <Bar yAxisId="left" dataKey="production" fill="#8884d8" name="Produção (%)" />
-                <Bar yAxisId="right" dataKey="totalEggs" fill="#82ca9d" name="Ovos Coletados" />
+                <Bar yAxisId="left" dataKey="production" fill="#8884d8" name="Produção (%)" radius={[4, 4, 0, 0]} />
+                <Bar yAxisId="right" dataKey="totalEggs" fill="#82ca9d" name="Ovos Coletados" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-4">Mortalidade Diária (%)</h3>
-          <div className="h-[300px]">
+        {/* Mortalidade Diária */}
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-lg font-semibold mb-3">Mortalidade Diária (%)</h3>
+          <div className="h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={mortalityData}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -94,16 +181,18 @@ function Dashboard() {
                 <YAxis domain={[0, 'auto']} />
                 <Tooltip formatter={(value) => [`${value}%`, 'Mortalidade']} />
                 <Legend />
-                <Line type="monotone" dataKey="mortalidade" stroke="#ff6b6b" name="Mortalidade Total" />
-                <Line type="monotone" dataKey="mortalidadeGalinhas" stroke="#feca57" name="Mortalidade Galinhas" />
-                <Line type="monotone" dataKey="mortalidadeGaloes" stroke="#48dbfb" name="Mortalidade Galos" />
+                <Line type="monotone" dataKey="mortalidade" stroke="#ff6b6b" name="Total" strokeWidth={2} />
+                <Line type="monotone" dataKey="mortalidadeGalinhas" stroke="#feca57" name="Galinhas" strokeWidth={2} />
+                <Line type="monotone" dataKey="mortalidadeGaloes" stroke="#48dbfb" name="Galos" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-4">Distribuição de Ovos (Último dia)</h3>
-          <div className="h-[300px]">
+
+        {/* Distribuição de Ovos */}
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-lg font-semibold mb-3">Distribuição de Ovos</h3>
+          <div className="h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -111,9 +200,9 @@ function Dashboard() {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={70}
+                  innerRadius={40}
                   dataKey="value"
                 >
                   {eggDistributionData.map((entry, index) => (
@@ -121,14 +210,19 @@ function Dashboard() {
                   ))}
                 </Pie>
                 <Tooltip formatter={(value) => [value, 'Quantidade']} />
-                <Legend />
+                <Legend layout="vertical" align="right" verticalAlign="middle" />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-4">Evolução do Plantel</h3>
-          <div className="h-[300px]">
+      </div>
+
+      {/* Segunda Linha - Gráficos Secundários */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Evolução do Plantel */}
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-lg font-semibold mb-3">Evolução do Plantel</h3>
+          <div className="h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={birdsEvolutionData}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -136,17 +230,18 @@ function Dashboard() {
                 <YAxis />
                 <Tooltip formatter={(value) => [value, 'Quantidade']} />
                 <Legend />
-                <Area type="monotone" dataKey="total" stackId="1" stroke="#ff9ff3" fill="#ff9ff3" name="Total Aves" />
-                <Area type="monotone" dataKey="galinhas" stackId="2" stroke="#1dd1a1" fill="#1dd1a1" name="Galinhas" />
-                <Area type="monotone" dataKey="galoes" stackId="3" stroke="#54a0ff" fill="#54a0ff" name="Galos" />
+                <Area type="monotone" dataKey="total" stackId="1" stroke="#8884d8" fill="#8884d8" name="Total Aves" />
+                <Area type="monotone" dataKey="galinhas" stackId="2" stroke="#82ca9d" fill="#82ca9d" name="Galinhas" />
+                <Area type="monotone" dataKey="galoes" stackId="3" stroke="#ffc658" fill="#ffc658" name="Galos" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow col-span-2">
-          <h3 className="text-lg font-semibold mb-4">Destino dos Ovos</h3>
-          <div className="h-[300px]">
+        {/* Destino dos Ovos */}
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-lg font-semibold mb-3">Destino dos Ovos</h3>
+          <div className="h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={eggDestinationData}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -154,12 +249,44 @@ function Dashboard() {
                 <YAxis />
                 <Tooltip formatter={(value) => [value, 'Quantidade']} />
                 <Legend />
-                <Bar dataKey="incubaveis" stackId="a" fill="#2ecc71" name="Incubáveis" />
-                <Bar dataKey="mercado" stackId="a" fill="#3498db" name="Mercado" />
-                <Bar dataKey="descarte" stackId="a" fill="#e74c3c" name="Descarte" />
+                <Bar dataKey="incubaveis" stackId="a" fill="#2ecc71" name="Incubáveis" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="mercado" stackId="a" fill="#3498db" name="Mercado" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="descarte" stackId="a" fill="#e74c3c" name="Descarte" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
+        </div>
+      </div>
+
+      {/* Terceira Linha - Estatísticas Resumidas */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-sm font-medium text-gray-500">Total de Aves</h3>
+          <p className="text-2xl font-bold">
+            {weeklyData.dailyReports[weeklyData.dailyReports.length - 1]?.totalBirds || 0}
+          </p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-sm font-medium text-gray-500">Produção Média</h3>
+          <p className="text-2xl font-bold">
+            {weeklyData.dailyReports.length > 0 
+              ? (weeklyData.dailyReports.reduce((sum, report) => sum + report.production, 0) / weeklyData.dailyReports.length).toFixed(1) + '%'
+              : '0%'}
+          </p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-sm font-medium text-gray-500">Mortalidade Média</h3>
+          <p className="text-2xl font-bold">
+            {weeklyData.dailyReports.length > 0 
+              ? (weeklyData.dailyReports.reduce((sum, report) => sum + report.mortality, 0) / weeklyData.dailyReports.length).toFixed(1) + '%'
+              : '0%'}
+          </p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-sm font-medium text-gray-500">Ovos Incubáveis</h3>
+          <p className="text-2xl font-bold">
+            {weeklyData.dailyReports[weeklyData.dailyReports.length - 1]?.hatchableEggs || 0}
+          </p>
         </div>
       </div>
     </div>
