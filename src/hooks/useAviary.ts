@@ -2,7 +2,6 @@ import api from '../config/axios';
 import { AviaryData } from '@/@types/AviaryData';
 
 const aviaryHook = {
-  
   createAviary: async (aviaryData: AviaryData) => {
     try {
       const response = await api.post('/api/aviaries', aviaryData);
@@ -59,7 +58,7 @@ const aviaryHook = {
       return response.data;
     } catch (e) {
       console.error('Error deleting aviary:', e);
-      return null;
+      throw e;
     }
   },
 };

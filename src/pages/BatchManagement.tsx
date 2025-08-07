@@ -56,13 +56,11 @@ const BatchManagement: React.FC = () => {
   };
 
 
-  // ✅ Carrega os lotes ao montar o componente
   useEffect(() => {
 
     fetchBatches();
   }, [farmId]);
 
-  // Efeito para buscar aviários quando um lote é expandido
   useEffect(() => {
     const lastExpandedBatch = expandedBatches[expandedBatches.length - 1];
     if (lastExpandedBatch) {
@@ -173,7 +171,6 @@ const BatchManagement: React.FC = () => {
         toast.success('Aviário criado com sucesso!');
       }
 
-      // Recarregar aviários se houver lote expandido
       const lastExpandedBatch = expandedBatches[expandedBatches.length - 1];
       if (lastExpandedBatch) {
         await fetchAviaries(Number(lastExpandedBatch));
@@ -194,14 +191,14 @@ const BatchManagement: React.FC = () => {
       if (lastExpandedBatch) {
         await fetchAviaries(Number(lastExpandedBatch));
       }
-    } catch (error) {
-      toast.error('Erro ao deletar aviário');
-      setError('Erro ao deletar aviário');
-    } finally {
-      toast.success('Aviário deletado com sucesso!');
-
+      toast.success("Aviário deletado com sucesso");
+    } catch (error: any) {
+      const message = error?.response?.data?.message || 'Erro ao deletar aviário';
+      toast.error(message);
+      setError(message);
     }
   };
+
 
   const handleCloseAviaryModal = () => {
     setIsAviaryModalOpen(false);
