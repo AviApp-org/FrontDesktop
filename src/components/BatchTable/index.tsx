@@ -62,7 +62,8 @@ export const BatchTable: React.FC<BatchTableProps> = ({
 
                 return (
                   <React.Fragment key={batch.id}>
-                    <tr className={`hover:bg-gray-50 transition ${shouldBlur ? 'filter blur-sm' : ''}`}>
+                    <tr className={`hover:bg-gray-50 transition cursor-pointer ${shouldBlur ? 'filter blur-sm' : ''}`} onClick={() => onToggleExpansion(String(batch.id))}
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <button
