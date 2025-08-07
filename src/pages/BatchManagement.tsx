@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { BatchManagementTemplate } from '@/templates/Batch';
 import { BatchData } from '@/@types/BatchData';
 import { AviaryData } from '@/@types/AviaryData';
-import { CreateAviaryData } from '@/@types/CreateAviaryData';
 import batchHook from '@/hooks/useBatch';
 import { toast } from 'react-toastify';
 import { useFarm } from '@/contexts/FarmContext';
+import aviaryHook from '@/hooks/useAviary';
 
 const BatchManagement: React.FC = () => {
   // Estados
@@ -32,7 +32,7 @@ const BatchManagement: React.FC = () => {
     setIsLoadingBatches(true);
     setError(null);
     try {
-      const batchesData = await batchHook.getBatchesByFarm(farmId);
+      const batchesData = await batchHook.getBatchByFarm(farmId);
       setBatches(batchesData);
     } catch (err) {
       toast.error('Erro ao carregar lotes');
@@ -45,7 +45,7 @@ const BatchManagement: React.FC = () => {
   const fetchAviaries = async (batchId: number) => {
     setIsLoadingAviaries(true);
     try {
-      const aviaries = await batchHook.getAviariesByBatch(batchId);
+      const aviaries = await aviaryHook.getAviariesByBatch(batchId);
       setAviariesData(aviaries);
     } catch (err) {
       toast.error('Erro ao carregar aviários');
@@ -103,9 +103,9 @@ const BatchManagement: React.FC = () => {
 
     try {
       if (action === 'activate') {
-        await batchHook.activateBatchWithToast(id);
+        await batchHook.activateBatch(id);
       } else {
-        await batchHook.deactivateBatchWithToast(id);
+        await batchHook.deactivateBatch(id);
       }
 
       await fetchBatches();
@@ -122,17 +122,12 @@ const BatchManagement: React.FC = () => {
     setFormErrors({});
     setIsSubmitting(true);
 
-    if (!batchHook.validateBatchData(data)) {
-      setIsSubmitting(false);
-      return;
-    }
-
     try {
       if (isEdit && selectedBatch?.id) {
-        await batchHook.updateBatchWithToast(selectedBatch.id.toString(), data);
+        await batchHook.updateBatch(selectedBatch.id.toString(), data);
         toast.success('Lote atualizado com sucesso!');
       } else {
-        await batchHook.createBatchWithToast(data);
+        await batchHook.createBatch(data);
         toast.success('Lote criado com sucesso!');
       }
 
@@ -166,15 +161,15 @@ const BatchManagement: React.FC = () => {
     setIsAviaryModalOpen(true);
   };
 
-  const handleAviarySubmit = async (aviaryData: CreateAviaryData) => {
+  const handleAviarySubmit = async (aviaryData: AviaryData) => {
     try {
       setError(null);
 
       if (selectedAviary) {
-        await batchHook.updateAviary(Number(selectedAviary.id), aviaryData);
+        await aviaryHook.updateAviary(Number(selectedAviary.id), aviaryData);
         toast.success('Aviário atualizado com sucesso!');
       } else {
-        await batchHook.createAviary(aviaryData);
+        await aviaryHook.createAviary(aviaryData);
         toast.success('Aviário criado com sucesso!');
       }
 
@@ -194,7 +189,7 @@ const BatchManagement: React.FC = () => {
 
   const handleAviaryDelete = async (id: string) => {
     try {
-      await batchHook.deleteAviary(id);
+      await aviaryHook.deleteAviary(Number(id));
       const lastExpandedBatch = expandedBatches[expandedBatches.length - 1];
       if (lastExpandedBatch) {
         await fetchAviaries(Number(lastExpandedBatch));

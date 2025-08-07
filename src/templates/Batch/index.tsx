@@ -31,7 +31,7 @@ interface Props {
   onCloseBatchModal: () => void;
   onCreateAviary: (batch: BatchData) => void;
   onEditAviary: (batch: BatchData, aviary: AviaryData) => void;
-  onAviarySubmit: (aviaryData: CreateAviaryData) => void;
+  onAviarySubmit: (aviaryData: AviaryData) => void;
   onAviaryDelete: (id: string) => void;
   onCloseAviaryModal: () => void;
 }

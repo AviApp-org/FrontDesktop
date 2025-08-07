@@ -1,6 +1,7 @@
 import React from 'react';
 import { CreateAviaryData } from '../../@types/CreateAviaryData';
 import { AviaryModalProps } from './types';
+import { AviaryData } from '@/@types/AviaryData';
 
 export const AviaryModal: React.FC<AviaryModalProps> = ({
   isOpen,
@@ -24,7 +25,8 @@ export const AviaryModal: React.FC<AviaryModalProps> = ({
           <form onSubmit={(e) => {
             e.preventDefault();
             const formData = new FormData(e.currentTarget);
-            const aviaryData: CreateAviaryData = {
+            const aviaryData: AviaryData = {
+              id: 0,
               name: formData.get('name') as string,
               initialAmountOfRoosters: Number(formData.get('initialAmountOfRoosters')),
               initialAmountOfChickens: Number(formData.get('initialAmountOfChickens')),

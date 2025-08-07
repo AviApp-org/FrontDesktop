@@ -1,5 +1,8 @@
 import React from 'react';
 import { BatchModalProps } from './types';
+import { BatchData } from '@/@types/BatchData';
+import { useFarm } from '@/contexts/FarmContext';
+import { BatchStatus } from '@/@types/enums/enumBatchStatus';
 
 export const BatchModal: React.FC<BatchModalProps> = ({
   isOpen,
@@ -10,6 +13,7 @@ export const BatchModal: React.FC<BatchModalProps> = ({
   onSubmit
 }) => {
   if (!isOpen) return null;
+  const { farmId } = useFarm();
 
   const formatDateForInput = (dateString: string) => {
     const [day, month, year] = dateString.split('/');
@@ -35,10 +39,12 @@ export const BatchModal: React.FC<BatchModalProps> = ({
             e.preventDefault();
             const formData = new FormData(e.currentTarget);
             const dateValue = formData.get('startDate') as string;
-            const data = {
+            const data: BatchData = {
+              id: 0,
               name: formData.get('name') as string,
               startDate: formatDateForSubmit(dateValue),
-              status: formData.get('status') as string || 'ACTIVE',
+              status: formData.get('status') as BatchStatus || 'ACTIVE',
+              farmId: farmId
             };
             onSubmit(data);
           }}>
@@ -49,9 +55,8 @@ export const BatchModal: React.FC<BatchModalProps> = ({
                   type="text"
                   name="name"
                   defaultValue={batch?.name}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition ${
-                    formErrors.name ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition ${formErrors.name ? 'border-red-500' : 'border-gray-300'
+                    }`}
                   placeholder="Ex: LOTE001"
                   required
                   disabled={isSubmitting}
@@ -65,9 +70,8 @@ export const BatchModal: React.FC<BatchModalProps> = ({
                   type="date"
                   name="startDate"
                   defaultValue={batch?.startDate ? formatDateForInput(batch.startDate) : ''}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition ${
-                    formErrors.startDate ? 'border-red-500' : 'border-gray-300'
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition ${formErrors.startDate ? 'border-red-500' : 'border-gray-300'
+                    }`}
                   required
                   disabled={isSubmitting}
                 />
@@ -84,8 +88,7 @@ export const BatchModal: React.FC<BatchModalProps> = ({
                   disabled={isSubmitting}
                 >
                   <option value="ACTIVE">Ativo</option>
-                  <option value="COMPLETED">Concluído</option>
-                  <option value="CANCELLED">Cancelado</option>
+                  <option value="INACTIVE">Inativo</option>
                 </select>
               </div>
 
@@ -101,9 +104,8 @@ export const BatchModal: React.FC<BatchModalProps> = ({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-xl text-sm font-medium hover:from-green-700 hover:to-teal-700 transition ${
-                    isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
+                  className={`px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-xl text-sm font-medium hover:from-green-700 hover:to-teal-700 transition ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                 >
                   {isSubmitting ? (
                     <span className="flex items-center justify-center gap-2">
