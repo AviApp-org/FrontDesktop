@@ -1,8 +1,5 @@
 import React from 'react';
-import { Button, Form, Input, Select, Spin, Card } from 'antd';
 import { FarmFormProps } from './types';
-
-const { Option } = Select;
 
 export const FarmForm: React.FC<FarmFormProps> = ({
   formData,
@@ -12,204 +9,134 @@ export const FarmForm: React.FC<FarmFormProps> = ({
   onInputChange,
   onSubmit
 }) => {
-  const handleFinish = async () => {
+  const handleFinish = async (e: React.FormEvent) => {
+    e.preventDefault();
     await onSubmit();
   };
 
-  const handleSelectChange = (name: string) => (value: any) => {
+  const handleSelectChange = (name: string) => (value: string) => {
     onInputChange({ target: { name, value } });
   };
 
   return (
-    <Spin spinning={isSubmitting}>
-      <Form
-        layout="vertical"
-        onFinish={handleFinish}
-        className="space-y-4"
-      >
-        {/* Dados da Granja */}
-        <Card title="Dados da Granja" className="mb-4">
-          <Form.Item
-            label="Nome da Granja"
-            validateStatus={formErrors.name ? 'error' : ''}
-            help={formErrors.name}
-          >
-            <Input 
-              name="name"
-              value={formData.name}
-              onChange={onInputChange}
-              className="rounded-md"
-              placeholder="Digite o nome da granja"
-              disabled={isSubmitting}
-            />
-          </Form.Item>
+    <form onSubmit={handleFinish} className="space-y-6">
+      <div className="border border-gray-200 rounded-md p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Dados da Granja</h2>
 
-          <Form.Item
-            label="Cliente"
-            validateStatus={formErrors.clientId ? 'error' : ''}
-            help={formErrors.clientId}
-          >
-            <Select 
-              value={formData.clientId}
-              onChange={handleSelectChange('clientId')}
-              className="rounded-md"
-              placeholder="Selecione o cliente"
-              disabled={isSubmitting}
-            >
-              {clients.map(client => (
-                <Option key={client.id} value={client.id}>
-                  {client.name}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-        </Card>
-
-        {/* Endereço */}
-        <Card title="Endereço" className="mb-4">
-          <Form.Item
-            label="CEP"
-            validateStatus={formErrors.cep ? 'error' : ''}
-            help={formErrors.cep}
-          >
-            <Input 
-              name="cep"
-              value={formData.cep}
-              onChange={onInputChange}
-              className="rounded-md"
-              maxLength={8}
-              placeholder="Digite apenas números"
-              disabled={isSubmitting}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Rua"
-            validateStatus={formErrors.street ? 'error' : ''}
-            help={formErrors.street}
-          >
-            <Input 
-              name="street"
-              value={formData.street}
-              onChange={onInputChange}
-              className="rounded-md"
-              placeholder="Digite o nome da rua"
-              disabled={isSubmitting}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Número"
-            validateStatus={formErrors.number ? 'error' : ''}
-            help={formErrors.number}
-          >
-            <Input 
-              name="number"
-              value={formData.number}
-              onChange={onInputChange}
-              className="rounded-md"
-              placeholder="Digite o número"
-              disabled={isSubmitting}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Bairro"
-            validateStatus={formErrors.neighborhood ? 'error' : ''}
-            help={formErrors.neighborhood}
-          >
-            <Input 
-              name="neighborhood"
-              value={formData.neighborhood}
-              onChange={onInputChange}
-              className="rounded-md"
-              placeholder="Digite o bairro"
-              disabled={isSubmitting}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Cidade"
-            validateStatus={formErrors.city ? 'error' : ''}
-            help={formErrors.city}
-          >
-            <Input 
-              name="city"
-              value={formData.city}
-              onChange={onInputChange}
-              className="rounded-md"
-              placeholder="Digite a cidade"
-              disabled={isSubmitting}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Estado"
-            validateStatus={formErrors.state ? 'error' : ''}
-            help={formErrors.state}
-          >
-            <Select 
-              value={formData.state}
-              onChange={handleSelectChange('state')}
-              className="rounded-md"
-              placeholder="Selecione o estado"
-              disabled={isSubmitting}
-            >
-              <Option value="AC">Acre</Option>
-              <Option value="AL">Alagoas</Option>
-              <Option value="AP">Amapá</Option>
-              <Option value="AM">Amazonas</Option>
-              <Option value="BA">Bahia</Option>
-              <Option value="CE">Ceará</Option>
-              <Option value="DF">Distrito Federal</Option>
-              <Option value="ES">Espírito Santo</Option>
-              <Option value="GO">Goiás</Option>
-              <Option value="MA">Maranhão</Option>
-              <Option value="MT">Mato Grosso</Option>
-              <Option value="MS">Mato Grosso do Sul</Option>
-              <Option value="MG">Minas Gerais</Option>
-              <Option value="PA">Pará</Option>
-              <Option value="PB">Paraíba</Option>
-              <Option value="PR">Paraná</Option>
-              <Option value="PE">Pernambuco</Option>
-              <Option value="PI">Piauí</Option>
-              <Option value="RJ">Rio de Janeiro</Option>
-              <Option value="RN">Rio Grande do Norte</Option>
-              <Option value="RS">Rio Grande do Sul</Option>
-              <Option value="RO">Rondônia</Option>
-              <Option value="RR">Roraima</Option>
-              <Option value="SC">Santa Catarina</Option>
-              <Option value="SP">São Paulo</Option>
-              <Option value="SE">Sergipe</Option>
-              <Option value="TO">Tocantins</Option>
-            </Select>
-          </Form.Item>
-        </Card>
-
-        {formErrors.submit && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4">
-            {formErrors.submit}
-          </div>
-        )}
-
-        {formErrors.clients && (
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-md mb-4">
-            {formErrors.clients}
-          </div>
-        )}
-
-        <Form.Item className="mb-0">
-          <Button 
-            type="primary" 
-            htmlType="submit" 
-            loading={isSubmitting}
-            className="btn-primary-sm"
+        <div className="mb-4">
+          <label htmlFor="name" className="block font-medium text-sm text-gray-700 mb-1">
+            Nome da Granja
+          </label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            value={formData.name}
+            onChange={onInputChange}
             disabled={isSubmitting}
+            placeholder="Digite o nome da granja"
+            className={`w-full px-3 py-2 border ${formErrors.name ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-lime-500 focus:outline-none`}
+          />
+          {formErrors.name && <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>}
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="clientId" className="block font-medium text-sm text-gray-700 mb-1">
+            Cliente
+          </label>
+          <select
+            id="clientId"
+            name="clientId"
+            value={formData.clientId}
+            onChange={(e) => handleSelectChange('clientId')(e.target.value)}
+            disabled={isSubmitting}
+            className={`w-full px-3 py-2 border ${formErrors.clientId ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-lime-500 focus:outline-none`}
           >
-            {isSubmitting ? 'Cadastrando...' : 'Cadastrar Granja'}
-          </Button>
-        </Form.Item>
-      </Form>
-    </Spin>
+            <option value="">Selecione o cliente</option>
+            {clients.map((client) => (
+              <option key={client.id} value={client.id}>
+                {client.name}
+              </option>
+            ))}
+          </select>
+          {formErrors.clientId && <p className="text-red-500 text-sm mt-1">{formErrors.clientId}</p>}
+        </div>
+      </div>
+
+      <div className="border border-gray-200 rounded-md p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Endereço</h2>
+
+        {[
+          { name: 'cep', label: 'CEP', maxLength: 8 },
+          { name: 'street', label: 'Rua' },
+          { name: 'number', label: 'Número' },
+          { name: 'neighborhood', label: 'Bairro' },
+          { name: 'city', label: 'Cidade' }
+        ].map(({ name, label, maxLength }) => (
+          <div key={name} className="mb-4">
+            <label htmlFor={name} className="block font-medium text-sm text-gray-700 mb-1">
+              {label}
+            </label>
+            <input
+              id={name}
+              name={name}
+              type="text"
+              maxLength={maxLength}
+              value={formData[name as keyof typeof formData] as string}
+              onChange={onInputChange}
+              disabled={isSubmitting}
+              placeholder={`Digite ${label.toLowerCase()}`}
+              className={`w-full px-3 py-2 border ${formErrors[name] ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-lime-500 focus:outline-none`}
+            />
+            {formErrors[name] && <p className="text-red-500 text-sm mt-1">{formErrors[name]}</p>}
+          </div>
+        ))}
+
+        <div className="mb-4">
+          <label htmlFor="state" className="block font-medium text-sm text-gray-700 mb-1">
+            Estado
+          </label>
+          <select
+            id="state"
+            name="state"
+            value={formData.state}
+            onChange={(e) => handleSelectChange('state')(e.target.value)}
+            disabled={isSubmitting}
+            className={`w-full px-3 py-2 border ${formErrors.state ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-lime-500 focus:outline-none`}
+          >
+            <option value="">Selecione o estado</option>
+            {[
+              'AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG',
+              'PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'
+            ].map((uf) => (
+              <option key={uf} value={uf}>{uf}</option>
+            ))}
+          </select>
+          {formErrors.state && <p className="text-red-500 text-sm mt-1">{formErrors.state}</p>}
+        </div>
+      </div>
+
+      {formErrors.submit && (
+        <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+          {formErrors.submit}
+        </div>
+      )}
+
+      {formErrors.clients && (
+        <div className="bg-yellow-100 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-md">
+          {formErrors.clients}
+        </div>
+      )}
+
+      <div>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full bg-lime-600 text-white py-2 px-4 rounded-md hover:bg-lime-700 transition disabled:opacity-50"
+        >
+          {isSubmitting ? 'Cadastrando...' : 'Cadastrar Granja'}
+        </button>
+      </div>
+    </form>
   );
 };

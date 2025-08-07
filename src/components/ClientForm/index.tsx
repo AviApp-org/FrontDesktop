@@ -1,9 +1,6 @@
 import React from 'react';
-import { Button, Form, Input, Select, Spin } from 'antd';
 import { ClientStatus } from '../../@types/enums/enumClientStatus';
 import { ClientFormProps } from './types';
-
-const { Option } = Select;
 
 export const ClientForm: React.FC<ClientFormProps> = ({
   formData,
@@ -12,114 +9,127 @@ export const ClientForm: React.FC<ClientFormProps> = ({
   onInputChange,
   onSubmit
 }) => {
-  const handleFinish = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     await onSubmit();
   };
 
   return (
-    <Spin spinning={isSubmitting}>
-      <Form
-        layout="vertical"
-        onFinish={handleFinish}
-        className="space-y-4"
-      >
-        <Form.Item 
-          label="Nome" 
-          validateStatus={formErrors.name ? 'error' : ''}
-          help={formErrors.name}
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Nome</label>
+        <input
+          name="name"
+          type="text"
+          value={formData.name}
+          onChange={onInputChange}
+          disabled={isSubmitting}
+          placeholder="Digite o nome do cliente"
+          className={`mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-1 ${
+            formErrors.name
+              ? 'border-red-500 focus:ring-red-500'
+              : 'border-gray-300 focus:ring-green-600'
+          }`}
+        />
+        {formErrors.name && <p className="mt-1 text-sm text-red-600">{formErrors.name}</p>}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">E-mail</label>
+        <input
+          name="email"
+          type="email"
+          value={formData.email}
+          onChange={onInputChange}
+          disabled={isSubmitting}
+          placeholder="Digite o e-mail do cliente"
+          className={`mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-1 ${
+            formErrors.email
+              ? 'border-red-500 focus:ring-red-500'
+              : 'border-gray-300 focus:ring-green-600'
+          }`}
+        />
+        {formErrors.email && <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">CNPJ</label>
+        <input
+          name="cnpj"
+          type="text"
+          maxLength={14}
+          value={formData.cnpj}
+          onChange={onInputChange}
+          disabled={isSubmitting}
+          placeholder="Digite apenas os números do CNPJ"
+          className={`mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-1 ${
+            formErrors.cnpj
+              ? 'border-red-500 focus:ring-red-500'
+              : 'border-gray-300 focus:ring-green-600'
+          }`}
+        />
+        {formErrors.cnpj && <p className="mt-1 text-sm text-red-600">{formErrors.cnpj}</p>}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Telefone</label>
+        <input
+          name="phone"
+          type="text"
+          value={formData.phone}
+          onChange={onInputChange}
+          disabled={isSubmitting}
+          placeholder="Digite o telefone do cliente"
+          className={`mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-1 ${
+            formErrors.phone
+              ? 'border-red-500 focus:ring-red-500'
+              : 'border-gray-300 focus:ring-green-600'
+          }`}
+        />
+        {formErrors.phone && <p className="mt-1 text-sm text-red-600">{formErrors.phone}</p>}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Status</label>
+        <select
+          name="status"
+          value={formData.status}
+          onChange={(e) =>
+            onInputChange({ target: { name: 'status', value: e.target.value } })
+          }
+          disabled={isSubmitting}
+          className={`mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-1 ${
+            formErrors.status
+              ? 'border-red-500 focus:ring-red-500'
+              : 'border-gray-300 focus:ring-green-600'
+          }`}
         >
-          <Input 
-            name="name"
-            value={formData.name}
-            onChange={onInputChange}
-            className="rounded-md"
-            placeholder="Digite o nome do cliente"
-            disabled={isSubmitting}
-          />
-        </Form.Item>
+          <option value="">Selecione o status</option>
+          <option value={ClientStatus.ACTIVE}>Ativo</option>
+          <option value={ClientStatus.INACTIVE}>Inativo</option>
+        </select>
+        {formErrors.status && <p className="mt-1 text-sm text-red-600">{formErrors.status}</p>}
+      </div>
 
-        <Form.Item 
-          label="E-mail"
-          validateStatus={formErrors.email ? 'error' : ''}
-          help={formErrors.email}
+      {formErrors.submit && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+          {formErrors.submit}
+        </div>
+      )}
+
+      <div>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className={`w-full rounded-md px-4 py-2 font-medium text-white shadow-sm transition ${
+            isSubmitting
+              ? 'bg-green-300 cursor-not-allowed'
+              : 'bg-green-600 hover:bg-green-700'
+          }`}
         >
-          <Input 
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={onInputChange}
-            className="rounded-md"
-            placeholder="Digite o e-mail do cliente"
-            disabled={isSubmitting}
-          />
-        </Form.Item>
-
-        <Form.Item 
-          label="CNPJ"
-          validateStatus={formErrors.cnpj ? 'error' : ''}
-          help={formErrors.cnpj}
-        >
-          <Input 
-            name="cnpj"
-            value={formData.cnpj}
-            onChange={onInputChange}
-            maxLength={14}
-            className="rounded-md"
-            placeholder="Digite apenas os números do CNPJ"
-            disabled={isSubmitting}
-          />
-        </Form.Item>
-
-        <Form.Item 
-          label="Telefone"
-          validateStatus={formErrors.phone ? 'error' : ''}
-          help={formErrors.phone}
-        >
-          <Input 
-            name="phone"
-            value={formData.phone}
-            onChange={onInputChange}
-            className="rounded-md"
-            placeholder="Digite o telefone do cliente"
-            disabled={isSubmitting}
-          />
-        </Form.Item>
-
-        <Form.Item 
-          label="Status"
-          validateStatus={formErrors.status ? 'error' : ''}
-          help={formErrors.status}
-        >
-          <Select 
-            value={formData.status}
-            onChange={(value) => onInputChange({ target: { name: 'status', value } })}
-            className="rounded-md"
-            placeholder="Selecione o status"
-            disabled={isSubmitting}
-          >
-            <Option value={ClientStatus.ACTIVE}>Ativo</Option>
-            <Option value={ClientStatus.INACTIVE}>Inativo</Option>
-          </Select>
-        </Form.Item>
-
-        {formErrors.submit && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4">
-            {formErrors.submit}
-          </div>
-        )}
-
-        <Form.Item className="mb-0">
-          <Button 
-            type="primary" 
-            htmlType="submit" 
-            loading={isSubmitting}
-            className="w-full rounded-md"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Cadastrando...' : 'Cadastrar Cliente'}
-          </Button>
-        </Form.Item>
-      </Form>
-    </Spin>
+          {isSubmitting ? 'Cadastrando...' : 'Cadastrar Cliente'}
+        </button>
+      </div>
+    </form>
   );
 };
