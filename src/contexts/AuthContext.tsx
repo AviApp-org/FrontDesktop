@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { API_URL } from '@/config/api';
 import axios from 'axios';
 
 
@@ -7,6 +6,8 @@ interface LoginCredentials {
     login: string;
     password: string;
 }
+
+const API_URL = 'http://localhost:8080/api'
 
 interface User {
     clientId: number;

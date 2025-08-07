@@ -72,10 +72,8 @@ function CollectsPage() {
             ) {
               console.log('Nova coleta recebida:', newCollect);
               setEggCollects(prev => {
-                // Adiciona a nova coleta no início do array
                 const newCollects = [newCollect, ...prev];
 
-                // Mantém a ordenação por data/hora (opcional)
                 return newCollects.sort((a, b) =>
                   new Date(b.collectionDate).getTime() - new Date(a.collectionDate).getTime()
                 );
