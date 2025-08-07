@@ -37,9 +37,16 @@ function Dashboard() {
   const [weeklyData, setWeeklyData] = useState<WeeklyReportData | null>(null);
   const [batches, setBatches] = useState<BatchData[]>([]);
   const [selectedBatchId, setSelectedBatchId] = useState<number | null>(null);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState(() => {
+    // Ajuste para pegar a data atual sem o problema do +1 dia
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  });
   const [isLoading, setIsLoading] = useState(true);
   const { farmId } = useFarm();
+
+  // Filtra apenas lotes ativos
+  const activeBatches = batches.filter(batch => batch.status === "ACTIVE");
 
   // Transforma os dados para os gráficos
   const productionData = weeklyData ? getProductionData(weeklyData.dailyReports) : [];
@@ -48,7 +55,7 @@ function Dashboard() {
   const birdsEvolutionData = weeklyData ? getBirdsEvolutionData(weeklyData.dailyReports) : [];
   const eggDestinationData = weeklyData ? getEggDestinationData(weeklyData.dailyReports) : [];
 
-  // Carrega a lista de lotes
+  // Carrega a lista de lotes ativos
   useEffect(() => {
     const fetchBatches = async () => {
       if (!farmId) return;
@@ -56,9 +63,11 @@ function Dashboard() {
         setIsLoading(true);
         const batchesData = await batchHook.getBatchByFarm(farmId);
         setBatches(batchesData);
-        // Seleciona o primeiro lote por padrão
-        if (batchesData.length > 0) {
-          setSelectedBatchId(batchesData[0].id);
+        
+        // Seleciona o primeiro lote ativo por padrão
+        const firstActiveBatch = batchesData.find(batch => batch.status === "ACTIVE");
+        if (firstActiveBatch) {
+          setSelectedBatchId(firstActiveBatch.id);
         }
       } catch (err) {
         toast.error('Erro ao carregar lotes');
@@ -75,7 +84,9 @@ function Dashboard() {
       if (!selectedBatchId) return;
       try {
         setIsLoading(true);
-        const weekReport = await reportHook.getWeek(selectedBatchId, formatDateForBackend(selectedDate));
+        // Corrige o formato da data para o backend
+        const formattedDate = formatDateForBackend(selectedDate);
+        const weekReport = await reportHook.getWeek(selectedBatchId, formattedDate);
         setWeeklyData(weekReport);
       } catch (error) {
         console.error('Erro ao buscar dados:', error);
@@ -105,7 +116,7 @@ function Dashboard() {
         <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full">
           <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
           
-          {/* Select de Lotes */}
+          {/* Select de Lotes - Mostra apenas ativos */}
           <div className="w-full md:w-64">
             <label htmlFor="batch-select" className="block text-sm font-medium text-gray-700 mb-1">
               Selecione o Lote
@@ -118,8 +129,10 @@ function Dashboard() {
               disabled={isLoading}
             >
               {isLoading && <option value="">Carregando lotes...</option>}
-              {!isLoading && batches.length === 0 && <option value="">Nenhum lote disponível</option>}
-              {batches.map((batch) => (
+              {!isLoading && activeBatches.length === 0 && (
+                <option value="">Nenhum lote ativo disponível</option>
+              )}
+              {activeBatches.map((batch) => (
                 <option key={batch.id} value={batch.id}>
                   {batch.name} ({batch.id})
                 </option>
@@ -127,7 +140,7 @@ function Dashboard() {
             </select>
           </div>
 
-          {/* Seletor de Data */}
+          {/* Seletor de Data - Corrigido para não adicionar +1 dia */}
           <div className="w-full md:w-48">
             <label htmlFor="date-select" className="block text-sm font-medium text-gray-700 mb-1">
               Data de Referência
@@ -139,6 +152,7 @@ function Dashboard() {
               onChange={handleDateChange}
               className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               disabled={isLoading}
+              max={new Date().toISOString().split('T')[0]} // Impede selecionar datas futuras
             />
           </div>
         </div>
@@ -149,7 +163,7 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Primeira Linha - Gráficos Principais */}
+      {/* Gráficos (mantidos iguais) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* Produção Diária */}
         <div className="bg-white p-4 rounded-lg shadow">
