@@ -23,5 +23,5 @@ export interface AviaryReportData {
   percentageByEggType: EggDetailPercentageData[];
   marketEggs: number;
   dumpEggs: number;
-  incubateEggs: number;
+  hatchableEggs: number;
 }

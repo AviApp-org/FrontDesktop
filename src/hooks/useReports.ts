@@ -121,6 +121,7 @@ export const useReports = () => {
         const endpoint = `/api/daily-report/${batchId}/${formattedDate}`;
 
         const response = await api.get(endpoint);
+        console.log(response)
 
         setReportData(response.data);
       } catch (err: any) {

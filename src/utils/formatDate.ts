@@ -13,7 +13,7 @@ export const formatDateForBackend = (dateString: string): string => {
 
   if (dateString.includes('-') && dateString.length === 10 && dateString.indexOf('-') === 4) {
     const [year, month, day] = dateString.split('-');
-    return `${day}/${month}/${year}`;
+    return `${day}-${month}-${year}`;
   }
 
   return dateString;
