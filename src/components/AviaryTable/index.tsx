@@ -1,7 +1,11 @@
-import React from 'react';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, Pencil, Trash2, Info } from 'lucide-react';
 import { AviaryTableProps } from './types';
 import { toast } from 'react-toastify';
+import eggCollectHook from '@/hooks/useEggCollect';
+import { CollectEggData } from '@/@types/CollectEggData';
+import { EggType } from '@/@types/enums/enumEggtype';
+
 
 export const AviaryTable: React.FC<AviaryTableProps> = ({
   batch,
@@ -11,6 +15,11 @@ export const AviaryTable: React.FC<AviaryTableProps> = ({
   onEditAviary,
   onDeleteAviary
 }) => {
+  const [selectedAviaryForCollects, setSelectedAviaryForCollects] = useState<number | null>(null);
+  const [collectsModalOpen, setCollectsModalOpen] = useState(false);
+  const [collectsData, setCollectsData] = useState<CollectEggData[]>([]);
+  const [isLoadingCollects, setIsLoadingCollects] = useState(false);
+
   const batchAviaries = aviariesData?.filter(aviary => String(aviary.batchId) === String(batch.id)) || [];
   const isBatchInactive = batch.status === 'INACTIVE';
 
@@ -22,8 +31,85 @@ export const AviaryTable: React.FC<AviaryTableProps> = ({
     onCreateAviary();
   };
 
+  const handleViewCollects = async (aviaryId: number) => {
+    setSelectedAviaryForCollects(aviaryId);
+    setIsLoadingCollects(true);
+    try {
+      const collects = await eggCollectHook.getByAviary(aviaryId);
+      setCollectsData(collects);
+      setCollectsModalOpen(true);
+    } catch (error) {
+      toast.error('Erro ao carregar coletas do aviário');
+    } finally {
+      setIsLoadingCollects(false);
+    }
+  };
+
   return (
     <div className="mt-4">
+      {collectsModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <div className="bg-gradient-to-r from-green-500 to-teal-500 p-4 flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-white flex items-center">
+                <Info className="mr-2 h-5 w-5" />
+                Coletas do Aviário
+              </h3>
+              <button
+                onClick={() => setCollectsModalOpen(false)}
+                className="text-white hover:text-gray-200"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+              {isLoadingCollects ? (
+                <div className="flex justify-center items-center py-10">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+                </div>
+              ) : collectsData.length === 0 ? (
+                <div className="text-center py-10 text-gray-500">
+                  Nenhuma coleta encontrada para este aviário
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {collectsData.slice().reverse().map((collect, index) => (
+                    <div key={index} className="p-4 rounded-xl border border-gray-200 hover:shadow-md transition">
+                      <div className="flex justify-between items-center mb-3">
+                        <div>
+                          <span className="font-medium text-gray-700">
+                            {new Date(collect.collectionDate).toLocaleDateString('pt-BR')}
+                          </span>
+                          <span className="text-gray-500 ml-2">
+                            {new Date(collect.collectionDate).toLocaleTimeString('pt-BR', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              hour12: false
+                            })}
+                          </span>
+                        </div>
+                        <div className="text-lg font-bold text-green-600">
+                          {collect.totalEggs} ovos
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                        {collect.eggDetails?.map((detail, idx) => (
+                          <div key={idx} className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <div className="text-sm text-gray-600">  {EggType[detail.type as unknown as keyof typeof EggType] ?? detail.type}</div>
+                            <div className="font-semibold text-gray-800">{detail.quantity}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="bg-white px-6 py-4 border-b border-gray-200 flex justify-between items-center">
           <h3 className="text-lg font-semibold text-gray-800">Aviários do Lote {batch.name}</h3>
@@ -75,7 +161,11 @@ export const AviaryTable: React.FC<AviaryTableProps> = ({
                     (aviary.currentAmountOfChickens ?? aviary.initialAmountOfChickens);
 
                   return (
-                    <tr key={aviary.id} className="hover:bg-gray-50 transition">
+                    <tr
+                      key={aviary.id}
+                      className="hover:bg-gray-50 transition cursor-pointer"
+                      onClick={() => handleViewCollects(aviary.id)}
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600">
