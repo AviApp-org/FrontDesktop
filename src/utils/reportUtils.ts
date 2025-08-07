@@ -1,4 +1,5 @@
 import { DailyReportData } from '@/@types/DailyReportData';
+import { EggType } from '@/@types/enums/enumEggtype';
 
 export const formatDateForAPI = (dateString: string): string => {
   if (!dateString) return '';
@@ -72,7 +73,7 @@ export const getEggDistributionData = (dailyReports: DailyReportData[]) => {
   
   const lastDay = dailyReports[dailyReports.length - 1];
   return lastDay.quantityByEggType.map(egg => ({
-    name: egg.type,
+    name: EggType[egg.type as unknown as keyof typeof EggType] || egg.type, // Usa a tradução ou mantém o original se não existir
     value: egg.quantity
   }));
 };
