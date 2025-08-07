@@ -42,9 +42,22 @@ export default function CollectsTemplate({
             <input
               type="date"
               value={currentDate}
-              onChange={(e) => onDateChange(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+
+                const isValidDate = /^(\d{4})-(\d{2})-(\d{2})$/.test(value);
+                if (!isValidDate) return;
+
+                const year = Number(value.split('-')[0]);
+                if (year < 1900 || year > 2100) return;
+
+                onDateChange(value);
+              }}
+              min="1900-01-01"
+              max="2100-12-31"
               className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
             />
+
           </div>
         </div>
 
