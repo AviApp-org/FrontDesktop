@@ -67,7 +67,6 @@ export const BatchTable: React.FC<BatchTableProps> = ({
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <button
-                            onClick={() => onToggleExpansion(String(batch.id))}
                             className="mr-3 text-gray-400 hover:text-gray-600 transition-colors"
                             aria-label="Toggle detalhes"
                           >
