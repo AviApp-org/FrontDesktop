@@ -114,7 +114,6 @@ function Dashboard() {
       {/* Cabeçalho com seletores */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full">
-          <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
           
           {/* Select de Lotes - Mostra apenas ativos */}
           <div className="w-full md:w-64">
