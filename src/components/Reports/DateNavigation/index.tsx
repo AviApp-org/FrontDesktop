@@ -1,6 +1,5 @@
 import React from 'react';
-import { Button } from 'antd';
-import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface DateNavigationProps {
   reportType: 'Diário' | 'Semanal' | 'Mensal';
@@ -42,22 +41,26 @@ export const DateNavigation: React.FC<DateNavigationProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
-      <div className="flex items-center justify-between">
+    <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6 shadow-sm">
+      <div className="flex items-center justify-between gap-4">
         {/* Botão Anterior */}
-        <Button
-          icon={<LeftOutlined />}
+        <button
           onClick={onPrevious}
           disabled={!canGoPrevious}
-          type="default"
+          className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md border transition-colors ${
+            canGoPrevious
+              ? 'border-gray-300 hover:bg-gray-50 text-gray-700'
+              : 'border-gray-200 text-gray-400 cursor-not-allowed'
+          }`}
         >
-          Dia Anterior
-        </Button>
+          <ChevronLeft className="h-4 w-4" />
+          <span>Dia Anterior</span>
+        </button>
 
         {/* Informações do dia atual */}
-        <div className="text-center">
+        <div className="text-center flex-1">
           <div className="text-lg font-semibold text-gray-800">
-            📅 {formatDateForDisplay(currentDate)}
+            <span role="img" aria-label="calendar">📅</span> {formatDateForDisplay(currentDate)}
           </div>
           <div className="text-sm text-gray-600">
             {getNavigationLabel()}
@@ -65,14 +68,18 @@ export const DateNavigation: React.FC<DateNavigationProps> = ({
         </div>
 
         {/* Botão Próximo */}
-        <Button
-          icon={<RightOutlined />}
+        <button
           onClick={onNext}
           disabled={!canGoNext}
-          type="default"
+          className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md border transition-colors ${
+            canGoNext
+              ? 'border-gray-300 hover:bg-gray-50 text-gray-700'
+              : 'border-gray-200 text-gray-400 cursor-not-allowed'
+          }`}
         >
-          Próximo Dia
-        </Button>
+          <span>Próximo Dia</span>
+          <ChevronRight className="h-4 w-4" />
+        </button>
       </div>
 
       {/* Barra de progresso visual */}
@@ -107,6 +114,7 @@ export const DateNavigation: React.FC<DateNavigationProps> = ({
                   : 'bg-gray-300 hover:bg-gray-400'
               }`}
               title={formatDateForDisplay(date)}
+              aria-label={`Ir para ${formatDateForDisplay(date)}`}
             />
           ))}
         </div>

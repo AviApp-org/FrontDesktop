@@ -1,10 +1,9 @@
 import React from 'react';
-import { Card, Button } from 'antd';
 import { formatDateForDisplay } from '../../../utils/reportUtils';
 import { EmptyStateNoDateProps } from './types';
 
 export const EmptyStateNoDate: React.FC<EmptyStateNoDateProps> = ({ reportType }) => (
-  <Card className="text-center py-12">
+  <div className="bg-white rounded-lg border border-gray-200 shadow-sm text-center py-12">
     <div className="text-6xl mb-4">📅</div>
     <h3 className="text-xl font-semibold text-gray-600 mb-2">
       Selecione uma data
@@ -12,7 +11,7 @@ export const EmptyStateNoDate: React.FC<EmptyStateNoDateProps> = ({ reportType }
     <p className="text-gray-500">
       Escolha uma data para visualizar o relatório {reportType.toLowerCase()}.
     </p>
-  </Card>
+  </div>
 );
 
 interface EmptyStateWaitingProps {
@@ -20,7 +19,7 @@ interface EmptyStateWaitingProps {
 }
 
 export const EmptyStateWaiting: React.FC<EmptyStateWaitingProps> = ({ selectedDate }) => (
-  <Card className="text-center py-12">
+  <div className="bg-white rounded-lg border border-gray-200 shadow-sm text-center py-12">
     <div className="text-6xl mb-4">⏳</div>
     <h3 className="text-xl font-semibold text-gray-600 mb-2">
       Clique em "Buscar Relatório"
@@ -28,7 +27,7 @@ export const EmptyStateWaiting: React.FC<EmptyStateWaitingProps> = ({ selectedDa
     <p className="text-gray-500">
       Data selecionada: {formatDateForDisplay(selectedDate)}
     </p>
-  </Card>
+  </div>
 );
 
 interface EmptyStateNoDataProps {
@@ -42,7 +41,7 @@ export const EmptyStateNoData: React.FC<EmptyStateNoDataProps> = ({
   batchId, 
   onRetry 
 }) => (
-  <Card className="text-center py-12">
+  <div className="bg-white rounded-lg border border-gray-200 shadow-sm text-center py-12">
     <div className="text-6xl mb-4">📊</div>
     <h3 className="text-xl font-semibold text-gray-600 mb-2">
       Nenhum dado encontrado
@@ -50,10 +49,13 @@ export const EmptyStateNoData: React.FC<EmptyStateNoDataProps> = ({
     <p className="text-gray-500 mb-4">
       Não foram encontrados dados para o lote {batchId} na data {formatDateForDisplay(selectedDate)}.
     </p>
-    <Button type="primary" onClick={onRetry}>
+    <button
+      onClick={onRetry}
+      className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+    >
       Tentar Novamente
-    </Button>
-  </Card>
+    </button>
+  </div>
 );
 
 interface EmptyStateNoAviariesProps {
@@ -67,7 +69,7 @@ export const EmptyStateNoAviaries: React.FC<EmptyStateNoAviariesProps> = ({
   totalEggs, 
   totalDeaths 
 }) => (
-  <Card className="text-center py-12">
+  <div className="bg-white rounded-lg border border-gray-200 shadow-sm text-center py-12">
     <div className="text-6xl mb-4">🏠</div>
     <h3 className="text-xl font-semibold text-gray-600 mb-2">
       Nenhum aviário encontrado
@@ -98,7 +100,7 @@ export const EmptyStateNoAviaries: React.FC<EmptyStateNoAviariesProps> = ({
         Não foram encontrados dados de aviários para esta consulta.
       </p>
     )}
-  </Card>
+  </div>
 );
 
 interface ErrorStateProps {
@@ -107,7 +109,7 @@ interface ErrorStateProps {
 }
 
 export const ErrorState: React.FC<ErrorStateProps> = ({ error, onRetry }) => (
-  <Card className="text-center py-12 border-red-200 bg-red-50">
+  <div className="bg-red-50 rounded-lg border border-red-200 shadow-sm text-center py-12">
     <div className="text-6xl mb-4">❌</div>
     <h3 className="text-xl font-semibold text-red-600 mb-2">
       Erro ao carregar relatório
@@ -115,10 +117,13 @@ export const ErrorState: React.FC<ErrorStateProps> = ({ error, onRetry }) => (
     <p className="text-red-500 mb-4 max-w-md mx-auto">
       {error}
     </p>
-    <Button type="primary" danger onClick={onRetry}>
+    <button
+      onClick={onRetry}
+      className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+    >
       Tentar Novamente
-    </Button>
-  </Card>
+    </button>
+  </div>
 );
 
 interface LoadingStateProps {
@@ -126,7 +131,7 @@ interface LoadingStateProps {
 }
 
 export const LoadingState: React.FC<LoadingStateProps> = ({ reportType }) => (
-  <Card className="text-center py-12">
+  <div className="bg-white rounded-lg border border-gray-200 shadow-sm text-center py-12">
     <div className="text-6xl mb-4">⏳</div>
     <h3 className="text-xl font-semibold text-gray-600 mb-2">
       Carregando relatório {reportType.toLowerCase()}...
@@ -134,6 +139,5 @@ export const LoadingState: React.FC<LoadingStateProps> = ({ reportType }) => (
     <p className="text-gray-500">
       Por favor, aguarde enquanto buscamos os dados.
     </p>
-  </Card>
+  </div>
 );
-

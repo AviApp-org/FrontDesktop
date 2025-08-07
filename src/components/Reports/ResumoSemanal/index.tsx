@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card, Row, Col, Statistic } from 'antd';
 
 interface ResumoSemanalProps {
   reportData: any;
@@ -26,64 +25,62 @@ export const ResumoSemanal: React.FC<ResumoSemanalProps> = ({
   };
 
   return (
-    <Card 
-      title={`📊 Resumo Geral da ${periodText} (${daysText})`}
-      className="mb-6 shadow-lg border-l-4 border-l-blue-500"
-    >
-      <Row gutter={[16, 16]} justify="center">
-        <Col xs={12} sm={6} md={6}>
-          <Card className="text-center bg-blue-50 border border-blue-200">
-            <Statistic
-              title="📈 % de Produção"
-              value={consolidatedData.averageProduction}
-              suffix="%"
-              precision={1}
-              valueStyle={{ color: '#1890ff', fontWeight: 'bold', fontSize: '1.5rem' }}
-            />
-          </Card>
-        </Col>
+    <div className="bg-white rounded-lg border border-gray-200 shadow-lg border-l-4 border-l-blue-500 p-6 mb-6">
+      <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+        <span className="mr-2">📊</span> Resumo Geral da {periodText} ({daysText})
+      </h3>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        {/* Produção */}
+        <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="text-sm text-gray-600 flex items-center justify-center mb-2">
+            <span className="mr-1">📈</span> % de Produção
+          </div>
+          <div className="text-2xl font-bold text-blue-600">
+            {consolidatedData.averageProduction.toFixed(1)}%
+          </div>
+        </div>
 
-        <Col xs={12} sm={6} md={6}>
-          <Card className="text-center bg-blue-50 border border-blue-200">
-            <Statistic
-              title="💀 % de Mortalidade"
-              value={consolidatedData.averageMortality}
-              suffix="%"
-              precision={2}
-              valueStyle={{ color: '#1890ff', fontWeight: 'bold', fontSize: '1.5rem' }}
-            />
-          </Card>
-        </Col>
+        {/* Mortalidade */}
+        <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="text-sm text-gray-600 flex items-center justify-center mb-2">
+            <span className="mr-1">💀</span> % de Mortalidade
+          </div>
+          <div className="text-2xl font-bold text-blue-600">
+            {consolidatedData.averageMortality.toFixed(2)}%
+          </div>
+        </div>
 
-        <Col xs={12} sm={6} md={6}>
-          <Card className="text-center bg-blue-50 border border-blue-200">
-            <Statistic
-              title="⚖️ Relação Macho e Fêmea"
-              value={consolidatedData.maleFemaleProportion}
-              precision={2}
-              valueStyle={{ color: '#1890ff', fontWeight: 'bold', fontSize: '1.5rem' }}
-            />
-          </Card>
-        </Col>
+        {/* Relação Macho/Fêmea */}
+        <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="text-sm text-gray-600 flex items-center justify-center mb-2">
+            <span className="mr-1">⚖️</span> Relação Macho e Fêmea
+          </div>
+          <div className="text-2xl font-bold text-blue-600">
+            {consolidatedData.maleFemaleProportion.toFixed(2)}
+          </div>
+        </div>
 
-        <Col xs={12} sm={6} md={6}>
-          <Card className="text-center bg-blue-50 border border-blue-200">
-            <Statistic
-              title="🥚 Total de Ovos"
-              value={consolidatedData.totalEggs}
-              valueStyle={{ color: '#1890ff', fontWeight: 'bold', fontSize: '1.5rem' }}
-            />
-          </Card>
-        </Col>
-      </Row>
-
-      <div className="mt-4 p-3 bg-blue-50 rounded border border-blue-200">
-        <div className="text-sm text-blue-700 text-center">
-          📊 Resumo consolidado da {periodText.toLowerCase()} • 
-          Dia {currentDateIndex + 1} de {totalDays} • 
-          Use as setas para navegar entre os dias
+        {/* Total de Ovos */}
+        <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="text-sm text-gray-600 flex items-center justify-center mb-2">
+            <span className="mr-1">🥚</span> Total de Ovos
+          </div>
+          <div className="text-2xl font-bold text-blue-600">
+            {consolidatedData.totalEggs.toLocaleString()}
+          </div>
         </div>
       </div>
-    </Card>
+
+      <div className="mt-4 p-3 bg-blue-50 rounded border border-blue-200">
+        <div className="text-sm text-blue-700 text-center flex flex-wrap justify-center items-center gap-1">
+          <span>📊 Resumo consolidado da {periodText.toLowerCase()}</span>
+          <span>•</span>
+          <span>Dia {currentDateIndex + 1} de {totalDays}</span>
+          <span>•</span>
+          <span>Use as setas para navegar entre os dias</span>
+        </div>
+      </div>
+    </div>
   );
 };
