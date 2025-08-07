@@ -5,7 +5,7 @@ import { BatchTableProps } from './types';
 import { toast } from 'react-toastify';
 
 const translateStatus = (status: string) => {
-  const translations = { ACTIVE: 'ATIVO', INACTIVE: 'INATIVO', COMPLETED: 'CONCLUÍDO' };
+  const translations = { ACTIVE: 'ATIVO', INACTIVE: 'INATIVO' };
   return translations[status as keyof typeof translations] || status;
 };
 
@@ -77,11 +77,15 @@ export const BatchTable: React.FC<BatchTableProps> = ({
                             )}
                           </button>
                           <div className="flex items-center">
-                            <div className="flex-shrink-0 h-10 w-10 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                            <div
+                              className={`flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center 
+                               ${batch.status === 'INACTIVE' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}
+                            >
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                               </svg>
                             </div>
+
                             <div className="ml-4">
                               <div className="text-sm font-medium text-gray-900">{batch.name}</div>
                               <div className="text-xs text-gray-500">Lote</div>
@@ -110,9 +114,8 @@ export const BatchTable: React.FC<BatchTableProps> = ({
                               }
                               onEdit(batch);
                             }}
-                            className={`flex items-center gap-1 ${
-                              isEditDisabled ? 'text-gray-400 cursor-not-allowed' : 'text-blue-600 hover:text-blue-800'
-                            }`}
+                            className={`flex items-center gap-1 ${isEditDisabled ? 'text-gray-400 cursor-not-allowed' : 'text-blue-600 hover:text-blue-800'
+                              }`}
                             disabled={isEditDisabled}
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -123,11 +126,10 @@ export const BatchTable: React.FC<BatchTableProps> = ({
 
                           <button
                             onClick={() => onAction(batch.status === 'ACTIVE' ? 'deactivate' : 'activate', String(batch.id))}
-                            className={`flex items-center gap-1 ${
-                              batch.status === 'ACTIVE'
-                                ? 'text-red-600 hover:text-red-800'
-                                : 'text-green-600 hover:text-green-800'
-                            }`}
+                            className={`flex items-center gap-1 ${batch.status === 'ACTIVE'
+                              ? 'text-red-600 hover:text-red-800'
+                              : 'text-green-600 hover:text-green-800'
+                              }`}
                             disabled={isActivating || isDeactivating || isSubmitting}
                           >
                             {batch.status === 'ACTIVE' ? (
