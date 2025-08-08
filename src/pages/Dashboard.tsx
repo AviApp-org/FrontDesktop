@@ -23,13 +23,14 @@ import reportHook from '@/hooks/useReport';
 import { WeeklyReportData } from '@/@types/WeeklyReportData';
 import { BatchData } from '@/@types/BatchData';
 import { formatDateForBackend } from '@/utils/formatDate';
-import { 
-  getBirdsEvolutionData, 
-  getEggDestinationData, 
-  getEggDistributionData, 
-  getMortalityData, 
-  getProductionData 
+import {
+  getBirdsEvolutionData,
+  getEggDestinationData,
+  getEggDistributionData,
+  getMortalityData,
+  getProductionData
 } from '@/utils/reportUtils';
+import { Skeleton } from '@/components/Skeleton';
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#00C49F', '#FF6B6B'];
 
@@ -45,10 +46,8 @@ function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const { farmId } = useFarm();
 
-  // Filtra apenas lotes ativos
   const activeBatches = batches.filter(batch => batch.status === "ACTIVE");
 
-  // Transforma os dados para os gráficos
   const productionData = weeklyData ? getProductionData(weeklyData.dailyReports) : [];
   const mortalityData = weeklyData ? getMortalityData(weeklyData.dailyReports) : [];
   const eggDistributionData = weeklyData ? getEggDistributionData(weeklyData.dailyReports) : [];
@@ -63,7 +62,7 @@ function Dashboard() {
         setIsLoading(true);
         const batchesData = await batchHook.getBatchByFarm(farmId);
         setBatches(batchesData);
-        
+
         // Seleciona o primeiro lote ativo por padrão
         const firstActiveBatch = batchesData.find(batch => batch.status === "ACTIVE");
         if (firstActiveBatch) {
@@ -106,15 +105,42 @@ function Dashboard() {
     setSelectedDate(e.target.value);
   };
 
-  if (isLoading) return <div className="flex justify-center items-center h-screen">Carregando dados...</div>;
-  if (!weeklyData) return <div className="flex justify-center items-center h-screen">Nenhum dado disponível</div>;
+  if (isLoading || !weeklyData) {
+    return (
+      <div className="p-4 space-y-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <Skeleton className="h-10 w-64" />
+          <Skeleton className="h-10 w-48" />
+          <Skeleton className="h-10 w-60" />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Skeleton className="h-[250px] w-full" />
+          <Skeleton className="h-[250px] w-full" />
+          <Skeleton className="h-[250px] w-full" />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Skeleton className="h-[250px] w-full" />
+          <Skeleton className="h-[250px] w-full" />
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-24 w-full" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4">
       {/* Cabeçalho com seletores */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full">
-          
+
           {/* Select de Lotes - Mostra apenas ativos */}
           <div className="w-full md:w-64">
             <label htmlFor="batch-select" className="block text-sm font-medium text-gray-700 mb-1">
@@ -282,7 +308,7 @@ function Dashboard() {
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-sm font-medium text-gray-500">Produção Média</h3>
           <p className="text-2xl font-bold">
-            {weeklyData.dailyReports.length > 0 
+            {weeklyData.dailyReports.length > 0
               ? (weeklyData.dailyReports.reduce((sum, report) => sum + report.production, 0) / weeklyData.dailyReports.length).toFixed(1) + '%'
               : '0%'}
           </p>
@@ -290,7 +316,7 @@ function Dashboard() {
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-sm font-medium text-gray-500">Mortalidade Média</h3>
           <p className="text-2xl font-bold">
-            {weeklyData.dailyReports.length > 0 
+            {weeklyData.dailyReports.length > 0
               ? (weeklyData.dailyReports.reduce((sum, report) => sum + report.mortality, 0) / weeklyData.dailyReports.length).toFixed(1) + '%'
               : '0%'}
           </p>

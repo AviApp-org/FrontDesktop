@@ -14,6 +14,7 @@ import SockJS from 'sockjs-client';
 import { CollectChickenData } from '@/@types/CollectChickenData';
 import chickenCollectHook from '@/hooks/useChickenCollect';
 import aviaryHook from '@/hooks/useAviary';
+import { API_URL } from '@/constants';
 
 
 function CollectsPage() {
@@ -52,7 +53,7 @@ function CollectsPage() {
   }, [farmId]);
 
   useEffect(() => {
-    const socket = new SockJS(`http://localhost:8080/ws-collect`);
+    const socket = new SockJS(`${API_URL}/ws-collect`);
     const stompClient = new Client({
       webSocketFactory: () => socket,
       debug: (str) => console.log('[STOMP]', str),
