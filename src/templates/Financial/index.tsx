@@ -1,8 +1,11 @@
 import { Info } from 'lucide-react';
+import { BatchData } from '@/@types/BatchData';
+import React, { useState } from 'react';
 
 interface FinancialTemplateProps {
-  batchId: number;
-  setBatchId: (id: number) => void;
+  batches: BatchData[];
+  selectedBatch: BatchData | null;
+  setSelectedBatch: (batch: BatchData | null) => void;
   date: string;
   setDate: (date: string) => void;
   weekStart: string;
@@ -20,8 +23,9 @@ interface FinancialTemplateProps {
 }
 
 export default function FinancialTemplate({
-  batchId,
-  setBatchId,
+  batches,
+  selectedBatch,
+  setSelectedBatch,
   date,
   setDate,
   weekStart,
@@ -37,21 +41,44 @@ export default function FinancialTemplate({
   onFetchWeekly,
   onFetchMonthly,
 }: FinancialTemplateProps) {
+  // Estados locais para mês e ano
+  const currentYear = new Date().getFullYear();
+  const [selectedMonth, setSelectedMonth] = useState(monthYear.split('-')[1] || '');
+  const [selectedYear, setSelectedYear] = useState(monthYear.split('-')[0] || String(currentYear));
+
+  // Atualiza o estado global monthYear ao trocar mês ou ano
+  const handleMonthChange = (month: string) => {
+    setSelectedMonth(month);
+    if (selectedYear && month) setMonthYear(`${selectedYear}-${month}`);
+  };
+
+  const handleYearChange = (year: string) => {
+    setSelectedYear(year);
+    if (year && selectedMonth) setMonthYear(`${year}-${selectedMonth}`);
+  };
+
   return (
-    <div className="mx-auto p-4 max-w-2xl">
+    <div className="mx-auto p-4">
       <div className="bg-white rounded-2xl p-6 mb-8 shadow">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Relatório Financeiro</h2>
         <div className="grid grid-cols-1 gap-6 mb-6">
           <div>
-            <label className="block text-gray-700 font-medium mb-2">ID do Lote</label>
-            <input
-              type="number"
-              value={batchId}
-              onChange={e => setBatchId(Number(e.target.value))}
+            <label className="block text-gray-700 font-medium mb-2">Selecione um Lote</label>
+            <select
+              value={selectedBatch?.id?.toString() || ''}
+              onChange={e => {
+                const batch = batches.find(b => b.id === parseInt(e.target.value)) || null;
+                setSelectedBatch(batch);
+              }}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
-              placeholder="Digite o ID do lote"
-              min={1}
-            />
+              disabled={loading || batches.length === 0}
+            >
+              <option value="">Selecione um lote</option>
+              {batches.map(batch => (
+                <option key={batch.id} value={batch.id}>
+                  {batch.name}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-gray-700 font-medium mb-2">Valor Unitário do Ovo (R$)</label>
@@ -63,6 +90,7 @@ export default function FinancialTemplate({
               placeholder="Digite o valor do ovo"
               min={0}
               step="0.01"
+              disabled={loading}
             />
             <button
               onClick={onSaveEggValue}
@@ -81,10 +109,11 @@ export default function FinancialTemplate({
               value={date}
               onChange={e => setDate(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              disabled={loading}
             />
             <button
               onClick={onFetchDaily}
-              disabled={loading || !date || !batchId}
+              disabled={loading || !date || !selectedBatch}
               className="mt-2 w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-xl transition disabled:opacity-50"
             >
               Buscar Diário
@@ -97,10 +126,11 @@ export default function FinancialTemplate({
               value={weekStart}
               onChange={e => setWeekStart(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              disabled={loading}
             />
             <button
               onClick={onFetchWeekly}
-              disabled={loading || !weekStart || !batchId}
+              disabled={loading || !weekStart || !selectedBatch}
               className="mt-2 w-full bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-4 rounded-xl transition disabled:opacity-50"
             >
               Buscar Semanal
@@ -108,15 +138,35 @@ export default function FinancialTemplate({
           </div>
           <div>
             <label className="block text-gray-700 font-medium mb-2">Mês/Ano (Mensal)</label>
-            <input
-              type="month"
-              value={monthYear}
-              onChange={e => setMonthYear(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
+            <div className="flex gap-2">
+              <select
+                value={selectedMonth}
+                onChange={e => handleMonthChange(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-md"
+                disabled={loading}
+              >
+                <option value="">Mês</option>
+                {Array.from({ length: 12 }, (_, i) => {
+                  const month = String(i + 1).padStart(2, '0');
+                  return <option key={month} value={month}>{month}</option>;
+                })}
+              </select>
+              <select
+                value={selectedYear}
+                onChange={e => handleYearChange(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-md"
+                disabled={loading}
+              >
+                <option value="">Ano</option>
+                {Array.from({ length: 10 }, (_, i) => {
+                  const year = currentYear - i;
+                  return <option key={year} value={year}>{year}</option>;
+                })}
+              </select>
+            </div>
             <button
               onClick={onFetchMonthly}
-              disabled={loading || !monthYear || !batchId}
+              disabled={loading || !monthYear || !selectedBatch}
               className="mt-2 w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-xl transition disabled:opacity-50"
             >
               Buscar Mensal

@@ -1,86 +1,64 @@
-import { useState } from 'react';
-import axios from '../config/axios';
 import api from '../config/axios';
 
-interface FinancialDetails {
-  hatchableTotal: number;
-  marketTotal: number;
-  total: number;
+export interface EggValueData {
+  egg: string;
+  value: number;
+  batchId: number;
+  id?: number;
+  timeStamp?: string;
 }
 
-export const useFinancial = () => {
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<FinancialDetails | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  // Salvar valor do ovo
-  const saveEggValue = async (eggValue: number) => {
-    setLoading(true);
-    setError(null);
+const financialHook = {
+  saveEggValue: async (eggValue: EggValueData) => {
     try {
-      await api.post('/egg-value', { value: eggValue });
-      return true;
-    } catch (err) {
-      setError('Erro ao salvar valor do ovo!');
-      return false;
-    } finally {   
-      setLoading(false);
+      const response = await api.post('/api/egg-value', eggValue);
+      return response.data;
+    } catch (e) {
+      console.error('Erro ao salvar valor do ovo:', e);
+      throw new Error('Erro ao salvar valor do ovo!');
     }
-  };
+  },
 
-  // Buscar relatório diário
-  const fetchDaily = async (batchId: number, date: string) => {
-    setLoading(true);
-    setError(null);
+  getDailyFinancial: async (batchId: number, date: string) => {
     try {
-      const res = await api.get(`/financial-details/${batchId}/${date}`);
-      setData(res.data);
-    } catch (err) {
-      setError('Erro ao buscar relatório diário!');
-      setData(null);
-    } finally {
-      setLoading(false);
+      const response = await api.get(`/api/financial-details/${batchId}/${date}`);
+      return response.data;
+    } catch (e) {
+      console.error('Erro ao buscar relatório diário:', e);
+      throw new Error('Erro ao buscar relatório diário!');
     }
-  };
+  },
 
-  // Buscar relatório semanal
-  const fetchWeekly = async (batchId: number, startDate: string) => {
-    setLoading(true);
-    setError(null);
+  getWeeklyFinancial: async (batchId: number, startDate: string) => {
     try {
-      const res = await api.get(`/financial-details/${batchId}/weekly/${startDate}`);
-      setData(res.data);
-    } catch (err) {
-      setError('Erro ao buscar relatório semanal!');
-      setData(null);
-    } finally {
-      setLoading(false);
+      const response = await api.get(`/api/financial-details/${batchId}/weekly/${startDate}`);
+      return response.data;
+    } catch (e) {
+      console.error('Erro ao buscar relatório semanal:', e);
+      throw new Error('Erro ao buscar relatório semanal!');
     }
-  };
+  },
 
-  // Buscar relatório mensal
-  const fetchMonthly = async (batchId: number, yearMonth: string) => {
-    setLoading(true);
-    setError(null);
+  getMonthlyFinancial: async (batchId: number, yearMonth: string) => {
     try {
-      const res = await api.get(`/financial-details/${batchId}/monthly/${yearMonth}`);
-      setData(res.data);
-    } catch (err) {
-      setError('Erro ao buscar relatório mensal!');
-      setData(null);
-    } finally {
-      setLoading(false);
+      const response = await api.get(`/api/financial-details/${batchId}/monthly/${yearMonth}`);
+      return response.data;
+    } catch (e) {
+      console.error('Erro ao buscar relatório mensal:', e);
+      throw new Error('Erro ao buscar relatório mensal!');
     }
-  };
+  },
 
-  return {
-    loading,
-    data,
-    error,
-    saveEggValue,
-    fetchDaily,
-    fetchWeekly,
-    fetchMonthly,
-    setData,
-  };
+getLastEggValue: async (batchId: number) => {
+  try {
+    const response = await api.get(`/api/egg-value/last/batch/${batchId}`);
+    return response.data as EggValueData;
+  } catch (e) {
+    console.error('Erro ao buscar último valor do ovo:', e);
+    throw new Error('Erro ao buscar último valor do ovo!');
+  }
+},
+
 };
+
+export default financialHook;
